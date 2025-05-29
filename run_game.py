@@ -124,6 +124,9 @@ class Game:
         
         self.player = Player(self)
         self.camera_x = 0
+        self.enemies = pygame.sprite.Group()
+        enemy = Enemy(self)
+        self.enemies.add(enemy)
 
     def update_dimensions(self):
         # Update screen and ground dimensions based on current window size
@@ -158,6 +161,14 @@ class Game:
     def update(self):
         self.player.update(self.platforms)
         self.update_camera()
+        for enemy in self.enemies:
+            enemy.update()
+        # Remove dead enemies and spawn new ones
+        for enemy in self.enemies:
+            if enemy.rect.x <= 0 + self.camera_x or enemy.health <= 0 or self.isGameover == True:
+                enemy.kill()
+                new_enemy = Enemy(self)
+                self.enemies.add(new_enemy)
     
     def draw(self):
         self.screen.fill((135, 206, 235))  # Sky blue background
@@ -179,6 +190,13 @@ class Game:
                                    self.player.rect.y, 
                                    self.player.rect.width, 
                                    self.player.rect.height))
+        # Draw enemies
+        for enemy in self.enemies:
+            pygame.draw.rect(self.screen, enemy.color,
+                             pygame.Rect(enemy.rect.x - self.camera_x, 
+                                        enemy.rect.y, 
+                                        enemy.rect.width, 
+                                        enemy.rect.height))
 
 if __name__ == "__main__":
     game = Game()
