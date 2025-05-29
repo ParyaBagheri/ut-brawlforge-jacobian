@@ -7,7 +7,9 @@ MOVE_SPEED = 5
 BASE_GROUND_HEIGHT = 100
 BASE_SCREEN_WIDTH = 800
 BASE_SCREEN_HEIGHT = 600
-
+MAX_ENEMY_HEALTH = 1
+INITIAL_ENEMY_SPEED = 5
+MAX_PLAYER_HEALTH = 3
 class Platform:
     def __init__(self, x, y, width, height, color=(139, 69, 19), is_solid=True):
         self.rect = pygame.Rect(x, y, width, height)
@@ -86,7 +88,19 @@ class Player:
         if (keys[pygame.K_UP] or keys[pygame.K_SPACE]) and self.on_ground:
             self.velocity_y = JUMP_VELOCITY
             self.on_ground = False
-
+class Enemy(pygame.sprite.Sprite):
+    def __init__(self, game):
+        pygame.sprite.Sprite.__init__(self)
+        self.game = game
+        self.rect = pygame.Rect(self.game.screen_width + self.game.camera_x , 450, 50, 50)
+        self.velocity_y = 0
+        self.on_ground = False
+        self.color = (60, 77, 217) 
+        self.health = MAX_ENEMY_HEALTH
+        self.velocity_x = -1*(INITIAL_ENEMY_SPEED)
+        self.is_collided = False
+    def update(self):
+        self.rect.x += self.velocity_x
 class Game:
     def __init__(self):
         pygame.init()
