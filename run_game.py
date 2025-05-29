@@ -11,6 +11,11 @@ MAX_ENEMY_HEALTH = 1
 INITIAL_ENEMY_SPEED = 5
 MAX_PLAYER_HEALTH = 3
 
+pygame.font.init()
+font = pygame.font.SysFont('Arial',  32, True, False)
+heartfont = pygame.font.SysFont('Segoe UI Symbol', 40)
+gameoverfont = pygame.font.SysFont('OCR A Extended', 72)
+
 class Platform:
     def __init__(self, x, y, width, height, color=(139, 69, 19), is_solid=True):
         self.rect = pygame.Rect(x, y, width, height)
@@ -30,7 +35,8 @@ class Player:
         self.velocity_y = 0
         self.on_ground = False
         self.color = (255, 0, 0)  # Player color (red)
-    
+        self.health = MAX_PLAYER_HEALTH
+
     def check_collision(self, platforms):
         # Check vertical collision (falling)
         if self.velocity_y > 0:
@@ -102,6 +108,10 @@ class Player:
         # Check collisions
         self.check_collision(platforms)
         self.check_enemy_collision(enemies)
+
+        # Game over when player dies
+        if self.health <= 0:
+            game.gameover()
             
         # Jumping (only if on ground)
         if (keys[pygame.K_UP] or keys[pygame.K_SPACE]) and self.on_ground:
@@ -146,6 +156,8 @@ class Game:
         enemy = Enemy(self)
         self.enemies.add(enemy)
 
+        self.isGameover = False
+
     def update_dimensions(self):
         # Update screen and ground dimensions based on current window size
         self.screen_width = self.screen.get_width()
@@ -175,18 +187,25 @@ class Game:
                 # Resize window and update dimensions
                 self.screen = pygame.display.set_mode((event.w, event.h), pygame.RESIZABLE)
                 self.update_dimensions()
+            # Restart after game over
+            elif self.isGameover == True and event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                self.player
+                self.player.health = MAX_PLAYER_HEALTH
+                self.player.color = (255, 0, 0)
+                self.isGameover = False
     
     def update(self):
-        self.player.update(self.platforms, self.enemies)
-        self.update_camera()
-        for enemy in self.enemies:
-            enemy.update()
-        # Remove dead enemies and spawn new ones
-        for enemy in self.enemies:
-            if enemy.rect.x <= 0 + self.camera_x or enemy.health <= 0 or self.isGameover == True:
-                enemy.kill()
-                new_enemy = Enemy(self)
-                self.enemies.add(new_enemy)
+        if self.isGameover == False:
+            self.player.update(self.platforms, self.enemies)
+            self.update_camera()
+            for enemy in self.enemies:
+                enemy.update()
+            # Remove dead enemies and spawn new ones
+            for enemy in self.enemies:
+                if enemy.rect.x <= 0 + self.camera_x or enemy.health <= 0 or self.isGameover == True:
+                    enemy.kill()
+                    new_enemy = Enemy(self)
+                    self.enemies.add(new_enemy)
     
     def draw(self):
         self.screen.fill((135, 206, 235))  # Sky blue background
@@ -208,6 +227,7 @@ class Game:
                                    self.player.rect.y, 
                                    self.player.rect.width, 
                                    self.player.rect.height))
+        
         # Draw enemies
         for enemy in self.enemies:
             pygame.draw.rect(self.screen, enemy.color,
@@ -215,6 +235,25 @@ class Game:
                                         enemy.rect.y, 
                                         enemy.rect.width, 
                                         enemy.rect.height))
+            
+        # Show health
+        health_display = font.render("Health: " + str(self.player.health), True, 'white')
+        self.screen.blit(health_display, (20,20))
+        heart = heartfont.render("♥", True, "red")
+        if self.player.health >= 0:
+            for i in range(0,self.player.health):
+                self.screen.blit(heart, (40 + 30*i , 40))
+        # Show game over
+        if self.isGameover == True:
+            gameover_message = gameoverfont.render("GAME OVER!", True, 'black')
+            text_rect = gameover_message.get_rect()
+            text_rect.center = (self.screen_width //2, self.screen_height//2)
+            self.screen.blit(gameover_message, text_rect)
+
+    def gameover(self):
+        self.isGameover = True
+        self.player.color = (0, 0, 0)
+        self.player.rect.x = 100
 
 if __name__ == "__main__":
     game = Game()
