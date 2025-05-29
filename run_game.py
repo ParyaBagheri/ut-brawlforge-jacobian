@@ -69,7 +69,24 @@ class Player:
         self.on_ground = False
         return None
     
-    def update(self, platforms):
+    def check_enemy_collision(self,enemies):
+        for enemy in enemies:
+            if isinstance(enemy, Enemy):
+                if self.rect.colliderect(enemy.rect):
+                    #stomp enemy to kill it;  other collisions reduce player's health
+                    if(self.velocity_y > 0 and
+                        self.rect.bottom > enemy.rect.top and
+                        self.rect.top < enemy.rect.top):
+                        enemy.health -= 1
+                        self.velocity_y = JUMP_VELOCITY * 0.5
+                    else :
+                        self.health -= 1
+                        if self.health > 0:
+                            self.rect.y -= 30
+                        enemy.is_collided = True
+                        return enemy
+    
+    def update(self, platforms, enemies):
         keys = pygame.key.get_pressed()
         
         # Horizontal movement
@@ -84,6 +101,7 @@ class Player:
         
         # Check collisions
         self.check_collision(platforms)
+        self.check_enemy_collision(enemies)
             
         # Jumping (only if on ground)
         if (keys[pygame.K_UP] or keys[pygame.K_SPACE]) and self.on_ground:
@@ -159,7 +177,7 @@ class Game:
                 self.update_dimensions()
     
     def update(self):
-        self.player.update(self.platforms)
+        self.player.update(self.platforms, self.enemies)
         self.update_camera()
         for enemy in self.enemies:
             enemy.update()
