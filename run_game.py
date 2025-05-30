@@ -53,8 +53,27 @@ class Player:
         self.direction = "right" # Track facing direction ( default : right- facing )
 
     def check_collision(self, platforms):
+        '''#check horizontal collisions
+        if self.direction == "right" :
+            for platform in platforms :
+                if isinstance(platform, Platform) :
+                    if (self.rect.right >= platform.rect.left and
+                    self.rect.right < platform.rect.right and
+                    self.rect.top < platform.rect.bottom and
+                    self.rect.bottom > platform.rect.top ) :
+                        self.rect.right == platform.rect.left
+
+        if self.direction == "left" :
+            for platform in platforms :
+                if isinstance(platform, Platform) :
+                    if (self.rect.left <= platform.rect.right and
+                    self.rect.left > platform.rect.left and
+                    self.rect.top < platform.rect.bottom and
+                    self.rect.bottom > platform.rect.top ) :
+                        self.rect.left == platform.rect.right'''
+
         # Check vertical collision (falling)
-        if self.velocity_y > 0:
+        if self.velocity_y > 0 :
             for platform in platforms:
                 if isinstance(platform, Platform):
                     if (self.rect.bottom + self.velocity_y > platform.rect.top and
@@ -275,6 +294,7 @@ class Game:
             Platform(600, 350, 150, 20),
             Platform(900, 300, 100, 20),
             Platform(1200, 400, 200, 20),
+            Platform(1400, 420,200, 20),
             self.ground_rect
         ]
 
