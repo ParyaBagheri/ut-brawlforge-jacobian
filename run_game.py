@@ -48,6 +48,10 @@ class Player:
         self.color = (255, 0, 0)  # Player color (red)
         self.health = MAX_PLAYER_HEALTH
 
+        self.held_bullet = Bullet(self) # Create a bullet that follows the player (not fired yet)
+
+        self.direction = "right" # Track facing direction ( default : right- facing )
+
     def check_collision(self, platforms):
         # Check vertical collision (falling)
         if self.velocity_y > 0:
@@ -107,10 +111,13 @@ class Player:
         keys = pygame.key.get_pressed()
         
         # Horizontal movement
-        if keys[pygame.K_LEFT]:
+        if keys[pygame.K_a]:
             self.rect.x -= MOVE_SPEED
-        if keys[pygame.K_RIGHT]:
+            self.direction = "left" # Update facing direction
+
+        if keys[pygame.K_d]:
             self.rect.x += MOVE_SPEED
+            self.direction = "right" # Update facing direction
             
         # Apply gravity
         self.velocity_y += GRAVITY
@@ -128,7 +135,17 @@ class Player:
         if (keys[pygame.K_UP] or keys[pygame.K_SPACE]) and self.on_ground:
             self.velocity_y = JUMP_VELOCITY
             self.on_ground = False
+        
+        # Update held bullet (follows player if not fired)
+        self.held_bullet.update()
+        
+    def shoot (self) :
 
+        # Trigger the held bullet to be fired
+        self.held_bullet.fire()
+
+        # Create a new bullet that will follow the player (for next shot)
+        self.held_bullet = Bullet (self)
 class Bullet :
 
     def __init__(self, player) :
