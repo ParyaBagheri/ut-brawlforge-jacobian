@@ -138,7 +138,7 @@ class Player:
         
         # Update held bullet (follows player if not fired)
         self.held_bullet.update()
-        
+
     def shoot (self) :
 
         # Trigger the held bullet to be fired
@@ -165,8 +165,6 @@ class Bullet :
         self.rect = pygame.Rect(self.player.rect.centerx-10, self.player.rect.centery-10, 20, 20)
 
     
-            
-
     def fire (self) :
         
         # Mark bullet as shot and add it to the game's bullet list
@@ -221,10 +219,7 @@ class Bullet :
                         self.rect.y <= enemy.rect.bottom ):
                             enemy.got_shot()
                             return True
-
-
-
-        
+     
         
     def check_platform_collision (self) :
         
@@ -259,6 +254,9 @@ class Enemy(pygame.sprite.Sprite):
         self.is_collided = False
     def update(self):
         self.rect.x += self.velocity_x
+
+    def got_shot(self):
+        self.health -= BULLET_DAMAGE
 
 class Game:
     def __init__(self):
