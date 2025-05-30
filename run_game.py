@@ -12,7 +12,7 @@ MAX_ENEMY_HEALTH = 1
 INITIAL_ENEMY_SPEED = 5
 MAX_PLAYER_HEALTH = 3
 BULLET_SPEED = 30
-BULLET_DAMAGE = 5
+BULLET_DAMAGE = 1
 
 right_bullet_image_path = os.path.join("src","assets", "images" , "rightpaintball.png")
 left_bullet_image_path = os.path.join("src","assets", "images" , "rightpaintball.png")
@@ -118,6 +118,8 @@ class Player:
         if keys[pygame.K_d]:
             self.rect.x += MOVE_SPEED
             self.direction = "right" # Update facing direction
+        if self.rect.x <= 0 :
+            self.rect.x = 0
             
         # Apply gravity
         self.velocity_y += GRAVITY
@@ -156,7 +158,7 @@ class Bullet :
         self.player = player # Reference to the player who shot this bullet
         
         self.is_fired = False
-        self.game = self.player.game 
+        self.game = self.player.game
         
         #bullet's speed
         self.changex = 0
@@ -192,7 +194,7 @@ class Bullet :
             self.rect.x += self.changex
 
             # Check for collisions, remove if hit something
-            if self.check_platform_collision() :
+            if self.check_platform_collision() or self.check_enemy_collision() : 
                 self.game.Fired_bullets_list.remove(self)
     
         else :
@@ -209,7 +211,7 @@ class Bullet :
                         if (self.rect.right >= enemy.rect.left and 
                         self.rect.right <= enemy.rect.right and 
                         self.rect.y >= enemy.rect.top and 
-                        self.rect.y <= enemy.rect.bottom ):
+                        self.rect.y < enemy.rect.bottom ):
                             enemy.got_shot()
                             return True
                     elif self.direction == "left" :
@@ -231,14 +233,14 @@ class Bullet :
 
             # Check collision with platforms
             for platform in self.game.platforms:
-                    #if isinstance (platform, Platform) :
+                if isinstance (platform, Platform) :
                     
-                if (self.rect.x >= platform.rect.left and 
-                self.rect.x <= platform.rect.right and 
-                self.rect.y >= platform.rect.top and 
-                self.rect.y <= platform.rect.bottom ):
+                    if (self.rect.x >= platform.rect.left and 
+                    self.rect.x <= platform.rect.right and 
+                    self.rect.y >= platform.rect.top and 
+                    self.rect.y <= platform.rect.bottom ):
                         
-                    return True # Bullet hit a platform
+                        return True # Bullet hit a platform
                     
         return False  # Bullet didn't hit anything
 class Enemy(pygame.sprite.Sprite):
@@ -275,7 +277,10 @@ class Game:
             Platform(1200, 400, 200, 20),
             self.ground_rect
         ]
-        
+
+        #list of fired bullets
+        self.Fired_bullets_list = []
+
         self.player = Player(self)
         self.camera_x = 0
         self.enemies = pygame.sprite.Group()
@@ -313,6 +318,11 @@ class Game:
                 # Resize window and update dimensions
                 self.screen = pygame.display.set_mode((event.w, event.h), pygame.RESIZABLE)
                 self.update_dimensions()
+
+            elif event.type == pygame.MOUSEBUTTONDOWN :
+                if event.button == 1 : #left mouse button
+                    self.player.shoot()
+
             # Restart after game over
             elif self.isGameover == True and event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 self.player
@@ -326,9 +336,15 @@ class Game:
             self.update_camera()
             for enemy in self.enemies:
                 enemy.update()
+
+            # Update all fired bullets
+            for bullet in self.Fired_bullets_list :
+                if isinstance(bullet, Bullet) :
+                    bullet.update()
+
             # Remove dead enemies and spawn new ones
             for enemy in self.enemies:
-                if enemy.rect.x <= 0 + self.camera_x or enemy.health <= 0 or self.isGameover == True:
+                if enemy.rect.x <= 0 + self.camera_x or enemy.health <= 0 or self.isGameover == True :
                     enemy.kill()
                     new_enemy = Enemy(self)
                     self.enemies.add(new_enemy)
@@ -354,6 +370,11 @@ class Game:
                                    self.player.rect.width, 
                                    self.player.rect.height))
         
+        # Draw all fired bullets with camera offset
+        for bullet in self.Fired_bullets_list :
+            if isinstance(bullet, Bullet) :
+                self.screen.blit(bullet.bulletimg, (bullet.rect.x - self.camera_x, bullet.rect.y))
+
         # Draw enemies
         for enemy in self.enemies:
             pygame.draw.rect(self.screen, enemy.color,
