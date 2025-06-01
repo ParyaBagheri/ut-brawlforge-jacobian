@@ -47,31 +47,16 @@ class Player:
         self.on_ground = False
         self.color = (255, 0, 0)  # Player color (red)
         self.health = MAX_PLAYER_HEALTH
+        self.is_invincible = False
+        self.invincibility_timer = 0
+        self.visible = True
 
         self.held_bullet = Bullet(self) # Create a bullet that follows the player (not fired yet)
 
         self.direction = "right" # Track facing direction ( default : right- facing )
+        self.collision_direction = "none" 
 
-    def check_collision(self, platforms):
-        '''#check horizontal collisions
-        if self.direction == "right" :
-            for platform in platforms :
-                if isinstance(platform, Platform) :
-                    if (self.rect.right >= platform.rect.left and
-                    self.rect.right < platform.rect.right and
-                    self.rect.top < platform.rect.bottom and
-                    self.rect.bottom > platform.rect.top ) :
-                        self.rect.right == platform.rect.left
-
-        if self.direction == "left" :
-            for platform in platforms :
-                if isinstance(platform, Platform) :
-                    if (self.rect.left <= platform.rect.right and
-                    self.rect.left > platform.rect.left and
-                    self.rect.top < platform.rect.bottom and
-                    self.rect.bottom > platform.rect.top ) :
-                        self.rect.left == platform.rect.right'''
-
+    def check_vertical_collision(self, platforms):
         # Check vertical collision (falling)
         if self.velocity_y > 0 :
             for platform in platforms:
@@ -109,6 +94,23 @@ class Player:
         self.on_ground = False
         return None
     
+    def check_horizontal_collision(self,platforms):
+        for platform in platforms :
+            if isinstance(platform, Platform):
+                if(self.rect.top < platform.rect.bottom and
+                    self.rect.bottom > platform.rect.top) :
+                    if(self.direction == "right" and
+                       self.rect.right == platform.rect.left):
+                        self.rect.right = platform.rect.left
+                        self.collision_direction = "right"
+                        return platform
+                    elif(self.direction == "left" and
+                         self.rect.left == platform.rect.right):
+                        self.rect.left = platform.rect.right
+                        self.collision_direction = "left"
+                        return platform
+                    self.collision_direction = "none"
+
     def check_enemy_collision(self,enemies):
         for enemy in enemies:
             if isinstance(enemy, Enemy):
@@ -119,22 +121,21 @@ class Player:
                         self.rect.top < enemy.rect.top):
                         enemy.health -= 1
                         self.velocity_y = JUMP_VELOCITY * 0.5
-                    else :
+                    elif(enemy.is_collided == False) :
                         self.health -= 1
-                        if self.health > 0:
-                            self.rect.y -= 30
                         enemy.is_collided = True
+                        self.is_invincible = True
                         return enemy
     
     def update(self, platforms, enemies):
         keys = pygame.key.get_pressed()
         
         # Horizontal movement
-        if keys[pygame.K_a]:
+        if (keys[pygame.K_a] and self.collision_direction != "left"):
             self.rect.x -= MOVE_SPEED
             self.direction = "left" # Update facing direction
 
-        if keys[pygame.K_d]:
+        if (keys[pygame.K_d] and self.collision_direction != "right"):
             self.rect.x += MOVE_SPEED
             self.direction = "right" # Update facing direction
         if self.rect.x <= 0 :
@@ -145,8 +146,23 @@ class Player:
         self.rect.y += self.velocity_y
         
         # Check collisions
-        self.check_collision(platforms)
+        self.check_vertical_collision(platforms)
+        self.check_horizontal_collision(platforms)
         self.check_enemy_collision(enemies)
+
+        # Temporary flickering after collision with an enemy
+        if self.is_invincible :
+            self.invincibility_timer += 1
+            if self.invincibility_timer % 15 < 8 :
+                self.visible = True
+            else :
+                self.visible = False
+            if self.invincibility_timer >= 50:
+                self.is_invincible = False
+        else :
+            self.visible = True
+            self.invincibility_timer = 0
+
 
         # Game over when player dies
         if self.health <= 0:
@@ -384,7 +400,8 @@ class Game:
                                           platform.height))
         
         # Draw player
-        pygame.draw.rect(self.screen, self.player.color, 
+        if(self.player.visible == True) :
+            pygame.draw.rect(self.screen, self.player.color, 
                         pygame.Rect(self.player.rect.x - self.camera_x, 
                                    self.player.rect.y, 
                                    self.player.rect.width, 
@@ -421,6 +438,8 @@ class Game:
         self.isGameover = True
         self.player.color = (0, 0, 0)
         self.player.rect.x = 100
+        self.player.invincibility_timer = 0
+        self.player.is_invincible = False
 
 if __name__ == "__main__":
     game = Game()
