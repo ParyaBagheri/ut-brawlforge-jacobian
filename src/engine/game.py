@@ -4,15 +4,15 @@ import os
 
 import config
 
-#right_bullet_image_path = os.path.join("src","assets", "images" , "rightpaintball.png")
-#left_bullet_image_path = os.path.join("src","assets", "images" , "rightpaintball.png")
+right_bullet_image_path = os.path.join("src","assets", "images" , "rightpaintball.png")
+left_bullet_image_path = os.path.join("src","assets", "images" , "rightpaintball.png")
 
 
-#right_bullet_image = pygame.image.load(right_bullet_image_path)
-right_bullet_image = pygame.image.load(config.IMAGE_PATH, "rightpaintball.png")
+right_bullet_image = pygame.image.load(right_bullet_image_path)
+#right_bullet_image = pygame.image.load(config.IMAGE_PATH, "rightpaintball.png")
 right_bullet_image = pygame.transform.scale(right_bullet_image, (20, 20))
-#left_bullet_image = pygame.image.load(left_bullet_image_path)
-left_bullet_image = pygame.image.load(config.IMAGE_PATH, "leftpaintball.png")
+left_bullet_image = pygame.image.load(left_bullet_image_path)
+#left_bullet_image = pygame.image.load(config.IMAGE_PATH, "leftpaintball.png")
 left_bullet_image = pygame.transform.scale(left_bullet_image, (20, 20))
 
 # Fonts 
@@ -22,10 +22,10 @@ heartfont = pygame.font.SysFont('Segoe UI Symbol', 40)
 gameoverfont = pygame.font.SysFont('OCR A Extended', 72)
 loadingscreen_font = pygame.font.SysFont('OCR A Extended', 36)
 
-from engine.bullet import Bullet
-from engine.player import Player
-from engine.platform import Platform
-from engine.enemy import Enemy
+from src.engine.bullet import Bullet
+from src.engine.player import Player
+from src.engine.platform import Platform
+from src.engine.enemy import Enemy
 
 class Game:
     def __init__(self):

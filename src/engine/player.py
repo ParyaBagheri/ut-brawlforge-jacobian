@@ -1,8 +1,8 @@
 import pygame
 import config
-from engine.enemy import Enemy
-from engine.bullet import Bullet
-from engine.platform import Platform
+from src.engine.enemy import Enemy
+from src.engine.bullet import Bullet
+from src.engine.platform import Platform
 
 class Player:
     def __init__(self, game):

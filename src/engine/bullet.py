@@ -1,7 +1,7 @@
 import pygame
 import os
-from engine.enemy import Enemy
-from engine.platform import Platform
+from src.engine.enemy import Enemy
+from src.engine.platform import Platform
 
 right_bullet_image_path = os.path.join("src","assets", "images" , "rightpaintball.png")
 left_bullet_image_path = os.path.join("src","assets", "images" , "rightpaintball.png")

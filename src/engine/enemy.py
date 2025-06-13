@@ -14,3 +14,6 @@ class Enemy(pygame.sprite.Sprite):
         self.is_collided = False
     def update(self):
         self.rect.x += self.velocity_x
+
+    def got_shot(self):
+        self.health -= config.BULLET_DAMAGE
