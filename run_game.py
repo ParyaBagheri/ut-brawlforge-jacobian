@@ -2,7 +2,7 @@ import pygame
 import sys
 
 import config
-from engine.game import Game
+from src.engine.game import Game
 
 if __name__ == "__main__":
     game = Game()

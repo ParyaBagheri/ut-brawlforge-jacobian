@@ -4,13 +4,17 @@ import os
 
 import config
 
-right_bullet_image_path = os.path.join("src","assets", "images" , "rightpaintball.png")
-left_bullet_image_path = os.path.join("src","assets", "images" , "rightpaintball.png")
+#right_bullet_image_path = os.path.join("src","assets", "images" , "rightpaintball.png")
+#left_bullet_image_path = os.path.join("src","assets", "images" , "rightpaintball.png")
 
-right_bullet_image = pygame.image.load(right_bullet_image_path)
+
+#right_bullet_image = pygame.image.load(right_bullet_image_path)
+right_bullet_image = pygame.image.load(config.IMAGE_PATH, "rightpaintball.png")
 right_bullet_image = pygame.transform.scale(right_bullet_image, (20, 20))
-left_bullet_image = pygame.image.load(left_bullet_image_path)
+#left_bullet_image = pygame.image.load(left_bullet_image_path)
+left_bullet_image = pygame.image.load(config.IMAGE_PATH, "leftpaintball.png")
 left_bullet_image = pygame.transform.scale(left_bullet_image, (20, 20))
+
 # Fonts 
 pygame.font.init()
 font = pygame.font.SysFont('Arial',  32, True, False)

@@ -16,6 +16,6 @@ class Button :
         self.rect = self.image.get_rect(center=(self.x,self.y))
         self.text_rect = self.text.get_rect(center=(self.x,self.y))
 
-    #def draw(self):
-        #if self.image is not None:
-            #screen.blit()
+    def draw(self):
+        if self.image is not None:
+            screen.blit()
