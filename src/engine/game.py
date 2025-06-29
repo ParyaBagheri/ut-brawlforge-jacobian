@@ -26,8 +26,10 @@ from src.engine.bullet import Bullet
 from src.engine.player import Player
 from src.engine.platform import Platform
 from src.engine.enemy import Enemy
+from src.engine.assetmanager import AssetManager
 
 class Game:
+    
     def __init__(self):
         pygame.init()
         self.screen = pygame.display.set_mode((config.BASE_SCREEN_WIDTH, config.BASE_SCREEN_HEIGHT), pygame.RESIZABLE)
@@ -46,6 +48,8 @@ class Game:
             Platform(1400, 420,200, 20),
             self.ground_rect
         ]
+        
+        AssetManager.load_assets()
 
         #list of fired bullets
         self.Fired_bullets_list = []
@@ -135,11 +139,10 @@ class Game:
         
         # Draw player
         if(self.player.visible == True) :
-            pygame.draw.rect(self.screen, self.player.color, 
-                        pygame.Rect(self.player.rect.x - self.camera_x, 
-                                   self.player.rect.y, 
-                                   self.player.rect.width, 
-                                   self.player.rect.height))
+            if self.player.direction == "left" :
+                self.screen.blit( pygame.transform.flip(self.player.image,True,False), (self.player.rect.x - self.camera_x, self.player.rect.y))
+            else :
+                self.screen.blit( self.player.image, (self.player.rect.x - self.camera_x, self.player.rect.y))
         
         # Draw all fired bullets with camera offset
         for bullet in self.Fired_bullets_list :

@@ -3,6 +3,8 @@ import config
 from src.engine.enemy import Enemy
 from src.engine.bullet import Bullet
 from src.engine.platform import Platform
+from src.engine.assetmanager import AssetManager
+
 
 class Player:
     def __init__(self, game):
@@ -19,7 +21,15 @@ class Player:
         self.held_bullet = Bullet(self) # Create a bullet that follows the player (not fired yet)
 
         self.direction = "right" # Track facing direction ( default : right- facing )
-        self.collision_direction = "none" 
+        self.collision_direction = "none"
+
+        self.state = "idle" 
+        self.assets = AssetManager.player_assets["knight"]
+
+        self.current_frame = 0
+        self.image = self.assets[self.state][self.current_frame]
+
+
 
     def check_vertical_collision(self, platforms):
         # Check vertical collision (falling)
@@ -94,6 +104,7 @@ class Player:
     
     def update(self, platforms, enemies):
         keys = pygame.key.get_pressed()
+        self.update_image(keys)
         
         # Horizontal movement
         if (keys[pygame.K_a] and self.collision_direction != "left"):
@@ -140,6 +151,37 @@ class Player:
         
         # Update held bullet (follows player if not fired)
         self.held_bullet.update()
+
+    def update_image (self, keys) :
+
+        self.current_frame += 0.1
+        if(self.current_frame >= len(self.assets[self.state])) :
+            self.current_frame = 0
+
+        if (self.on_ground and ( not ( keys[pygame.K_a] or keys[pygame.K_d] or keys[pygame.K_UP] or keys[pygame.K_SPACE] ) ) ):
+            if(self.state != "idle"):
+                self.current_frame = 0
+                self.state = "idle"
+
+        elif ( (keys[pygame.K_UP] or keys[pygame.K_SPACE]) and self.on_ground) :
+
+            self.current_frame = 0
+            self.state = "jumping"
+            
+        elif not self.on_ground :
+
+            if(self.state != "falling" and self.state != "jumping") :
+                self.current_frame = 0
+                self.state = "falling"
+        
+        elif (keys[pygame.K_a] or keys[pygame.K_d]) and self.on_ground :
+            if(self.state != "run" ):
+                self.current_frame = 0
+                self.state = "run"
+
+        self.image = self.assets[self.state][int(self.current_frame)]
+        
+        
 
     def shoot (self) :
 
