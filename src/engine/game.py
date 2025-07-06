@@ -55,6 +55,28 @@ class Game:
 
         self.isGameover = False
 
+    def main_menu(self):
+        #self.screen.fill((0, 0, 0))
+        background = pygame.image.load(background_path)
+        background = pygame.transform.scale(background, (800,600))
+        self.screen.blit(background, (0,0))
+        MENU_PLAY = Button(self, None, [400, 100], "PLAY","OCRAEXT", 50, (255,255,255), (0,146,155))
+        MENU_HOWTO = Button(self, None, [400, 300], "HOW TO PLAY",'OCRAEXT', 50, 'white', (0, 146, 155))
+        MENU_MOUSE_POS = pygame.mouse.get_pos
+        def main_menu_render():        
+            MENU_PLAY.draw(MENU_MOUSE_POS())
+            MENU_HOWTO.draw(MENU_MOUSE_POS())
+        def main_menu_event_handler():
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+        while True:
+            main_menu_render()
+            main_menu_event_handler()
+            pygame.display.flip()
+            self.clock.tick(config.FPS)
+
     def platform_maker(self):
         platforms = [
             Platform(self, 300, 400, 150, 20, 'solid'),
