@@ -4,8 +4,11 @@ import os
 
 import config
 
+#press esc to pause, shift to shoot
+
 right_bullet_image_path = os.path.join("src","assets", "images" , "rightpaintball.png")
 left_bullet_image_path = os.path.join("src","assets", "images" , "rightpaintball.png")
+background_path = os.path.join("src", "assets", "images", "background.jpg")
 
 
 right_bullet_image = pygame.image.load(right_bullet_image_path)
@@ -26,6 +29,8 @@ from src.engine.bullet import Bullet
 from src.engine.player import Player
 from src.engine.platform import Platform
 from src.engine.enemy import Enemy
+from src.engine.button import Button
+
 
 class Game:
     def __init__(self):
@@ -33,19 +38,18 @@ class Game:
         self.screen = pygame.display.set_mode((config.BASE_SCREEN_WIDTH, config.BASE_SCREEN_HEIGHT), pygame.RESIZABLE)
         pygame.display.set_caption("Platformer Game")
         self.clock = pygame.time.Clock()
-        self.start = False
-        
+        self.is_paused = False
         self.update_dimensions()
+        self.PAUSE_BUTTON = Button(self, None, [750,10], "Pause", 'Blox2', 30, 'white', 'grey') #Add pause button image later
         
         # Create platforms and ground
-        self.platforms = [
-            Platform(300, 400, 200, 20),
-            Platform(600, 350, 150, 20),
+        ''' self.platforms = [
             Platform(900, 300, 100, 20),
             Platform(1200, 400, 200, 20),
             Platform(1400, 420,200, 20),
             self.ground_rect
-        ]
+        ]'''
+        self.platforms = self.platform_maker()
 
         #list of fired bullets
         self.Fired_bullets_list = []
@@ -57,6 +61,20 @@ class Game:
         self.enemies.add(enemy)
 
         self.isGameover = False
+
+    def platform_maker(self):
+        platforms = [
+            Platform(self, 300, 400, 150, 20, 'solid'),
+            Platform(self, 600, 300, 150, 20, 'solid'),
+            Platform(self, 750, 300, 250, 20, 'solid'), #Fragile platform
+            Platform(self, 1050, 200, 100, 20, 'solid'), # Bonus on this platform
+            Platform(self, 1140, 560 - config.BASE_GROUND_HEIGHT, 50, 40, 'bouncy'), #Bouncy platform
+            Platform(self, 1250, 300, 300, 20, 'solid'),
+            Platform(self, 1400, 580 - config.BASE_GROUND_HEIGHT, 350, 20, 'slowing'), #Muddy platform
+            Platform(self, 1630, 200, 100, 20, 'timed'),
+            self.ground_rect
+        ]
+        return platforms
 
     def update_dimensions(self):
         # Update screen and ground dimensions based on current window size
@@ -79,6 +97,7 @@ class Game:
             self.clock.tick(60)
     
     def handle_events(self):
+        GAME_MOUSE_POS = pygame.mouse.get_pos
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -87,23 +106,29 @@ class Game:
                 # Resize window and update dimensions
                 self.screen = pygame.display.set_mode((event.w, event.h), pygame.RESIZABLE)
                 self.update_dimensions()
-            elif self.start == False and event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                self.start = True
-            elif event.type == pygame.MOUSEBUTTONDOWN :
-                if event.button == 1 : #left mouse button
-                    self.player.shoot()
+            elif ((event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE) or 
+                  (event.type == pygame.MOUSEBUTTONDOWN and self.PAUSE_BUTTON.is_pressed(GAME_MOUSE_POS()))) and self.isGameover == False :
+                # Press esc or pause button to pause
+                self.is_paused = True
 
+            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.is_paused == False and self.isGameover == False:
+                #if event.button == 1 : #left mouse button
+                    self.player.shoot()
+            elif event.type == pygame.KEYDOWN and self.is_paused == True: # press space to resume
+                if event.key == pygame.K_SPACE:
+                    self.is_paused = False
             # Restart after game over
             elif self.isGameover == True and event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                self.player
-                self.player.health = config.MAX_PLAYER_HEALTH
-                self.player.color = (255, 0, 0)
-                self.isGameover = False
+                self.restart()
     
     def update(self):
-        if self.isGameover == False and self.start == True:
+        if self.isGameover == False and self.is_paused == False:
             self.player.update(self.platforms, self.enemies)
             self.update_camera()
+
+            for platform in self.platforms :
+                if isinstance(platform, Platform):
+                    platform.update()
             for enemy in self.enemies:
                 enemy.update()
 
@@ -118,15 +143,20 @@ class Game:
                     enemy.kill()
                     new_enemy = Enemy(self)
                     self.enemies.add(new_enemy)
+
     
     def draw(self):
         self.screen.fill((135, 206, 235))  # Sky blue background
-        
+        GAME_MOUSE_POS = pygame.mouse.get_pos
+        self.PAUSE_BUTTON.draw(GAME_MOUSE_POS())
+        if self.is_paused == True: 
+            self.pause_render()
+
         # Draw platforms and ground
         for platform in self.platforms:
-            if isinstance(platform, Platform):
+            if isinstance(platform, Platform) and platform.visible == True:
                 platform.draw(self.screen, self.camera_x)
-            else:
+            elif not isinstance(platform, Platform) :
                 pygame.draw.rect(self.screen, (34, 139, 34), 
                                pygame.Rect(platform.x - self.camera_x, 
                                           platform.y, 
@@ -147,41 +177,61 @@ class Game:
                 self.screen.blit(bullet.bulletimg, (bullet.rect.x - self.camera_x, bullet.rect.y))
 
         # Draw enemies
+        self.draw_enemies()
+        # Show health
+        self.show_health()
+        # Show game over
+        if self.isGameover == True:
+            self.gameover_render()
+        # Show loading screen 
+        '''if self.is_started == False:
+            self.screen.fill((0,0,0))
+            loadingscreen_text = loadingscreen_font.render("Press space to start the game!", True, 'white')
+            ls_text_rect = loadingscreen_text.get_rect()
+            ls_text_rect.center = (self.screen_width //2, self.screen_height //2)
+            self.screen.blit(loadingscreen_text, ls_text_rect)'''
+        
+    def draw_enemies(self):
         for enemy in self.enemies:
             pygame.draw.rect(self.screen, enemy.color,
                              pygame.Rect(enemy.rect.x - self.camera_x, 
                                         enemy.rect.y, 
                                         enemy.rect.width, 
                                         enemy.rect.height))
-            
-        # Show health
+    def show_health(self):
         health_display = font.render("Health: " + str(self.player.health), True, 'white')
         self.screen.blit(health_display, (20,20))
         heart = heartfont.render("♥", True, "red")
         if self.player.health >= 0:
             for i in range(0,self.player.health):
                 self.screen.blit(heart, (40 + 30*i , 40))
-        # Show game over
-        if self.isGameover == True:
-            gameover_message = gameoverfont.render("GAME OVER!", True, 'black')
-            text_rect = gameover_message.get_rect()
-            text_rect.center = (self.screen_width //2, self.screen_height//2)
-            self.screen.blit(gameover_message, text_rect)
-        # Show loading screen 
-        if self.start == False:
-            self.screen.fill((0,0,0))
-            loadingscreen_text = loadingscreen_font.render("Press space to start the game!", True, 'white')
-            ls_text_rect = loadingscreen_text.get_rect()
-            ls_text_rect.center = (self.screen_width //2, self.screen_height //2)
-            self.screen.blit(loadingscreen_text, ls_text_rect)
 
     def gameover(self):
         self.isGameover = True
         self.player.color = (0, 0, 0)
         self.player.rect.x = 100
+        self.player.rect.bottom = 600 - config.BASE_GROUND_HEIGHT
         self.player.invincibility_timer = 0
         self.player.is_invincible = False
 
+    def gameover_render(self):
+        gameover_font = pygame.font.Font("src/assets/fonts/OCRAEXT.ttf", 72)
+        gameover_message = gameover_font.render("GAME OVER!", True, 'black')
+        text_rect = gameover_message.get_rect()
+        text_rect.center = (self.screen_width //2, self.screen_height//2)
+        self.screen.blit(gameover_message, text_rect)
+
+    def restart(self):
+        self.player.health = config.MAX_PLAYER_HEALTH
+        self.player.color = (255, 0, 0)
+        self.isGameover = False
+
+    def pause_render(self):
+        pause_msg_font =  pygame.font.Font("src/assets/fonts/OCRAEXT.ttf", 50)
+        pause_msg_text = pause_msg_font.render("Press space to resume!", True, 'indigo')
+        pause_msg_rect = pause_msg_text.get_rect(center=(self.screen_width//2, self.screen_height//2))
+        self.screen.blit(pause_msg_text, pause_msg_rect)
+
 if __name__ == "__main__":
     game = Game()
-    game.run()
+    game.main_menu()
