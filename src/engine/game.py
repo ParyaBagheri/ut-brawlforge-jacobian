@@ -41,14 +41,7 @@ class Game:
         self.is_paused = False
         self.update_dimensions()
         self.PAUSE_BUTTON = Button(self, None, [750,10], "Pause", 'Blox2', 30, 'white', 'grey') #Add pause button image later
-        
-        # Create platforms and ground
-        ''' self.platforms = [
-            Platform(900, 300, 100, 20),
-            Platform(1200, 400, 200, 20),
-            Platform(1400, 420,200, 20),
-            self.ground_rect
-        ]'''
+                
         self.platforms = self.platform_maker()
 
         #list of fired bullets
