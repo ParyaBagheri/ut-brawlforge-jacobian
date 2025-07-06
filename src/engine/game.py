@@ -71,9 +71,49 @@ class Game:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if MENU_PLAY.is_pressed(MENU_MOUSE_POS()):
+                        self.map_menu()
         while True:
             main_menu_render()
             main_menu_event_handler()
+            pygame.display.flip()
+            self.clock.tick(config.FPS)
+    def map_menu(self):
+        #self.screen.fill((22, 15, 133))
+        #self.screen.fill((246, 231, 143))
+        #self.screen.fill((123, 145, 155))
+        #self.screen.fill((242, 239, 131))
+        background = pygame.image.load(background_path)
+        background = pygame.transform.scale(background, (800,600))
+        self.screen.blit(background, (0,0))
+
+        map_menu_font = pygame.font.SysFont('OCR A Extended', 45)
+        map_menu_text = map_menu_font.render("Choose a map!", True, 'indigo')
+        map_menu_text_rect = map_menu_text.get_rect(center= (self.screen_width // 2, self.screen_height//6))
+        self.screen.blit(map_menu_text, map_menu_text_rect)
+        MAP_1 = Button(self, None, [self.screen_width//4,self.screen_height//2], "Jungle",'OCRAEXT', 40, (0, 38, 21), (0, 89, 21))
+        MAP_2 = Button(self, None, [3 *self.screen_width//4, self.screen_height//2], "Desert", 'OCRAEXT', 40, (117, 96,0), (42, 32, 0))
+        MAP_3 = Button(self, None, [self.screen_width//4, 5 * self.screen_height//6], "Lost City","OCRAEXT", 40, (255, 181, 118), (81, 1, 109))
+        MAP_4 = Button(self, None, [3 * self.screen_width//4, 5 * self.screen_height//6], "Under Water","OCRAEXT", 40, (0, 13, 72), (229, 134, 169))
+        MAP_MENU_MOUSE_POS = pygame.mouse.get_pos
+        def map_menu_render():
+            MAP_1.draw(MAP_MENU_MOUSE_POS())
+            MAP_2.draw(MAP_MENU_MOUSE_POS())
+            MAP_3.draw(MAP_MENU_MOUSE_POS())
+            MAP_4.draw(MAP_MENU_MOUSE_POS())
+        def map_menu_event_handler():
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit
+                    sys.exit()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if MAP_1.is_pressed(MAP_MENU_MOUSE_POS()):
+                        self.run()
+
+        while True:
+            map_menu_render()
+            map_menu_event_handler()
             pygame.display.flip()
             self.clock.tick(config.FPS)
 
