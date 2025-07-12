@@ -51,10 +51,9 @@ class Game:
         
         AssetManager.load_assets()
 
-        #list of fired bullets
         self.Fired_bullets_list = []
-
-        self.player = Player(self)
+        self.character_type = "wizard"
+        self.player = Player(self, self.character_type)
         self.camera_x = 0
         self.enemies = pygame.sprite.Group()
         enemy = Enemy(self)

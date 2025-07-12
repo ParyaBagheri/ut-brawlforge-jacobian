@@ -7,7 +7,7 @@ from src.engine.assetmanager import AssetManager
 
 
 class Player:
-    def __init__(self, game):
+    def __init__(self, game,character_type):
         self.game = game
         self.rect = pygame.Rect(100, 300, 50, 80)
         self.velocity_y = 0
@@ -24,9 +24,10 @@ class Player:
         self.collision_direction = "none"
 
         self.state = "idle" 
-        self.assets = AssetManager.player_assets["knight"]
+        self.assets = AssetManager.player_assets["wizard"]
 
         self.current_frame = 0
+        #self.character_type = character_type
         self.image = self.assets[self.state][self.current_frame]
 
 
@@ -154,7 +155,7 @@ class Player:
 
     def update_image (self, keys) :
 
-        self.current_frame += 0.1
+        self.current_frame += 0.15
         if(self.current_frame >= len(self.assets[self.state])) :
             self.current_frame = 0
 
@@ -170,7 +171,7 @@ class Player:
             
         elif not self.on_ground :
 
-            if(self.state != "falling" and self.state != "jumping") :
+            if(self.state != "falling" and self.velocity_y > 0) :
                 self.current_frame = 0
                 self.state = "falling"
         
