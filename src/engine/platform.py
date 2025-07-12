@@ -10,7 +10,7 @@ class Platform(pygame.sprite.Sprite):
         self.width = width
         self.height = height
         if image:
-            self.image = image.convert()
+            self.image = image
         else:
             self.image = pygame.Surface((width, height))
             self.image.fill(color)
@@ -26,7 +26,7 @@ class Platform(pygame.sprite.Sprite):
     def update(self):
         if self.activated :
             self.visibility_timer += 1
-            if self.visibility_timer >= 180 :
+            if self.visibility_timer >= 60 :
                 self.visible = False
 
     def draw(self, screen, camera_x):

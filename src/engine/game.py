@@ -92,7 +92,7 @@ class Game:
         map_menu_text = map_menu_font.render("Choose a map!", True, 'indigo')
         map_menu_text_rect = map_menu_text.get_rect(center= (self.screen_width // 2, self.screen_height//6))
         self.screen.blit(map_menu_text, map_menu_text_rect)
-        MAP_1 = Button(self, None, [self.screen_width//4,self.screen_height//2], "Jungle",'OCRAEXT', 40, (0, 38, 21), (0, 89, 21))
+        MAP_1 = Button(self, None, [self.screen_width//4,self.screen_height//2], "Forest",'OCRAEXT', 40, (0, 38, 21), (0, 89, 21))
         MAP_2 = Button(self, None, [3 *self.screen_width//4, self.screen_height//2], "Desert", 'OCRAEXT', 40, (117, 96,0), (42, 32, 0))
         MAP_3 = Button(self, None, [self.screen_width//4, 5 * self.screen_height//6], "Lost City","OCRAEXT", 40, (255, 181, 118), (81, 1, 109))
         MAP_4 = Button(self, None, [3 * self.screen_width//4, 5 * self.screen_height//6], "Under Water","OCRAEXT", 40, (0, 13, 72), (229, 134, 169))
@@ -118,15 +118,24 @@ class Game:
             self.clock.tick(config.FPS)
 
     def platform_maker(self):
+        platform_img = pygame.image.load("src/assets/images/platform.png").convert_alpha()
         platforms = [
-            Platform(self, 300, 400, 150, 20, 'solid'),
-            Platform(self, 600, 300, 150, 20, 'solid'),
+            Platform(self, 300, 400, 150, 20, 'solid', image=platform_img),
+            Platform(self, 600, 300, 150, 20, 'solid', image=platform_img),
             Platform(self, 750, 300, 250, 20, 'solid'), #Fragile platform
             Platform(self, 1050, 200, 100, 20, 'solid'), # Bonus on this platform
             Platform(self, 1140, 560 - config.BASE_GROUND_HEIGHT, 50, 40, 'bouncy'), #Bouncy platform
             Platform(self, 1250, 300, 300, 20, 'solid'),
-            Platform(self, 1400, 580 - config.BASE_GROUND_HEIGHT, 350, 20, 'slowing'), #Muddy platform
+            Platform(self, 1400, 600 - config.BASE_GROUND_HEIGHT, 350, 20, 'slowing'), #Muddy platform
             Platform(self, 1630, 200, 100, 20, 'timed'),
+            Platform(self, 1700, 300, 100, 20, 'solid'),
+            Platform(self, 1800, 300, 250, 20, 'slowing'),
+            Platform(self, 2250, 200, 100, 20, 'timed'),
+            Platform(self, 2400, 300, 300, 20, 'solid'),
+            Platform(self, 2800, 200, 100, 20, 'timed'),
+            Platform(self, 3000, 100, 100, 20, 'timed'),
+            Platform(self, 3150, 250, 200, 100, 'solid'), #Finish platform
+            #Platform(self, 3050, 560 - config.BASE_GROUND_HEIGHT, 50, 40, 'bouncy')
             self.ground_rect
         ]
         return platforms
@@ -268,6 +277,10 @@ class Game:
         self.player.rect.bottom = 600 - config.BASE_GROUND_HEIGHT
         self.player.invincibility_timer = 0
         self.player.is_invincible = False
+        for platform in self.platforms :
+            if isinstance(platform, Platform):
+                platform.activated = False
+                platform.visible = True
 
     def gameover_render(self):
         gameover_font = pygame.font.Font("src/assets/fonts/OCRAEXT.ttf", 72)
