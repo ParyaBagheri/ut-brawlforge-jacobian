@@ -4,16 +4,7 @@ import os
 
 import config
 
-right_bullet_image_path = os.path.join("src","assets", "images" , "rightpaintball.png")
-left_bullet_image_path = os.path.join("src","assets", "images" , "rightpaintball.png")
 
-
-right_bullet_image = pygame.image.load(right_bullet_image_path)
-#right_bullet_image = pygame.image.load(config.IMAGE_PATH, "rightpaintball.png")
-right_bullet_image = pygame.transform.scale(right_bullet_image, (20, 20))
-left_bullet_image = pygame.image.load(left_bullet_image_path)
-#left_bullet_image = pygame.image.load(config.IMAGE_PATH, "leftpaintball.png")
-left_bullet_image = pygame.transform.scale(left_bullet_image, (20, 20))
 
 # Fonts 
 pygame.font.init()
@@ -52,7 +43,7 @@ class Game:
         AssetManager.load_assets()
 
         self.Fired_bullets_list = []
-        self.character_type = "wizard"
+        self.character_type = "girl"
         self.player = Player(self, self.character_type)
         self.camera_x = 0
         self.enemies = pygame.sprite.Group()
@@ -94,7 +85,7 @@ class Game:
                 self.start = True
             elif event.type == pygame.MOUSEBUTTONDOWN :
                 if event.button == 1 : #left mouse button
-                    self.player.shoot()
+                    self.player.is_shooting = True
 
             # Restart after game over
             elif self.isGameover == True and event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
@@ -146,7 +137,7 @@ class Game:
         # Draw all fired bullets with camera offset
         for bullet in self.Fired_bullets_list :
             if isinstance(bullet, Bullet) :
-                self.screen.blit(bullet.bulletimg, (bullet.rect.x - self.camera_x, bullet.rect.y))
+                self.screen.blit(bullet.image, (bullet.rect.x - self.camera_x, bullet.rect.y))
 
         # Draw enemies
         for enemy in self.enemies:
