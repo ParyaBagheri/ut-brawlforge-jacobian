@@ -99,7 +99,7 @@ class Bullet :
         else :
 
             # Check collision with platforms
-            for platform in self.game.platforms:
+            for platform in self.game.level.platforms:
                 if isinstance (platform, Platform) :
                     
                     if (self.rect.x >= platform.rect.left and 
