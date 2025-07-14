@@ -5,12 +5,17 @@ from src.engine.bullet import Bullet
 from src.engine.platform import Platform
 
 class Player:
-    def __init__(self, game):
+    def __init__(self, game, image=None):
         self.game = game
-        self.rect = pygame.Rect(100, 300, 50, 80)
+        self.color = (255, 0, 0)  # Player color (red)
+        if image:
+            self.image = image
+        else:
+            self.image = pygame.Surface((50, 80))
+            self.image.fill(self.color)
+        self.rect = self.image.get_rect(topleft=(100, 0))
         self.velocity_y = 0
         self.on_ground = False
-        self.color = (255, 0, 0)  # Player color (red)
         self.health = config.MAX_PLAYER_HEALTH
         self.is_invincible = False
         self.invincibility_timer = 0
@@ -23,8 +28,10 @@ class Player:
 
         self.direction = "right" # Track facing direction ( default : right- facing )
         self.collision_direction = "none" 
-
+    def set_character(self,name):
+        self.type = name
     def check_vertical_collision(self, platforms):
+        landed_on = None
         # Check vertical collision (falling)
         if self.velocity_y > 0 :
             for platform in platforms:
@@ -36,7 +43,9 @@ class Player:
                         self.rect.bottom = platform.rect.top
                         self.velocity_y = 0
                         self.on_ground = True
-                        return platform
+                        landed_on = platform
+                        #return platform
+                        break
                 elif not isinstance(platform, Platform):
                     if (self.rect.bottom + self.velocity_y > platform.top and
                         self.rect.top < platform.top and
@@ -45,7 +54,8 @@ class Player:
                         self.rect.bottom = platform.top
                         self.velocity_y = 0
                         self.on_ground = True
-                        return platform
+                        break
+                        #return platform
         
         # Check vertical collision (jumping)
         for platform in platforms:
@@ -57,10 +67,20 @@ class Player:
                     self.rect.left < platform.rect.right):
                     self.rect.top = platform.rect.bottom
                     self.velocity_y = 0
-                    return platform
+                    break
+                    #return platform
         
-        self.on_ground = False
-        return None
+        if self.velocity_y == 0:
+                for platform in platforms:
+                    rect = platform.rect if isinstance(platform, Platform) else platform
+                    if self.rect.bottom == rect.top and \
+                    self.rect.right > rect.left and self.rect.left < rect.right:
+                        landed_on = platform
+                        break
+
+        self.on_ground = bool(landed_on)
+        return landed_on
+
     
     def check_horizontal_collision(self,platforms):
         for platform in platforms :
@@ -127,6 +147,9 @@ class Player:
             elif collided_platform.type == 'slowing':
                 if self.velocity_x >= 3:
                     collided_platform.slowing_platform()
+            elif collided_platform.type == 'spikey' :
+                self.health -= 1
+                self.is_invincible = True
             
         self.check_horizontal_collision(platforms)
         self.check_enemy_collision(enemies)
