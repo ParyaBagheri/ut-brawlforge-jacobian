@@ -139,7 +139,7 @@ class Player:
         # Check collisions
         collided_platform = self.check_vertical_collision(platforms)
         #print("collided:", collided_platform.type if collided_platform else None)
-        if collided_platform != None and collided_platform != self.game.ground_rect:
+        if collided_platform != None and collided_platform != self.game.ground_rect :
             if collided_platform.type == 'timed':
                 collided_platform.timed_platform()
             elif collided_platform.type == 'bouncy':
@@ -147,12 +147,13 @@ class Player:
             elif collided_platform.type == 'slowing':
                 if self.velocity_x >= 3:
                     collided_platform.slowing_platform()
-            elif collided_platform.type == 'spikey' :
+            elif collided_platform.type == 'spikey' and self.is_invincible == False :
                 self.health -= 1
                 self.is_invincible = True
             
         self.check_horizontal_collision(platforms)
         self.check_enemy_collision(enemies)
+
 
         # Temporary flickering after collision with an enemy
         if self.is_invincible :
@@ -176,7 +177,7 @@ class Player:
 
 
         # Game over when player dies
-        if self.health <= 0:
+        if self.health <= 0 or self.rect.y >= 600:
             self.game.gameover()
             
         # Jumping (only if on ground)
