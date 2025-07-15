@@ -5,7 +5,7 @@ from src.engine.bullet import Bullet
 from src.engine.platform import Platform
 
 class Player:
-    def __init__(self, game, image=None):
+    def __init__(self, game, character_type, image=None):
         self.game = game
         self.color = (255, 0, 0)  # Player color (red)
         if image:

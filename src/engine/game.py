@@ -47,7 +47,7 @@ class Game:
         #list of fired bullets
         self.Fired_bullets_list = []
 
-        self.player = Player(self)
+        #self.player = Player(self)
         self.camera_x = 0
         self.enemies = pygame.sprite.Group()
         enemy = Enemy(self)
@@ -76,14 +76,15 @@ class Game:
                     sys.exit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if MENU_PLAY.is_pressed(MENU_MOUSE_POS()):
-                        self.state = "map_menu"
-                        self.map_menu()
+                        self.state = "char_menu"
+                        self.character_menu()
         while True:
             main_menu_render()
             main_menu_event_handler()
             pygame.display.flip()
             self.clock.tick(config.FPS)
-    def char_selection_menu(self):
+            
+    def character_menu(self):
         background = pygame.image.load(background_path)
         background = pygame.transform.scale(background, (800,600))
         self.screen.blit(background, (0,0))
@@ -94,9 +95,9 @@ class Game:
         self.screen.blit(char_menu_text, char_menu_text_rect)
 
         self.screen.blit(char_menu_text, char_menu_text_rect)
-        CHAR_1 = Button(self, None, [self.screen_width//4,self.screen_height//2], "char 1",'OCRAEXT', 40, (0, 38, 21), (0, 89, 21))
-        CHAR_2 = Button(self, None, [3 *self.screen_width//4, self.screen_height//2], "char 2", 'OCRAEXT', 40, (117, 96,0), (42, 32, 0))
-        CHAR_3 = Button(self, None, [self.screen_width//4, 5 * self.screen_height//6], "char 3","OCRAEXT", 40, (255, 181, 118), (81, 1, 109))
+        CHAR_1 = Button(self, None, [self.screen_width//4,self.screen_height//2], "knight",'OCRAEXT', 40, (0, 38, 21), (0, 89, 21))
+        CHAR_2 = Button(self, None, [3 *self.screen_width//4, self.screen_height//2], "girl", 'OCRAEXT', 40, (117, 96,0), (42, 32, 0))
+        CHAR_3 = Button(self, None, [self.screen_width//4, 5 * self.screen_height//6], "wizard","OCRAEXT", 40, (255, 181, 118), (81, 1, 109))
         CHAR_4 = Button(self, None, [3 * self.screen_width//4, 5 * self.screen_height//6], "char 4","OCRAEXT", 40, (0, 13, 72), (229, 134, 169))
         CHAR_MENU_MOUSE_POS = pygame.mouse.get_pos
         def char_menu_render():
@@ -113,7 +114,15 @@ class Game:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if CHAR_1.is_pressed(CHAR_MENU_MOUSE_POS()):
                         self.state = "map_menu"
-                        self.player.set_character('char1')
+                        self.player = Player(self, character_type='knight')
+                        self.map_menu()
+                    elif CHAR_2.is_pressed(CHAR_MENU_MOUSE_POS()):
+                        self.state = "map_menu"
+                        self.player = Player(self, character_type='girl')
+                        self.map_menu()
+                    elif CHAR_3.is_pressed(CHAR_MENU_MOUSE_POS()):
+                        self.state = "map_menu"
+                        self.player = Player(self, character_type='wizard')
                         self.map_menu()
 
         while True:
@@ -263,17 +272,17 @@ class Game:
 
     
     def draw(self):
-        #self.screen.fill((135, 206, 235))  # Sky blue background
-        if self.level.background_layers is not None:
+        self.screen.fill((135, 206, 235))  # Sky blue background
+        '''if self.level.background_layers is not None:
             for image, scroll_factor in self.level.background_layers :
                 offset = int(self.camera_x * scroll_factor)
                 scaled_image = pygame.transform.scale(image, (self.screen_width, self.screen_height))
                 image_width = scaled_image.get_width()
                 start_x = -offset % image_width
-                self.screen.blit(scaled_image, (-offset, 0))
+                #self.screen.blit(scaled_image, (-offset, 0))
             for i in range(-1, self.screen_width // image_width + 2):
                 self.screen.blit(scaled_image, (start_x + i * image_width, 0))
-
+'''
         GAME_MOUSE_POS = pygame.mouse.get_pos
         self.PAUSE_BUTTON.draw(GAME_MOUSE_POS())
         if self.is_paused == True: 
