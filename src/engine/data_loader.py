@@ -67,7 +67,7 @@ def get_level_data(name, game):
                 Platform(game, 4000, 480, 100, 120),
                 Platform(game, 4025, 440, 50, 40, 'bouncy'),
                 Platform(game, 4100, 500, 850, 100, 'spikey'),
-                Platform(game, 4200, 300, 200, 20),
+                Platform(game, 4180, 300, 200, 20),
                 Platform(game, 4500, 400, 150, 20),
                 Platform(game, 4700, 300, 150, 20),
                 Platform(game, 4950, 400, 450, 200),
@@ -76,6 +76,44 @@ def get_level_data(name, game):
                 #Finish Line at 6000
             ],
             "enemies" : []
+        }
+    elif name == "lost_city":
+        return{
+            "platforms" : [
+                Platform(game, 0, 300, 500, 300),
+                Platform(game, 600, 400, 150, 200),
+                Platform(game, 850, 300, 100, 300),
+                Platform(game, 1050, 250, 250, 350),
+                Platform(game, 1350, 150, 150, 20),
+                Platform(game, 1350, 350, 200, 250),
+                Platform(game, 1600, 250, 300, 30),
+                Platform(game, 2000, 350, 400, 250),
+                Platform(game, 2500, 250, 100, 350),
+                Platform(game, 2650, 200, 100, 30),
+                Platform(game, 2800, 100, 100, 30),
+                Platform(game, 2900, 220, 150, 30, 'timed'),
+                Platform(game, 3100, 300, 150, 300),
+                Platform(game, 3350, 250, 150, 350),
+                Platform(game, 3600, 350, 400, 250),
+                Platform(game, 3600, 350, 200, 20),
+                Platform(game, 4100, 300, 100, 30),
+                Platform(game, 4250, 200, 100, 30, 'timed'),
+                Platform(game, 4400, 300, 100, 30),
+                Platform(game, 4600, 400, 100, 30),
+                Platform(game, 4800, 500, 100, 30, 'slowing'),
+                Platform(game, 5000, 400, 150, 30, 'timed'),
+                Platform(game, 5250, 350, 100, 250),
+                Platform(game, 5400, 400, 100, 30),
+                Platform(game, 5600, 400, 100, 30),
+                Platform(game, 5800, 400, 100, 30),
+                Platform(game, 5950, 390, 250, 210),
+                Platform(game, 6300, 300, 100, 30, 'timed'), 
+                Platform(game, 6500, 350, 100, 250),
+                Platform(game, 6700, 300, 100, 30),
+                Platform(game, 6900, 200, 100, 30),
+                Platform(game, 7100, 100, 900, 20) #Finish line at 7700
+                
+            ]
         }
     
     else:

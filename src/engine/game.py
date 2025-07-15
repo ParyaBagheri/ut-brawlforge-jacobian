@@ -169,6 +169,10 @@ class Game:
                         self.state = "playing"
                         self.level = Level("desert", self)
                         self.run()
+                    if MAP_3.is_pressed(MAP_MENU_MOUSE_POS()):
+                        self.state = "playing"
+                        self.level = Level("lost_city", self)
+                        self.run()
                     
 
 
@@ -283,11 +287,6 @@ class Game:
             for i in range(-1, self.screen_width // image_width + 2):
                 self.screen.blit(scaled_image, (start_x + i * image_width, 0))
 '''
-        GAME_MOUSE_POS = pygame.mouse.get_pos
-        self.PAUSE_BUTTON.draw(GAME_MOUSE_POS())
-        if self.is_paused == True: 
-            self.pause_render()
-
         # Draw platforms and ground
         for platform in self.level.platforms:
             if isinstance(platform, Platform) and platform.visible == True:
@@ -316,6 +315,11 @@ class Game:
         self.draw_enemies()
         # Show health
         self.show_health()
+        # Draw pause button 
+        GAME_MOUSE_POS = pygame.mouse.get_pos
+        self.PAUSE_BUTTON.draw(GAME_MOUSE_POS())
+        if self.is_paused == True: 
+            self.pause_render()
         # Show game over
         if self.state == "gameover":
             self.gameover_render()

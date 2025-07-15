@@ -16,9 +16,9 @@ class Level:
     def load(self):
         data = data_loader.get_level_data(self.name, self.game)
 
-        self.background_layers = data["background_layers"]
+        #self.background_layers = data["background_layers"]
         self.platforms = data["platforms"]
-        self.enemies = data["enemies"]
+        #self.enemies = data["enemies"]
         #self.player = data["player"]
     def won(self):
         if self.winFunc is None:
