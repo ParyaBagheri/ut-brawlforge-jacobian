@@ -9,6 +9,7 @@ class Level:
         self.background_layers = []
         self.platforms = []
         self.enemies = []
+        self.powerups = []
         self.winFunc = winFunc
         self.loseFunc = loseFunc
         self.load()
@@ -18,6 +19,8 @@ class Level:
 
         #self.background_layers = data["background_layers"]
         self.platforms = data["platforms"]
+        self.powerups = data["powerups"]
+        print(f"[DEBUG] Loaded powerups: {len(self.powerups)}")
         #self.enemies = data["enemies"]
         #self.player = data["player"]
     def won(self):

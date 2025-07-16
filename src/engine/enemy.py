@@ -15,5 +15,5 @@ class Enemy(pygame.sprite.Sprite):
     def update(self):
         self.rect.x += self.velocity_x
 
-    def got_shot(self):
-        self.health -= config.BULLET_DAMAGE
+    def got_shot(self, damage):
+        self.health -= damage

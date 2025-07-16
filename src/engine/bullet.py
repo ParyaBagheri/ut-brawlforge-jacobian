@@ -23,6 +23,7 @@ class Bullet :
         
         self.is_fired = False
         self.game = self.player.game 
+        self.damage = config.BULLET_DAMAGE
         
         
         #bullet's speed
@@ -89,14 +90,14 @@ class Bullet :
                     self.rect.right <= enemy.rect.right and 
                     self.rect.y >= enemy.rect.top and 
                     self.rect.y <= enemy.rect.bottom ):
-                            enemy.got_shot()
+                            enemy.got_shot(self.damage)
                             return True
                 elif self.direction == "left" :
                     if (self.rect.left <= enemy.rect.right and 
                     self.rect.left >= enemy.rect.left and 
                     self.rect.y >= enemy.rect.top and 
                     self.rect.y <= enemy.rect.bottom ):
-                        enemy.got_shot()
+                        enemy.got_shot(self.damage)
                         return True
 
 

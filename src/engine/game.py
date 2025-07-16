@@ -125,7 +125,6 @@ class Game:
             pygame.display.flip()
             self.clock.tick(config.FPS)
             
-
     def map_menu(self):
         #self.screen.fill((22, 15, 133))
         #self.screen.fill((246, 231, 143))
@@ -284,7 +283,7 @@ class Game:
     def update(self):
         #if self.isGameover == False and self.is_paused == False:
         if self.state == "playing" and self.level != None:
-            self.player.update(self.level.platforms, self.enemies)
+            self.player.update(self.level.platforms, self.enemies, self.level.powerups)
             self.update_camera()
 
             for platform in self.level.platforms :
@@ -304,6 +303,8 @@ class Game:
                     enemy.kill()
                     new_enemy = Enemy(self)
                     self.enemies.add(new_enemy)
+            for powerup in self.level.powerups :
+                powerup.update()
 
     
     def draw(self):
@@ -343,6 +344,9 @@ class Game:
 
         # Draw enemies
         self.draw_enemies()
+        # Draw powerups 
+        for powerup in self.level.powerups :
+            powerup.draw()
         # Show health
         self.show_health()
         # Draw pause button 
@@ -387,6 +391,9 @@ class Game:
             if isinstance(platform, Platform):
                 platform.activated = False
                 platform.visible = True
+        for powerup in self.level.powerups :
+            powerup.visible = True
+        self.player.max_jumps = 1
 
     def gameover_render(self):
 

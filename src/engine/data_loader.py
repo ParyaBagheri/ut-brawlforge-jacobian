@@ -1,5 +1,6 @@
 import pygame
 from src.engine.platform import Platform
+from src.engine.collectible import Powerup
 import config
 
 
@@ -37,6 +38,10 @@ def get_level_data(name, game):
                 game.ground_rect
             ],
             "enemies" : [],
+            "powerups" : [
+                Powerup(game, 1100, 50, 'shield'),
+                Powerup(game, 2100, 550 - config.BASE_GROUND_HEIGHT, 'doublejump')
+            ]
         }
     elif name == "desert":
         return{
@@ -75,7 +80,8 @@ def get_level_data(name, game):
                 Platform(game, 5550, 200, 6600, 400) 
                 #Finish Line at 6000
             ],
-            "enemies" : []
+            "enemies" : [],
+            "powerups" : []
         }
     elif name == "lost_city":
         return{
@@ -113,7 +119,8 @@ def get_level_data(name, game):
                 Platform(game, 6900, 200, 100, 30),
                 Platform(game, 7100, 100, 900, 20) #Finish line at 7700
                 
-            ]
+            ],
+            "powerups" : []
         }
     
     else:
