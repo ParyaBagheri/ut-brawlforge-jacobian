@@ -5,6 +5,7 @@ import os
 import config
 
 
+background_path = os.path.join("src", "assets", "images", "background.jpg")
 
 # Fonts 
 pygame.font.init()
@@ -347,7 +348,7 @@ class Game:
         # Draw pause button 
         GAME_MOUSE_POS = pygame.mouse.get_pos
         self.PAUSE_BUTTON.draw(GAME_MOUSE_POS())
-        if self.is_paused == True: 
+        if self.state == "paused": 
             self.pause_render()
         # Show game over
         if self.state == "gameover":

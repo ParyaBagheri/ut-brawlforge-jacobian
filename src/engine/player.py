@@ -10,12 +10,11 @@ class Player:
     def __init__(self, game,character_type):
         self.game = game
         self.color = (255, 0, 0)  # Player color (red)
-        if image:
+        '''if image:
             self.image = image
         else:
             self.image = pygame.Surface((50, 80))
-            self.image.fill(self.color)
-        self.rect = self.image.get_rect(topleft=(100, 0))
+            self.image.fill(self.color)'''
         self.velocity_y = 0
         self.on_ground = False
         self.health = config.MAX_PLAYER_HEALTH
@@ -28,16 +27,16 @@ class Player:
 
         self.direction = "right" # Track facing direction ( default : right- facing )
         self.collision_direction = "none" 
-    def set_character(self,name):
-        self.type = name
-        self.collision_direction = "none"
+        self.collision_direction = "none"''
 
         # player's asset managing
         self.character_type = character_type
         self.state = "idle" 
-        self.assets = AssetManager.player_assets["girl"]
+        self.assets = AssetManager.player_assets[character_type]
         self.current_frame = 0
         self.image = self.assets[self.state][self.current_frame]
+        self.rect = self.image.get_rect(topleft=(100, 0))
+
         #tyoe of weapon
         self.weapon = config.WEAPONS[self.character_type]
         #held bullet animation

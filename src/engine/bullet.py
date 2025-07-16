@@ -68,11 +68,6 @@ class Bullet :
         else :
 
             # Bullet hasn't been fired yet - follow player position 
-<<<<<<< HEAD
-            self.rect.x = self.player.rect.centerx - 10
-            self.rect.y = self.player.rect.centery - 10
-    
-=======
             self.rect.x = self.player.rect.centerx
             self.rect.y = self.player.rect.centery - 3
 
@@ -85,7 +80,6 @@ class Bullet :
         elif self.direction == "left":
             self.image = pygame.transform.flip(self.asset[int(self.current_frame)], True, False ) #left_facing image
 
->>>>>>> sofia1
     def check_enemy_collision (self) :
         if self.is_fired == True :
             for enemy in self.game.enemies :
