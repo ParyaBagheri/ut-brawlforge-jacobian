@@ -393,6 +393,8 @@ class Game:
                 platform.visible = True
         for powerup in self.level.powerups :
             powerup.visible = True
+            powerup.timer = 0
+            powerup.is_inview = False
         self.player.max_jumps = 1
 
     def gameover_render(self):

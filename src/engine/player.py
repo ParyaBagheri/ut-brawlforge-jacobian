@@ -51,6 +51,10 @@ class Player:
 
         self.held_bullet = Bullet(self, self.bullet_type) # Create a bullet that follows the player (not fired yet)
 
+        self.max_jumps = 1
+        self.jump_count = 0
+        self.jumped = False
+        self.shield_activated = False
         
 
     def check_vertical_collision(self, platforms):
@@ -67,6 +71,7 @@ class Player:
                         self.velocity_y = 0
                         self.on_ground = True
                         landed_on = platform
+                        self.jump_count = 0
                         #return platform
                         break
                 elif not isinstance(platform, Platform):
@@ -77,6 +82,7 @@ class Player:
                         self.rect.bottom = platform.top
                         self.velocity_y = 0
                         self.on_ground = True
+                        self.jump_count = 0
                         break
                         #return platform
         
@@ -90,6 +96,7 @@ class Player:
                     self.rect.left < platform.rect.right):
                     self.rect.top = platform.rect.bottom
                     self.velocity_y = 0
+                    self.jump_count = 0
                     break
                     #return platform
         
@@ -138,8 +145,21 @@ class Player:
                         enemy.is_collided = True
                         self.is_invincible = True
                         return enemy
-    
-    def update(self, platforms, enemies):
+    def check_powerup_collision(self, powerups):
+        for powerup in powerups:
+            if self.rect.colliderect(powerup.rect):
+                if powerup.type == "doublejump":
+                    self.max_jumps = 2
+                    powerup.visible = False
+                if powerup.type == "shield":
+                    self.is_invincible = True 
+                    self.shield_activated = True
+                    powerup.visible = False
+                if powerup.type == "damageboost":
+                    self.held_bullet.damage += 1
+                    powerup.visible = False
+
+    def update(self, platforms, enemies, powerups):
         keys = pygame.key.get_pressed()
         self.update_image(keys)
         
@@ -177,6 +197,7 @@ class Player:
             
         self.check_horizontal_collision(platforms)
         self.check_enemy_collision(enemies)
+        self.check_powerup_collision(powerups)
 
 
         # Temporary flickering after collision with an enemy
@@ -186,7 +207,10 @@ class Player:
                 self.visible = True
             else :
                 self.visible = False
-            if self.invincibility_timer >= 50:
+            if self.shield_activated and self.invincibility_timer >= 180:
+                self.is_invincible = False
+                self.shield_activated = False
+            elif self.shield_activated == False and self.invincibility_timer >= 50:
                 self.is_invincible = False
         else :
             self.visible = True
@@ -205,9 +229,14 @@ class Player:
             self.game.gameover()
             
         # Jumping (only if on ground)
-        if (keys[pygame.K_UP] or keys[pygame.K_SPACE]) and self.on_ground:
-            self.velocity_y = config.JUMP_VELOCITY
-            self.on_ground = False
+        if (keys[pygame.K_UP] or keys[pygame.K_SPACE]):
+            if not self.jumped and (self.on_ground or self.jump_count < self.max_jumps) :
+                self.jump_count += 1
+                self.velocity_y = config.JUMP_VELOCITY
+                self.on_ground = False
+            self.jumped = True
+        else :
+            self.jumped = False
 
         #shoot_animation
         if self.is_shooting == True :
