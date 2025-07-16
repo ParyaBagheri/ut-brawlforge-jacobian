@@ -174,13 +174,43 @@ class Game:
                         self.level = Level("lost_city", self)
                         self.run()
                     
-
-
         while True:
             map_menu_render()
             map_menu_event_handler()
             pygame.display.flip()
             self.clock.tick(config.FPS)
+
+    def finish_menu(self):
+        self.screen.fill((0,0,0))
+        RESTART_BUTTON = Button(self, None, [400, 150], "restart", 'OCRAEXT', 50, 'white', 'yellow')
+        NEXTLEVEL_BUTTON = Button(self, None, [400, 250], "next level", 'OCRAEXT', 50, 'white', 'yellow')
+        MENU_BUTTON = Button(self, None, [400, 350], "main menu", 'OCRAEXT', 50, 'white', 'yellow')
+        MOUSE_POS = pygame.mouse.get_pos
+        def finish_menu_render():
+            RESTART_BUTTON.draw(MOUSE_POS())
+            if self.level.name != "underwater" :
+                NEXTLEVEL_BUTTON.draw(MOUSE_POS())
+            MENU_BUTTON.draw(MOUSE_POS())
+        def finish_menu_event_handler():
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit
+                    sys.exit()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if RESTART_BUTTON.is_pressed(MOUSE_POS()):
+                        self.state = "playing"
+                        self.run()
+                    if NEXTLEVEL_BUTTON.is_pressed(MOUSE_POS()):
+                        self.state = "playing"
+                        if self.level.name == "forest":
+                            self.level = Level("desert", self)
+                            self.run()
+                        elif self.level.name == ""
+                    if MENU_BUTTON.is_pressed(MOUSE_POS()):
+                        self.state = "main_menu"
+                        self.main_menu()
+
+
 
     def platform_maker(self):
         platform_img = pygame.image.load("src/assets/images/platform.png").convert_alpha()
