@@ -204,8 +204,11 @@ class Game:
                         self.state = "playing"
                         if self.level.name == "forest":
                             self.level = Level("desert", self)
-                            self.run()
-                        elif self.level.name == ""
+                        elif self.level.name == "desert":
+                            self.level = Level("lost_city", self)
+                        '''elif self.level.name == "lost_city":
+                            self.level = Level("underwater")'''
+                        self.run()
                     if MENU_BUTTON.is_pressed(MOUSE_POS()):
                         self.state = "main_menu"
                         self.main_menu()

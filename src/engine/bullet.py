@@ -104,14 +104,13 @@ class Bullet :
         else :
 
             # Check collision with platforms
-            for platform in self.game.platforms:
-                    #if isinstance (platform, Platform) :
-                    
-                if (self.rect.x >= platform.rect.left and 
-                self.rect.x <= platform.rect.right and 
-                self.rect.y >= platform.rect.top and 
-                self.rect.y <= platform.rect.bottom ):
-                        
-                    return True # Bullet hit a platform
+            for platform in self.game.level.platforms:
+                if isinstance (platform, Platform) :
+                    if (self.rect.x >= platform.rect.left and 
+                    self.rect.x <= platform.rect.right and 
+                    self.rect.y >= platform.rect.top and 
+                    self.rect.y <= platform.rect.bottom ):
+                            
+                        return True # Bullet hit a platform
                     
         return False  # Bullet didn't hit anything
