@@ -3,9 +3,11 @@ import config
 from src.engine.enemy import Enemy
 from src.engine.bullet import Bullet
 from src.engine.platform import Platform
+from src.engine.assetmanager import AssetManager
+
 
 class Player:
-    def __init__(self, game, character_type, image=None):
+    def __init__(self, game,character_type):
         self.game = game
         self.color = (255, 0, 0)  # Player color (red)
         if image:
@@ -24,12 +26,34 @@ class Player:
         self.is_slowed = False
         self.slowing_timer = 0
 
-        self.held_bullet = Bullet(self) # Create a bullet that follows the player (not fired yet)
-
         self.direction = "right" # Track facing direction ( default : right- facing )
         self.collision_direction = "none" 
     def set_character(self,name):
         self.type = name
+        self.collision_direction = "none"
+
+        # player's asset managing
+        self.character_type = character_type
+        self.state = "idle" 
+        self.assets = AssetManager.player_assets["girl"]
+        self.current_frame = 0
+        self.image = self.assets[self.state][self.current_frame]
+        #tyoe of weapon
+        self.weapon = config.WEAPONS[self.character_type]
+        #held bullet animation
+        self.is_shooting = False
+        self.attack_animation = False
+
+        #type of bullet 
+        if self.weapon == "bow" :
+            self.bullet_type = "arrow"
+        elif self.weapon == "wand" :
+            self.bullet_type = "fireball"
+
+        self.held_bullet = Bullet(self, self.bullet_type) # Create a bullet that follows the player (not fired yet)
+
+        
+
     def check_vertical_collision(self, platforms):
         landed_on = None
         # Check vertical collision (falling)
@@ -118,6 +142,7 @@ class Player:
     
     def update(self, platforms, enemies):
         keys = pygame.key.get_pressed()
+        self.update_image(keys)
         
         # Horizontal movement
         self.velocity_x = config.MOVE_SPEED - 3 if self.is_slowed else config.MOVE_SPEED
@@ -184,14 +209,62 @@ class Player:
         if (keys[pygame.K_UP] or keys[pygame.K_SPACE]) and self.on_ground:
             self.velocity_y = config.JUMP_VELOCITY
             self.on_ground = False
-        
+
+        #shoot_animation
+        if self.is_shooting == True :
+            self.attack_animation = True
+            self.is_shooting = False
+        #shoot
+        if (self.current_frame >= config.SHOOT_FRAME[self.weapon]  and 
+        self.current_frame < config.SHOOT_FRAME[self.weapon] + config.PLAYER_FRAMES_SPEED and 
+        self.state == "attack") :
+            self.shoot()
+
+            
         # Update held bullet (follows player if not fired)
         self.held_bullet.update()
 
-    def shoot (self) :
+    def update_image (self, keys) :
 
+        if self.attack_animation == True :
+            if self.state != "attack" :
+                self.current_frame = 0
+                self.state = "attack"
+            elif self.state == "attack" and self.current_frame >= len(self.assets [self.state]) - (2 * config.PLAYER_FRAMES_SPEED) :
+                self.attack_animation = False
+
+        elif (self.on_ground and ( not ( keys[pygame.K_a] or keys[pygame.K_d] or keys[pygame.K_UP] or keys[pygame.K_SPACE] ) ) ):
+            if(self.state != "idle"):
+                self.current_frame = 0
+                self.state = "idle"
+
+        elif ( (keys[pygame.K_UP] or keys[pygame.K_SPACE]) and self.on_ground) :
+
+            self.current_frame = 0
+            self.state = "jumping"
+            
+        elif not self.on_ground :
+
+            if(self.state != "falling" and self.velocity_y > 0) :
+                self.current_frame = 0
+                self.state = "falling"
+        
+        elif (keys[pygame.K_a] or keys[pygame.K_d]) and self.on_ground :
+            if(self.state != "run" ):
+                self.current_frame = 0
+                self.state = "run"
+    
+        self.image = self.assets[self.state][int(self.current_frame)]
+        
+        self.current_frame += config.PLAYER_FRAMES_SPEED
+        if(self.current_frame >= len(self.assets[self.state])) :
+            self.current_frame = 0
+        
+
+    def shoot (self) :
+        
         # Trigger the held bullet to be fired
         self.held_bullet.fire()
 
         # Create a new bullet that will follow the player (for next shot)
-        self.held_bullet = Bullet (self)
+        self.held_bullet = Bullet (self, self.held_bullet.type)

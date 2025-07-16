@@ -4,19 +4,7 @@ import os
 
 import config
 
-#press esc to pause, shift to shoot
 
-right_bullet_image_path = os.path.join("src","assets", "images" , "rightpaintball.png")
-left_bullet_image_path = os.path.join("src","assets", "images" , "rightpaintball.png")
-background_path = os.path.join("src", "assets", "images", "background.jpg")
-
-
-right_bullet_image = pygame.image.load(right_bullet_image_path)
-#right_bullet_image = pygame.image.load(config.IMAGE_PATH, "rightpaintball.png")
-right_bullet_image = pygame.transform.scale(right_bullet_image, (20, 20))
-left_bullet_image = pygame.image.load(left_bullet_image_path)
-#left_bullet_image = pygame.image.load(config.IMAGE_PATH, "leftpaintball.png")
-left_bullet_image = pygame.transform.scale(left_bullet_image, (20, 20))
 
 # Fonts 
 pygame.font.init()
@@ -32,7 +20,10 @@ from src.engine.enemy import Enemy
 from src.engine.button import Button
 from src.engine.level import Level
 from src.engine import data_loader
+from src.engine.assetmanager import AssetManager
+
 class Game:
+    
     def __init__(self):
         pygame.init()
         self.screen = pygame.display.set_mode((config.BASE_SCREEN_WIDTH, config.BASE_SCREEN_HEIGHT), pygame.RESIZABLE)
@@ -43,8 +34,10 @@ class Game:
         self.PAUSE_BUTTON = Button(self, None, [750,10], "Pause", 'Blox2', 30, 'white', 'grey') #Add pause button image later
                 
         #self.platforms = self.platform_maker()
+        
+        
+        AssetManager.load_assets()
 
-        #list of fired bullets
         self.Fired_bullets_list = []
 
         #self.player = Player(self)
@@ -269,6 +262,10 @@ class Game:
                   (event.type == pygame.MOUSEBUTTONDOWN and self.PAUSE_BUTTON.is_pressed(GAME_MOUSE_POS()))) and self.state != "gameover" :
                 # Press esc or pause button to pause
                 self.state = "paused"
+                
+            elif event.type == pygame.MOUSEBUTTONDOWN :
+                if event.button == 1 : #left mouse button
+                    self.player.is_shooting = True
 
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.state != "paused" and self.state != "gameover":
                 #if event.button == 1 : #left mouse button
@@ -330,16 +327,15 @@ class Game:
         
         # Draw player
         if(self.player.visible == True) :
-            pygame.draw.rect(self.screen, self.player.color, 
-                        pygame.Rect(self.player.rect.x - self.camera_x, 
-                                   self.player.rect.y, 
-                                   self.player.rect.width, 
-                                   self.player.rect.height))
+            if self.player.direction == "left" :
+                self.screen.blit( pygame.transform.flip(self.player.image,True,False), (self.player.rect.x - self.camera_x, self.player.rect.y))
+            else :
+                self.screen.blit( self.player.image, (self.player.rect.x - self.camera_x, self.player.rect.y))
         
         # Draw all fired bullets with camera offset
         for bullet in self.Fired_bullets_list :
             if isinstance(bullet, Bullet) :
-                self.screen.blit(bullet.bulletimg, (bullet.rect.x - self.camera_x, bullet.rect.y))
+                self.screen.blit(bullet.image, (bullet.rect.x - self.camera_x, bullet.rect.y))
 
         # Draw enemies
         self.draw_enemies()

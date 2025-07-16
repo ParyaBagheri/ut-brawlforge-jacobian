@@ -2,36 +2,35 @@ import pygame
 import os
 from src.engine.enemy import Enemy
 from src.engine.platform import Platform
-
-right_bullet_image_path = os.path.join("src","assets", "images" , "rightpaintball.png")
-left_bullet_image_path = os.path.join("src","assets", "images" , "rightpaintball.png")
-
-right_bullet_image = pygame.image.load(right_bullet_image_path)
-right_bullet_image = pygame.transform.scale(right_bullet_image, (20, 20))
-left_bullet_image = pygame.image.load(left_bullet_image_path)
-left_bullet_image = pygame.transform.scale(left_bullet_image, (20, 20))
-
-BULLET_SPEED = 30
-BULLET_DAMAGE = 1
+from src.engine.assetmanager import AssetManager
+import config
 
 
 class Bullet :
 
-    def __init__(self, player) :
+    def __init__(self,player, type) :
+        #arrow or fireball or ...
+        self.type = type
+
         #set the default direction
-        self.bulletimg = right_bullet_image # Default image (right-facing)
         self.direction = "none"
+        #bullet animation
+        self.asset = AssetManager.bullet_assets[self.type] # Default image (right-facing)
+        self.current_frame = 0
+        self.image = self.asset [self.current_frame]
 
         self.player = player # Reference to the player who shot this bullet
         
         self.is_fired = False
         self.game = self.player.game 
         
+        
         #bullet's speed
+        self.speed = config.BULLET_SPEED[self.type]
         self.changex = 0
-
+        
         # Create bullet's rectangle at player's center (adjusted for image size)
-        self.rect = pygame.Rect(self.player.rect.centerx-10, self.player.rect.centery-10, 20, 20)
+        self.rect = pygame.Rect(self.player.rect.centerx, self.player.rect.centery-3, config.BULLET_SIZE [self.type][0],config.BULLET_SIZE [self.type][1])
 
     
             
@@ -45,20 +44,20 @@ class Bullet :
         
         # Set direction and speed based on player's facing direction
         if self.player.direction == "right"  :
-            self.changex = BULLET_SPEED
+            self.changex = self.speed
             self.direction = "right"
-            self.bulletimg = right_bullet_image # Right-facing image
-            
+                 
         if self.player.direction == "left" :
-            self.changex = -BULLET_SPEED
+            self.changex = -self.speed
             self.direction = "left"
-            self.bulletimg = left_bullet_image # Left-facing image
+            
 
 
     def update (self) :
 
         if self.is_fired == True :
-
+            #fired bullet animation 
+            self.update_image ()
             # Bullet is in flight - move it horizontally
             self.rect.x += self.changex
 
@@ -69,9 +68,24 @@ class Bullet :
         else :
 
             # Bullet hasn't been fired yet - follow player position 
+<<<<<<< HEAD
             self.rect.x = self.player.rect.centerx - 10
             self.rect.y = self.player.rect.centery - 10
     
+=======
+            self.rect.x = self.player.rect.centerx
+            self.rect.y = self.player.rect.centery - 3
+
+    def update_image (self) :
+        self.current_frame += config.BULLET_FRAMES_SPEED
+        if self.current_frame >= len(self.asset) :
+            self.current_frame = 0
+        if self.direction == "right" :
+            self.image = self.asset[int(self.current_frame)] # Right-facing image
+        elif self.direction == "left":
+            self.image = pygame.transform.flip(self.asset[int(self.current_frame)], True, False ) #left_facing image
+
+>>>>>>> sofia1
     def check_enemy_collision (self) :
         if self.is_fired == True :
             for enemy in self.game.enemies :
