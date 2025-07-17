@@ -33,3 +33,5 @@ SHOOT_FRAME = {
 }
 BULLET_FRAMES_SPEED = 0.45
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+BUTTON_FRAMES_SPEED = 0.15
