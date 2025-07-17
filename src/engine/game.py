@@ -124,7 +124,12 @@ class Game:
             char_menu_events()
             pygame.display.flip()
             self.clock.tick(config.FPS)
-            
+    
+    def forest_win(self):
+        if self.player.rect.x >= 3200 :
+            return True
+        return False
+
     def map_menu(self):
         #self.screen.fill((22, 15, 133))
         #self.screen.fill((246, 231, 143))
@@ -156,7 +161,7 @@ class Game:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if MAP_1.is_pressed(MAP_MENU_MOUSE_POS()):
                         self.state = "playing"
-                        self.level = Level("forest", self)
+                        self.level = Level("forest", self, self.forest_win)
                         self.run()
                     if MAP_2.is_pressed(MAP_MENU_MOUSE_POS()):
                         self.state = "playing"
@@ -205,6 +210,11 @@ class Game:
                     if MENU_BUTTON.is_pressed(MOUSE_POS()):
                         self.state = "main_menu"
                         self.main_menu()
+        while True :
+            finish_menu_render()
+            finish_menu_event_handler()
+            pygame.display.flip()
+            self.clock.tick(config.FPS)
 
 
 
@@ -283,6 +293,9 @@ class Game:
     def update(self):
         #if self.isGameover == False and self.is_paused == False:
         if self.state == "playing" and self.level != None:
+            if self.level.won() :
+                self.state = "won"
+                self.finish_menu()
             self.player.update(self.level.platforms, self.enemies, self.level.powerups)
             self.update_camera()
 
