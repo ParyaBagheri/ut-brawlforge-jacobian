@@ -116,13 +116,16 @@ class AssetManager :
     def load_player_sounds ():
         
         # running sound
-        running_sound = pygame.mixer.music.load("src/assets/sounds/player/running.mp3")
+        running_sound = pygame.mixer.Sound("src/assets/sounds/player/running.wav")
+        running_sound.set_volume(1)
         # jump sound
-        jump_sound = pygame.mixer.music.load("src/assets/sounds/player/jump.wav")
+        jump_sound = pygame.mixer.Sound("src/assets/sounds/player/jump.wav")
+        jump_sound.set_volume(0.2)
         # attack sound
-        attack_sound = pygame.mixer.music.load("src/assets/sounds/player/attack.wav")
+        attack_sound = pygame.mixer.Sound("src/assets/sounds/player/attack.wav")
         # damege sound
-        damage_sound = pygame.mixer.music.load("src/assets/sounds/player/damage.wav")
+        damage_sound = pygame.mixer.Sound("src/assets/sounds/player/damage.wav")
+        damage_sound.set_volume(0.6)
 
         AssetManager.player_sounds = {
             "running" : running_sound ,
@@ -130,6 +133,7 @@ class AssetManager :
             "attack" : attack_sound ,
             "damage" : damage_sound
         }
+        
   
 
     def load_bullet_assets (): 

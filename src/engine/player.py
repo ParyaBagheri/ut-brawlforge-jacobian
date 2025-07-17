@@ -30,16 +30,22 @@ class Player:
         self.collision_direction = "none"''
 
         # player's asset managing
+        #sounds
+        self.sound_effects = AssetManager.player_sounds
+        self.mute = False
+        self.damage_sound = False
+        self.attack_sound = False
+
+        # images
         self.character_type = character_type
         self.state = "idle" 
         self.assets = AssetManager.player_images[character_type]
         self.current_frame = 0
         self.image = self.assets[self.state][self.current_frame]
         self.rect = self.image.get_rect(topleft=(100, 0))
-
-        #tyoe of weapon
+        # type of weapon
         self.weapon = config.WEAPONS[self.character_type]
-        #held bullet animation
+        # attack 
         self.is_shooting = False
         self.attack_animation = False
 
@@ -135,14 +141,17 @@ class Player:
                         return 
                     elif(enemy.is_collided == False) :
                         self.health -= 1
+
+                        # playing damage sound when the player is damaged
+                        self.damage_sound = True
+
                         enemy.is_collided = True
                         self.is_invincible = True
                         return enemy
     
     def update(self, platforms, enemies):
         keys = pygame.key.get_pressed()
-        self.update_image(keys)
-        
+        self.update_animation(keys)
         # Horizontal movement
         self.velocity_x = config.MOVE_SPEED - 3 if self.is_slowed else config.MOVE_SPEED
 
@@ -217,14 +226,15 @@ class Player:
         if (self.current_frame >= config.SHOOT_FRAME[self.weapon]  and 
         self.current_frame < config.SHOOT_FRAME[self.weapon] + config.PLAYER_FRAMES_SPEED and 
         self.state == "attack") :
+            self.attack_sound = True
             self.shoot()
 
             
         # Update held bullet (follows player if not fired)
         self.held_bullet.update()
 
-    def update_image (self, keys) :
-
+    def update_animation (self, keys) :
+        prev_state = self.state
         if self.attack_animation == True :
             if self.state != "attack" :
                 self.current_frame = 0
@@ -238,10 +248,9 @@ class Player:
                 self.state = "idle"
 
         elif ( (keys[pygame.K_UP] or keys[pygame.K_SPACE]) and self.on_ground) :
-
             self.current_frame = 0
             self.state = "jumping"
-            
+   
         elif not self.on_ground :
 
             if(self.state != "falling" and self.velocity_y > 0) :
@@ -249,17 +258,38 @@ class Player:
                 self.state = "falling"
         
         elif (keys[pygame.K_a] or keys[pygame.K_d]) and self.on_ground :
-            if(self.state != "run" ):
+            if(self.state != "run" ): 
+                
                 self.current_frame = 0
                 self.state = "run"
-    
+
         self.image = self.assets[self.state][int(self.current_frame)]
         
         self.current_frame += config.PLAYER_FRAMES_SPEED
         if(self.current_frame >= len(self.assets[self.state])) :
             self.current_frame = 0
-        
+        self.sound_manager(prev_state)
 
+    def sound_manager(self, prev_state) :
+        if not self.mute :
+            if self.state == "jumping" and prev_state != "jumping" :
+                self.sound_effects["jump"].play()
+
+            if self.state == "run" and prev_state != "run" :
+                self.sound_effects ["running"].play(loops=-1)
+
+            if (self.state != "run" and prev_state == "run"):
+                self.sound_effects["running"].fadeout(300)
+
+            if self.damage_sound :
+                self.sound_effects["damage"].play()
+                self.damage_sound = False
+
+            if self.attack_sound :
+                self.sound_effects["attack"].play()
+                self.attack_sound = False
+        
+                
     def shoot (self) :
         
         # Trigger the held bullet to be fired
