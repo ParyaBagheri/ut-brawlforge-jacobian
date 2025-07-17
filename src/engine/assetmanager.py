@@ -141,12 +141,19 @@ class AssetManager :
         # damege sound
         damage_sound = pygame.mixer.Sound("src/assets/sounds/player/damage.wav")
         damage_sound.set_volume(0.6)
-
+        # bounce sound
+        bounce_sound = pygame.mixer.Sound("src/assets/sounds/player/bounce.mp3")
+        bounce_sound.set_volume(0.4)
+        # game over sound
+        gameover_sound = pygame.mixer.Sound("src/assets/sounds/player/gameover.mp3")
+        gameover_sound.set_volume(0.4)
         AssetManager.player_sounds = {
             "running" : running_sound ,
             "jump" : jump_sound ,
             "attack" : attack_sound ,
-            "damage" : damage_sound
+            "damage" : damage_sound ,
+            "bounce" : bounce_sound ,
+            "game over" : gameover_sound
         }
         
   

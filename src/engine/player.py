@@ -35,6 +35,7 @@ class Player:
         self.mute = False
         self.damage_sound = False
         self.attack_sound = False
+        self.bounce_sound = False
 
         # images
         self.character_type = character_type
@@ -179,6 +180,8 @@ class Player:
                     collided_platform.timed_platform()
                 elif collided_platform.type == 'bouncy':
                     collided_platform.bouncy_platform()
+                    # bounce sound effect
+                    self.bounce_sound = True
                 elif collided_platform.type == 'slowing':
                     if self.velocity_x >= 3:
                         collided_platform.slowing_platform()
@@ -278,6 +281,9 @@ class Player:
 
     def sound_manager(self, prev_state) :
         if not self.mute :
+            if self.bounce_sound == True :
+                self.sound_effects["bounce"].play()
+                self.bounce_sound = False
             if self.state == "jumping" and prev_state != "jumping" :
                 self.sound_effects["jump"].play()
 
@@ -294,7 +300,9 @@ class Player:
             if self.attack_sound :
                 self.sound_effects["attack"].play()
                 self.attack_sound = False
-        
+            if self.is_dead :
+                self.sound_effects["game over"].play()
+                
                 
     def shoot (self) :
         
