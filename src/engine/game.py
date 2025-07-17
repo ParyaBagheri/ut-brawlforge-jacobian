@@ -378,15 +378,7 @@ class Game:
 
     def gameover(self):
         self.state = "gameover"
-        self.player.color = (0, 0, 0)
-        self.player.rect.x = 100
-        self.player.rect.top = 0
-        self.player.invincibility_timer = 0
-        self.player.is_invincible = False
-        for platform in self.level.platforms :
-            if isinstance(platform, Platform):
-                platform.activated = False
-                platform.visible = True
+        
 
     def gameover_render(self):
 
@@ -397,6 +389,17 @@ class Game:
         self.screen.blit(gameover_message, text_rect)
 
     def restart(self):
+        self.player.color = (0, 0, 0)
+        self.player.rect.x = 100
+        self.player.rect.top = 0
+        self.player.invincibility_timer = 0
+        self.player.is_invincible = False
+        self.player.is_dead = False
+        self.player.state = "idle"
+        for platform in self.level.platforms :
+            if isinstance(platform, Platform):
+                platform.activated = False
+                platform.visible = True
         self.player.health = config.MAX_PLAYER_HEALTH
         self.player.color = (255, 0, 0)
         self.state = "playing"
