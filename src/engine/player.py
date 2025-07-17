@@ -32,7 +32,7 @@ class Player:
         # player's asset managing
         self.character_type = character_type
         self.state = "idle" 
-        self.assets = AssetManager.player_assets[character_type]
+        self.assets = AssetManager.player_images[character_type]
         self.current_frame = 0
         self.image = self.assets[self.state][self.current_frame]
         self.rect = self.image.get_rect(topleft=(100, 0))
