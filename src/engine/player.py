@@ -30,24 +30,32 @@ class Player:
         self.collision_direction = "none"''
 
         # player's asset managing
+        #sounds
+        self.sound_effects = AssetManager.player_sounds
+        self.mute = False
+        self.damage_sound = False
+        self.attack_sound = False
+        self.bounce_sound = False
+
+        # images
         self.character_type = character_type
         self.state = "idle" 
-        self.assets = AssetManager.player_assets[character_type]
+        self.assets = AssetManager.player_images[character_type]
         self.current_frame = 0
         self.image = self.assets[self.state][self.current_frame]
         self.rect = self.image.get_rect(topleft=(100, 0))
-
-        #tyoe of weapon
+        # type of weapon
         self.weapon = config.WEAPONS[self.character_type]
-        #held bullet animation
+        # attack 
         self.is_shooting = False
         self.attack_animation = False
-
-        #type of bullet 
+        # type of bullet 
         if self.weapon == "bow" :
             self.bullet_type = "arrow"
         elif self.weapon == "wand" :
             self.bullet_type = "fireball"
+        # die animation 
+        self.is_dead = False
 
         self.held_bullet = Bullet(self, self.bullet_type) # Create a bullet that follows the player (not fired yet)
 
@@ -142,6 +150,10 @@ class Player:
                         return 
                     elif(enemy.is_collided == False) :
                         self.health -= 1
+
+                        # playing damage sound when the player is damaged
+                        self.damage_sound = True
+
                         enemy.is_collided = True
                         self.is_invincible = True
                         return enemy
@@ -161,116 +173,122 @@ class Player:
 
     def update(self, platforms, enemies, powerups):
         keys = pygame.key.get_pressed()
-        self.update_image(keys)
-        
-        # Horizontal movement
-        self.velocity_x = config.MOVE_SPEED - 3 if self.is_slowed else config.MOVE_SPEED
+        self.update_animation(keys)
+        if self.state != "die" :
+            # Horizontal movement
+            self.velocity_x = config.MOVE_SPEED - 3 if self.is_slowed else config.MOVE_SPEED
 
-        if (keys[pygame.K_a] and self.collision_direction != "left"):
-            self.rect.x -= self.velocity_x
-            self.direction = "left" # Update facing direction
+            if (keys[pygame.K_a] and self.collision_direction != "left"):
+                self.rect.x -= self.velocity_x
+                self.direction = "left" # Update facing direction
 
-        if (keys[pygame.K_d] and self.collision_direction != "right"):
-            self.rect.x += self.velocity_x
-            self.direction = "right" # Update facing direction
-        if self.rect.x <= 0 :
-            self.rect.x = 0
+            if (keys[pygame.K_d] and self.collision_direction != "right"):
+                self.rect.x += self.velocity_x
+                self.direction = "right" # Update facing direction
+            if self.rect.x <= 0 :
+                self.rect.x = 0
             
-        # Apply gravity
-        self.velocity_y += config.GRAVITY
-        self.rect.y += self.velocity_y
+            # Apply gravity
+            self.velocity_y += config.GRAVITY
+            self.rect.y += self.velocity_y
         
-        # Check collisions
-        collided_platform = self.check_vertical_collision(platforms)
-        #print("collided:", collided_platform.type if collided_platform else None)
-        if collided_platform != None and collided_platform != self.game.ground_rect :
-            if collided_platform.type == 'timed':
-                collided_platform.timed_platform()
-            elif collided_platform.type == 'bouncy':
-                collided_platform.bouncy_platform()
-            elif collided_platform.type == 'slowing':
-                if self.velocity_x >= 3:
-                    collided_platform.slowing_platform()
-            elif collided_platform.type == 'spikey' and self.is_invincible == False :
-                self.health -= 1
-                self.is_invincible = True
+            # Check collisions
+            collided_platform = self.check_vertical_collision(platforms)
+            #print("collided:", collided_platform.type if collided_platform else None)
+            if collided_platform != None and collided_platform != self.game.ground_rect :
+                if collided_platform.type == 'timed':
+                    collided_platform.timed_platform()
+                elif collided_platform.type == 'bouncy':
+                    collided_platform.bouncy_platform()
+                    # bounce sound effect
+                    self.bounce_sound = True
+                elif collided_platform.type == 'slowing':
+                    if self.velocity_x >= 3:
+                        collided_platform.slowing_platform()
+                elif collided_platform.type == 'spikey' and self.is_invincible == False :
+                    self.damage_sound = True
+                    self.health -= 1
+                    self.is_invincible = True
             
-        self.check_horizontal_collision(platforms)
-        self.check_enemy_collision(enemies)
-        self.check_powerup_collision(powerups)
+            self.check_horizontal_collision(platforms)
+            self.check_enemy_collision(enemies)
+            self.check_powerup_collision(powerups)
 
 
-        # Temporary flickering after collision with an enemy
-        if self.is_invincible :
-            self.invincibility_timer += 1
-            if self.invincibility_timer % 15 < 8 :
-                self.visible = True
+            # Temporary flickering after collision with an enemy
+            if self.is_invincible :
+                self.invincibility_timer += 1
+                if self.invincibility_timer % 15 < 8 :
+                    self.visible = True
+                else :
+                    self.visible = False
+                if self.shield_activated and self.invincibility_timer >= 180:
+                    self.is_invincible = False
+                    self.shield_activated = False
+                elif self.shield_activated == False and self.invincibility_timer >= 50 :
+                    self.is_invincible = False
             else :
-                self.visible = False
-            if self.shield_activated and self.invincibility_timer >= 180:
-                self.is_invincible = False
-                self.shield_activated = False
-            elif self.shield_activated == False and self.invincibility_timer >= 50:
-                self.is_invincible = False
-        else :
-            self.visible = True
-            self.invincibility_timer = 0
+                self.visible = True
+                self.invincibility_timer = 0
 
-        if self.is_slowed :
-            self.slowing_timer += 1
-            if self.slowing_timer >= 15 :
-                self.is_slowed = False
-                self.slowing_timer = 0
+            if self.is_slowed :
+                self.slowing_timer += 1
+                if self.slowing_timer >= 15 :
+                    self.is_slowed = False
+                    self.slowing_timer = 0
+   
+            # Jumping (only if on ground)
+            if (keys[pygame.K_UP] or keys[pygame.K_SPACE]):
+                if not self.jumped and (self.on_ground or self.jump_count < self.max_jumps) :
+                    self.jump_count += 1
+                    self.velocity_y = config.JUMP_VELOCITY
+                    self.on_ground = False
+                self.jumped = True
+            else :
+                self.jumped = False
 
+            #shoot_animation
+            if self.is_shooting == True :
+                self.attack_animation = True
+                self.is_shooting = False
+            #shoot
+            if (self.current_frame >= config.SHOOT_FRAME[self.weapon]  and 
+            self.current_frame < config.SHOOT_FRAME[self.weapon] + config.PLAYER_FRAMES_SPEED and 
+            self.state == "attack") :
+                self.attack_sound = True
+                self.shoot()
 
-
-        # Game over when player dies
-        if self.health <= 0 or self.rect.y >= 600:
+            
+            # Update held bullet (follows player if not fired)
+            self.held_bullet.update()
+        elif self.is_dead == True :
+            # Game over when player dies
             self.game.gameover()
-            
-        # Jumping (only if on ground)
-        if (keys[pygame.K_UP] or keys[pygame.K_SPACE]):
-            if not self.jumped and (self.on_ground or self.jump_count < self.max_jumps) :
-                self.jump_count += 1
-                self.velocity_y = config.JUMP_VELOCITY
-                self.on_ground = False
-            self.jumped = True
-        else :
-            self.jumped = False
 
-        #shoot_animation
-        if self.is_shooting == True :
-            self.attack_animation = True
-            self.is_shooting = False
-        #shoot
-        if (self.current_frame >= config.SHOOT_FRAME[self.weapon]  and 
-        self.current_frame < config.SHOOT_FRAME[self.weapon] + config.PLAYER_FRAMES_SPEED and 
-        self.state == "attack") :
-            self.shoot()
+    def update_animation (self, keys) :
+        prev_state = self.state
+        if (self.health <= 0 or self.rect.y >= 600 ) :
+            if self.state != "die" :
+                self.current_frame = 0
+                self.state = "die"
+            elif self.state == "die" and self.current_frame >= len(self.assets [self.state]) - (3 * config.PLAYER_FRAMES_SPEED) :
+                self.is_dead = True
 
-            
-        # Update held bullet (follows player if not fired)
-        self.held_bullet.update()
-
-    def update_image (self, keys) :
-
-        if self.attack_animation == True :
+        elif self.attack_animation == True :
             if self.state != "attack" :
                 self.current_frame = 0
                 self.state = "attack"
             elif self.state == "attack" and self.current_frame >= len(self.assets [self.state]) - (2 * config.PLAYER_FRAMES_SPEED) :
                 self.attack_animation = False
-
         elif (self.on_ground and ( not ( keys[pygame.K_a] or keys[pygame.K_d] or keys[pygame.K_UP] or keys[pygame.K_SPACE] ) ) ):
             if(self.state != "idle"):
                 self.current_frame = 0
                 self.state = "idle"
 
         elif ( (keys[pygame.K_UP] or keys[pygame.K_SPACE]) and self.on_ground) :
-
             self.current_frame = 0
             self.state = "jumping"
-            
+   
         elif not self.on_ground :
 
             if(self.state != "falling" and self.velocity_y > 0) :
@@ -278,17 +296,43 @@ class Player:
                 self.state = "falling"
         
         elif (keys[pygame.K_a] or keys[pygame.K_d]) and self.on_ground :
-            if(self.state != "run" ):
+            if(self.state != "run" ): 
+                
                 self.current_frame = 0
                 self.state = "run"
-    
+
         self.image = self.assets[self.state][int(self.current_frame)]
         
         self.current_frame += config.PLAYER_FRAMES_SPEED
         if(self.current_frame >= len(self.assets[self.state])) :
             self.current_frame = 0
-        
+        self.sound_manager(prev_state)
 
+    def sound_manager(self, prev_state) :
+        if not self.mute :
+            if self.bounce_sound == True :
+                self.sound_effects["bounce"].play()
+                self.bounce_sound = False
+            if self.state == "jumping" and prev_state != "jumping" :
+                self.sound_effects["jump"].play()
+
+            if self.state == "run" and prev_state != "run" :
+                self.sound_effects ["running"].play(loops=-1)
+
+            if (self.state != "run" and prev_state == "run"):
+                self.sound_effects["running"].fadeout(300)
+
+            if self.damage_sound :
+                self.sound_effects["damage"].play()
+                self.damage_sound = False
+
+            if self.attack_sound :
+                self.sound_effects["attack"].play()
+                self.attack_sound = False
+            if self.is_dead :
+                self.sound_effects["game over"].play()
+                
+                
     def shoot (self) :
         
         # Trigger the held bullet to be fired

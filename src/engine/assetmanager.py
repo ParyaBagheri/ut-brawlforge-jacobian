@@ -1,11 +1,14 @@
 import pygame
 import sys
 import config
+
 class AssetManager :
     
-    player_assets = {}
+    player_images = {}
     enemy_assets = {}
     bullet_assets = {}
+    player_sounds = {}
+
     def load_frames(sheet,frame_width,frame_hight ,startpoint, numframes):
         frames = []
         for i in range (numframes) :
@@ -22,7 +25,10 @@ class AssetManager :
         return newframes
     
     def load_player_assets () :
+        # player's sound effects
+        AssetManager.load_player_sounds ()
 
+        # knight character images
         knight_idle_sheet = pygame.image.load ("src/assets/images/player/knight/idle.png")
         knight_idle_frames = AssetManager.load_frames(knight_idle_sheet, 16,19,5,4)
         knight_idle_frames = AssetManager.scale_frames(knight_idle_frames, 50, 80)
@@ -43,6 +49,11 @@ class AssetManager :
         knight_attack_frames = AssetManager.load_frames(knight_attack_sheet, 16,20,4, 6)
         knight_attack_frames = AssetManager.scale_frames(knight_attack_frames, 50 , 80)
 
+        knight_die_sheet = pygame.image.load("src/assets/images/player/knight/die.png")
+        knight_die_frames = AssetManager.load_frames(knight_die_sheet, 16, 24, 0, 4)
+        knight_die_frames = AssetManager.scale_frames(knight_die_frames, 50, 80 )
+
+        # girl character images
         girl_idle_sheet = pygame.image.load("src/assets/images/player/girl/idle.png")
         girl_idle_frames = AssetManager.load_frames(girl_idle_sheet,16,20,4,4)
         girl_idle_frames = AssetManager.scale_frames(girl_idle_frames, 50, 80)
@@ -63,6 +74,11 @@ class AssetManager :
         girl_attack_frames = AssetManager.load_frames (girl_attack_sheet, 16, 21, 3 ,5)
         girl_attack_frames = AssetManager.scale_frames(girl_attack_frames, 50, 80)
 
+        girl_die_sheet = pygame.image.load("src/assets/images/player/girl/die.png")
+        girl_die_frames = AssetManager.load_frames(girl_die_sheet, 16, 24, 0, 4)
+        girl_die_frames = AssetManager.scale_frames(girl_die_frames, 50, 80 )
+
+        # wizard character images
         wizard_idle_sheet = pygame.image.load("src/assets/images/player/wizard/idle.png")
         wizard_idle_frames = AssetManager.load_frames(wizard_idle_sheet, 16, 22 , 2 ,4)
         wizard_idle_frames = AssetManager.scale_frames(wizard_idle_frames, 50 , 80)
@@ -80,30 +96,67 @@ class AssetManager :
         wizard_falling_frames = AssetManager.scale_frames(wizard_falling_frames, 50 , 80)
 
         wizard_attack_sheet = pygame.image.load("src/assets/images/player/wizard/attack.png")
-        wizard_attack_frames = AssetManager.load_frames(wizard_attack_sheet, 16,23,1,6)
+        wizard_attack_frames = AssetManager.load_frames(wizard_attack_sheet, 16, 23, 1,6)
         wizard_attack_frames = AssetManager.scale_frames(wizard_attack_frames, 50, 80)
 
-        AssetManager.player_assets["knight"] = {
+        wizard_die_sheet = pygame.image.load("src/assets/images/player/wizard/die.png")
+        wizard_die_frames = AssetManager.load_frames(wizard_die_sheet, 16, 24, 0, 4)
+        wizard_die_frames = AssetManager.scale_frames(wizard_die_frames, 50, 80 )
+
+        AssetManager.player_images["knight"] = {
             "idle" : knight_idle_frames ,
             "run" : knight_run_frames ,
             "jumping" : knight_jumping_frames,
             "falling" : knight_falling_frames ,
-            "attack" : knight_attack_frames
+            "attack" : knight_attack_frames ,
+            "die" : knight_die_frames
         }
-        AssetManager.player_assets["girl"] = {
+        AssetManager.player_images["girl"] = {
             "idle" : girl_idle_frames ,
             "run" : girl_run_frames ,
             "jumping" : girl_jumping_frames ,
             "falling" : girl_falling_frames ,
-            "attack" : girl_attack_frames
+            "attack" : girl_attack_frames ,
+            "die" : girl_die_frames
         }
-        AssetManager.player_assets["wizard"] = {
+        AssetManager.player_images["wizard"] = {
             "idle" : wizard_idle_frames ,
             "run" : wizard_run_frames ,
             "jumping" : wizard_jumping_frames ,
             "falling" : wizard_falling_frames ,
-            "attack" : wizard_attack_frames
+            "attack" : wizard_attack_frames ,
+            "die" : wizard_die_frames
         }
+
+    def load_player_sounds ():
+        
+        # running sound
+        running_sound = pygame.mixer.Sound("src/assets/sounds/player/running.wav")
+        running_sound.set_volume(1)
+        # jump sound
+        jump_sound = pygame.mixer.Sound("src/assets/sounds/player/jump.wav")
+        jump_sound.set_volume(0.2)
+        # attack sound
+        attack_sound = pygame.mixer.Sound("src/assets/sounds/player/attack.wav")
+        # damege sound
+        damage_sound = pygame.mixer.Sound("src/assets/sounds/player/damage.wav")
+        damage_sound.set_volume(0.6)
+        # bounce sound
+        bounce_sound = pygame.mixer.Sound("src/assets/sounds/player/bounce.mp3")
+        bounce_sound.set_volume(0.4)
+        # game over sound
+        gameover_sound = pygame.mixer.Sound("src/assets/sounds/player/gameover.mp3")
+        gameover_sound.set_volume(0.4)
+        AssetManager.player_sounds = {
+            "running" : running_sound ,
+            "jump" : jump_sound ,
+            "attack" : attack_sound ,
+            "damage" : damage_sound ,
+            "bounce" : bounce_sound ,
+            "game over" : gameover_sound
+        }
+        
+  
 
     def load_bullet_assets (): 
 

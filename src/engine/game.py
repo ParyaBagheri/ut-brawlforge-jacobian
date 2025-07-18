@@ -89,9 +89,9 @@ class Game:
         self.screen.blit(char_menu_text, char_menu_text_rect)
 
         self.screen.blit(char_menu_text, char_menu_text_rect)
-        CHAR_1 = Button(self, None, [self.screen_width//4,self.screen_height//2], "knight",'OCRAEXT', 40, (0, 38, 21), (0, 89, 21))
-        CHAR_2 = Button(self, None, [3 *self.screen_width//4, self.screen_height//2], "girl", 'OCRAEXT', 40, (117, 96,0), (42, 32, 0))
-        CHAR_3 = Button(self, None, [self.screen_width//4, 5 * self.screen_height//6], "wizard","OCRAEXT", 40, (255, 181, 118), (81, 1, 109))
+        CHAR_1 = Button(self, AssetManager.player_images["knight"]["idle"], [self.screen_width//4,self.screen_height//2], "knight",'OCRAEXT', 40, (0, 38, 21), (0, 89, 21))
+        CHAR_2 = Button(self, AssetManager.player_images["girl"]["idle"], [3 *self.screen_width//4, self.screen_height//2], "girl", 'OCRAEXT', 40, (117, 96,0), (42, 32, 0))
+        CHAR_3 = Button(self, AssetManager.player_images["wizard"]["idle"], [self.screen_width//4, 5 * self.screen_height//6], "wizard","OCRAEXT", 40, (255, 181, 118), (81, 1, 109))
         CHAR_4 = Button(self, None, [3 * self.screen_width//4, 5 * self.screen_height//6], "char 4","OCRAEXT", 40, (0, 13, 72), (229, 134, 169))
         CHAR_MENU_MOUSE_POS = pygame.mouse.get_pos
         def char_menu_render():
@@ -395,20 +395,7 @@ class Game:
 
     def gameover(self):
         self.state = "gameover"
-        self.player.color = (0, 0, 0)
-        self.player.rect.x = 100
-        self.player.rect.top = 0
-        self.player.invincibility_timer = 0
-        self.player.is_invincible = False
-        for platform in self.level.platforms :
-            if isinstance(platform, Platform):
-                platform.activated = False
-                platform.visible = True
-        for powerup in self.level.powerups :
-            powerup.visible = True
-            powerup.timer = 0
-            powerup.is_inview = False
-        self.player.max_jumps = 1
+        
 
     def gameover_render(self):
 
@@ -419,6 +406,17 @@ class Game:
         self.screen.blit(gameover_message, text_rect)
 
     def restart(self):
+        self.player.color = (0, 0, 0)
+        self.player.rect.x = 100
+        self.player.rect.top = 0
+        self.player.invincibility_timer = 0
+        self.player.is_invincible = False
+        self.player.is_dead = False
+        self.player.state = "idle"
+        for platform in self.level.platforms :
+            if isinstance(platform, Platform):
+                platform.activated = False
+                platform.visible = True
         self.player.health = config.MAX_PLAYER_HEALTH
         self.player.color = (255, 0, 0)
         self.state = "playing"
