@@ -180,6 +180,7 @@ class Game:
 
     def finish_menu(self):
         self.screen.fill((0,0,0))
+        self.restart()
         RESTART_BUTTON = Button(self, None, [400, 150], "restart", 'OCRAEXT', 50, 'white', 'yellow')
         NEXTLEVEL_BUTTON = Button(self, None, [400, 250], "next level", 'OCRAEXT', 50, 'white', 'yellow')
         MENU_BUTTON = Button(self, None, [400, 350], "main menu", 'OCRAEXT', 50, 'white', 'yellow')
@@ -392,24 +393,9 @@ class Game:
         if self.player.health >= 0:
             for i in range(0,self.player.health):
                 self.screen.blit(heart, (40 + 30*i , 40))
-
     def gameover(self):
         self.state = "gameover"
         self.player.color = (0, 0, 0)
-        self.player.rect.x = 100
-        self.player.rect.top = 0
-        self.player.invincibility_timer = 0
-        self.player.is_invincible = False
-        for platform in self.level.platforms :
-            if isinstance(platform, Platform):
-                platform.activated = False
-                platform.visible = True
-        for powerup in self.level.powerups :
-            powerup.visible = True
-            powerup.timer = 0
-            powerup.is_inview = False
-        self.player.max_jumps = 1
-
     def gameover_render(self):
 
         gameover_font = pygame.font.Font("src/assets/fonts/OCRAEXT.ttf", 72)
@@ -419,7 +405,20 @@ class Game:
         self.screen.blit(gameover_message, text_rect)
 
     def restart(self):
+        self.player.rect.x = 100
+        self.player.rect.top = 0
+        self.player.invincibility_timer = 0
+        self.player.is_invincible = False
+        self.player.max_jumps = 1
         self.player.health = config.MAX_PLAYER_HEALTH
+        for platform in self.level.platforms :
+            if isinstance(platform, Platform):
+                platform.activated = False
+                platform.visible = True
+        for powerup in self.level.powerups :
+            powerup.visible = True
+            powerup.timer = 0
+            powerup.is_inview = False
         self.player.color = (255, 0, 0)
         self.state = "playing"
 
