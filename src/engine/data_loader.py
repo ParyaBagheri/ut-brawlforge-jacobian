@@ -77,7 +77,7 @@ def get_level_data(name, game):
                 Platform(game, 4700, 300, 150, 20),
                 Platform(game, 4950, 400, 450, 200),
                 Platform(game, 5400, 300, 150, 300),
-                Platform(game, 5550, 200, 6600, 400) 
+                Platform(game, 5550, 200, 1050, 400) 
                 #Finish Line at 6000
             ],
             "enemies" : [],
@@ -122,6 +122,62 @@ def get_level_data(name, game):
             ],
             "powerups" : []
         }
-    
+    elif name == "underwater":
+        return{
+            "platforms" : [
+                Platform(game, 0, 300, 300, 100),
+                Platform(game, 450, 400, 300, 100),
+                Platform(game, 750, 350, 250, 150),
+                Platform(game, 1100, 330, 300, 50),
+                Platform(game, 1500, 300, 150, 50),
+                Platform(game, 1750, 200, 250, 50),
+                Platform(game, 1660, 400, 420, 20, 'spikey'),
+                Platform(game, 2100, 300, 300, 50),
+                Platform(game, 2500, 400, 300, 50),
+                Platform(game, 2900, 300, 300, 40),
+                Platform(game, 2900, 500, 1000, 40),
+                Platform(game, 3300, 200, 400, 40),
+                Platform(game, 3800, 350, 300, 50),
+                Platform(game, 4100, 420, 300, 20, 'spikey'), 
+                Platform(game, 4250, 250, 450, 50),
+                Platform(game, 4800, 200, 400, 50),
+                Platform(game, 5300, 300, 400, 50), 
+                Platform(game, 5800, 200, 100, 50), 
+                Platform(game, 5700, 350, 100, 20, 'spikey'),
+                Platform(game, 6000, 300, 100, 50),
+                Platform(game, 6200, 400, 100, 50),
+                Platform(game, 6400, 300, 400, 50),
+                Platform(game, 6950, 300, 100, 50),
+                Platform(game, 7200, 300, 150, 50),
+                Platform(game, 7500, 300, 200, 50),
+                Platform(game, 7800, 200, 400, 50),
+                Platform(game, 8300, 300, 200, 50), 
+                Platform(game, 8450, 360, 200, 20, 'spikey'),
+                Platform(game, 8600, 300, 400, 50),
+                Platform(game, 9100, 400, 150, 50), 
+                Platform(game, 9350, 300, 150, 50),
+                Platform(game, 9600, 200, 100, 50),
+                Platform(game, 9800, 300, 200, 50),
+                Platform(game, 10050, 450, 350, 50),
+                Platform(game, 10500, 300, 100, 50),
+                Platform(game, 10550, 370, 400, 20, 'spikey'),
+                Platform(game, 10700, 200, 100, 50),
+                Platform(game, 10900, 300, 100, 50),
+                Platform(game, 11100, 400, 300, 50),
+                Platform(game, 11400, 400, 300, 50, 'slowing'),
+                Platform(game, 11800, 300, 100, 50),
+                Platform(game, 12000, 300, 300, 50),
+                Platform(game, 12400, 200, 100, 50), 
+                Platform(game, 12600, 300, 100, 50),
+                Platform(game, 12800, 400, 100, 50),
+                Platform(game, 13000, 300, 150, 50),
+                Platform(game, 13250, 400, 150, 50),
+                Platform(game, 13500, 300, 100, 50),
+                Platform(game, 13700, 400, 300, 50),
+                Platform(game, 14100, 300, 1900, 50) # Finish platform
+
+            ],
+            "powerups" : []
+        }
     else:
         raise ValueError(f"Unknown level : {name}")
