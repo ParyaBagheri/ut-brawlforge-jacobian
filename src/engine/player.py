@@ -171,26 +171,26 @@ class Player:
                     self.held_bullet.damage += 1
                     powerup.visible = False
 
-    def update(self, platforms, enemies, powerups):
+    def update(self, platforms, enemies, powerups, dt):
         keys = pygame.key.get_pressed()
         self.update_animation(keys)
         if self.state != "die" :
             # Horizontal movement
-            self.velocity_x = config.MOVE_SPEED - 3 if self.is_slowed else config.MOVE_SPEED
+            self.velocity_x = config.MOVE_SPEED - 300 if self.is_slowed else config.MOVE_SPEED
 
             if (keys[pygame.K_a] and self.collision_direction != "left"):
-                self.rect.x -= self.velocity_x
+                self.rect.x -= self.velocity_x * dt
                 self.direction = "left" # Update facing direction
 
             if (keys[pygame.K_d] and self.collision_direction != "right"):
-                self.rect.x += self.velocity_x
+                self.rect.x += self.velocity_x * dt
                 self.direction = "right" # Update facing direction
             if self.rect.x <= 0 :
                 self.rect.x = 0
             
             # Apply gravity
             self.velocity_y += config.GRAVITY
-            self.rect.y += self.velocity_y
+            self.rect.y += self.velocity_y *dt
         
             # Check collisions
             collided_platform = self.check_vertical_collision(platforms)

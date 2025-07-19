@@ -309,12 +309,13 @@ class Game:
                 self.restart()
     
     def update(self):
+        dt = self.clock.tick(60) / 1000
         #if self.isGameover == False and self.is_paused == False:
         if self.state == "playing" and self.level != None:
             if self.level.won() :
                 self.state = "won"
                 self.finish_menu()
-            self.player.update(self.level.platforms, self.enemies, self.level.powerups)
+            self.player.update(self.level.platforms, self.enemies, self.level.powerups, dt)
             self.update_camera()
 
             for platform in self.level.platforms :
@@ -326,7 +327,7 @@ class Game:
             # Update all fired bullets
             for bullet in self.Fired_bullets_list :
                 if isinstance(bullet, Bullet) :
-                    bullet.update()
+                    bullet.update(dt)
 
             # Remove dead enemies and spawn new ones
             for enemy in self.enemies:
@@ -340,6 +341,7 @@ class Game:
     
     def draw(self):
         self.screen.fill((135, 206, 235))  # Sky blue background
+        self.level.tilemap.render(self.screen, self.camera_x)
         '''if self.level.background_layers is not None:
             for image, scroll_factor in self.level.background_layers :
                 offset = int(self.camera_x * scroll_factor)
@@ -351,7 +353,7 @@ class Game:
                 self.screen.blit(scaled_image, (start_x + i * image_width, 0))
 '''
         # Draw platforms and ground
-        for platform in self.level.platforms:
+        '''for platform in self.level.platforms:
             if isinstance(platform, Platform) and platform.visible == True:
                 platform.draw(self.screen, self.camera_x)
             elif not isinstance(platform, Platform) :
@@ -359,7 +361,7 @@ class Game:
                                pygame.Rect(platform.x - self.camera_x, 
                                           platform.y, 
                                           platform.width, 
-                                          platform.height))
+                                          platform.height))'''
         
         # Draw player
         if(self.player.visible == True) :
