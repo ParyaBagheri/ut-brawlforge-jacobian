@@ -129,6 +129,19 @@ class Game:
         if self.player.rect.x >= 3200 :
             return True
         return False
+    def desert_win(self):
+        if self.player.rect.x >= 6000 :
+            return True
+        return False
+    def lostcity_win(self):
+        if self.player.rect.x >= 7700 :
+            return True
+        return False
+    def underwater_win(self):
+        if self.player.rect.x >= 15600 :
+            return True
+        return False
+    
 
     def map_menu(self):
         #self.screen.fill((22, 15, 133))
@@ -165,11 +178,15 @@ class Game:
                         self.run()
                     if MAP_2.is_pressed(MAP_MENU_MOUSE_POS()):
                         self.state = "playing"
-                        self.level = Level("desert", self)
+                        self.level = Level("desert", self, self.desert_win)
                         self.run()
                     if MAP_3.is_pressed(MAP_MENU_MOUSE_POS()):
                         self.state = "playing"
-                        self.level = Level("lost_city", self)
+                        self.level = Level("lost_city", self, self.lostcity_win)
+                        self.run()
+                    if MAP_4.is_pressed(MAP_MENU_MOUSE_POS()):
+                        self.state = "playing"
+                        self.level = Level("underwater", self, self.underwater_win)
                         self.run()
                     
         while True:
@@ -180,6 +197,7 @@ class Game:
 
     def finish_menu(self):
         self.screen.fill((0,0,0))
+        self.restart()
         RESTART_BUTTON = Button(self, None, [400, 150], "restart", 'OCRAEXT', 50, 'white', 'yellow')
         NEXTLEVEL_BUTTON = Button(self, None, [400, 250], "next level", 'OCRAEXT', 50, 'white', 'yellow')
         MENU_BUTTON = Button(self, None, [400, 350], "main menu", 'OCRAEXT', 50, 'white', 'yellow')
@@ -201,11 +219,11 @@ class Game:
                     if NEXTLEVEL_BUTTON.is_pressed(MOUSE_POS()):
                         self.state = "playing"
                         if self.level.name == "forest":
-                            self.level = Level("desert", self)
+                            self.level = Level("desert", self, self.desert_win)
                         elif self.level.name == "desert":
-                            self.level = Level("lost_city", self)
-                        '''elif self.level.name == "lost_city":
-                            self.level = Level("underwater")'''
+                            self.level = Level("lost_city", self, self.lostcity_win)
+                        elif self.level.name == "lost_city":
+                            self.level = Level("underwater", self, self.underwater_win)
                         self.run()
                     if MENU_BUTTON.is_pressed(MOUSE_POS()):
                         self.state = "main_menu"
@@ -392,11 +410,9 @@ class Game:
         if self.player.health >= 0:
             for i in range(0,self.player.health):
                 self.screen.blit(heart, (40 + 30*i , 40))
-
     def gameover(self):
         self.state = "gameover"
-        
-
+        self.player.color = (0, 0, 0)
     def gameover_render(self):
 
         gameover_font = pygame.font.Font("src/assets/fonts/OCRAEXT.ttf", 72)
@@ -406,18 +422,20 @@ class Game:
         self.screen.blit(gameover_message, text_rect)
 
     def restart(self):
-        self.player.color = (0, 0, 0)
         self.player.rect.x = 100
         self.player.rect.top = 0
         self.player.invincibility_timer = 0
         self.player.is_invincible = False
-        self.player.is_dead = False
-        self.player.state = "idle"
+        self.player.max_jumps = 1
+        self.player.health = config.MAX_PLAYER_HEALTH
         for platform in self.level.platforms :
             if isinstance(platform, Platform):
                 platform.activated = False
                 platform.visible = True
-        self.player.health = config.MAX_PLAYER_HEALTH
+        for powerup in self.level.powerups :
+            powerup.visible = True
+            powerup.timer = 0
+            powerup.is_inview = False
         self.player.color = (255, 0, 0)
         self.state = "playing"
 
