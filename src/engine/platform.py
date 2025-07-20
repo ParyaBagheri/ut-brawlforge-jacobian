@@ -2,7 +2,7 @@ import pygame
 import config
 
 class Platform(pygame.sprite.Sprite):
-    def __init__(self,game, x, y, width, height, type='solid', color=(139, 69, 19), is_solid=True, image=None):
+    def __init__(self,game, x, y, width, height, type='solid', is_solid=True, image=None):
         super().__init__()
         self.game = game
         self.x = x
@@ -13,9 +13,9 @@ class Platform(pygame.sprite.Sprite):
             self.image = image
         else:
             self.image = pygame.Surface((width, height))
-            self.image.fill(color)
+            #self.image.fill(color)
         self.rect = self.image.get_rect(topleft=(x,y))
-        self.color = color
+        #self.color = color
         self.is_solid = is_solid  # Determines if platform is solid for collision
         self.type = type
         self.activated = False
