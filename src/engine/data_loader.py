@@ -1,12 +1,13 @@
 import pygame
 from src.engine.platform import Platform
 from src.engine.collectible import Powerup
+from src.engine.assetmanager import AssetManager
 import config
 
 
 def get_level_data(name, game):
     if name == "forest":
-        platform_img = pygame.image.load("src/assets/images/platform.png").convert_alpha()
+        
         return{
             "background_layers" : [
                 (pygame.image.load("src/assets/images/forest/backgrounds/L7.png").convert(), 0.1),
@@ -19,21 +20,21 @@ def get_level_data(name, game):
                 (pygame.image.load("src/assets/images/forest/backgrounds/L1.png").convert_alpha(), 0.7),
             ],
             "platforms" : [
-                Platform(game, 300, 400, 150, 20, 'solid', image=platform_img),
-                Platform(game, 600, 300, 150, 20, 'solid', image=platform_img),
+                Platform(game, 300, 400, 150, 20, 'solid', image = AssetManager.platform_images["forest"]),
+                Platform(game, 600, 300, 150, 20, 'solid', image = AssetManager.platform_images["forest"]),
                 Platform(game, 750, 300, 250, 20, 'solid'), #Fragile platform
-                Platform(game, 1050, 200, 100, 20, 'solid'), # Bonus on this platform
+                Platform(game, 1050, 200, 100, 20, 'solid', image = AssetManager.platform_images["forest"]), # Bonus on this platform
                 Platform(game, 1140, 560 - config.BASE_GROUND_HEIGHT, 50, 40, 'bouncy'), #Bouncy platform
-                Platform(game, 1250, 300, 300, 20, 'solid'),
+                Platform(game, 1250, 300, 300, 20, 'solid', image = AssetManager.platform_images["forest"]),
                 Platform(game, 1400, 600 - config.BASE_GROUND_HEIGHT, 350, 20, 'slowing'), #Muddy platform
                 Platform(game, 1630, 200, 100, 20, 'timed'),
-                Platform(game, 1700, 300, 100, 20, 'solid'),
+                Platform(game, 1700, 300, 100, 20, 'solid', image = AssetManager.platform_images["forest"]),
                 Platform(game, 1800, 300, 250, 20, 'slowing'),
                 Platform(game, 2250, 200, 100, 20, 'timed'),
-                Platform(game, 2400, 300, 300, 20, 'solid'),
+                Platform(game, 2400, 300, 300, 20, 'solid', image = AssetManager.platform_images["forest"]),
                 Platform(game, 2800, 200, 100, 20, 'timed'),
                 Platform(game, 3000, 100, 100, 20, 'timed'),
-                Platform(game, 3150, 250, 200, 100, 'solid'), #Finish platform
+                Platform(game, 3150, 250, 200, 100, 'solid', image = AssetManager.platform_images["forest"]), #Finish platform
                 #Platform(self, 3050, 560 - config.BASE_GROUND_HEIGHT, 50, 40, 'bouncy')
                 game.ground_rect
             ],
