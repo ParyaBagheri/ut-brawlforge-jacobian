@@ -163,7 +163,7 @@
  </tile>
  <tile id="95">
   <properties>
-   <property name="type" value="&quot;spike&quot;"/>
+   <property name="type" value="&quot;spikey&quot;"/>
   </properties>
  </tile>
  <tile id="97">
@@ -218,7 +218,7 @@
  </tile>
  <tile id="119">
   <properties>
-   <property name="type" value="&quot;spike&quot;"/>
+   <property name="type" value="&quot;spikey&quot;"/>
   </properties>
  </tile>
  <tile id="121">
@@ -273,12 +273,12 @@
  </tile>
  <tile id="143">
   <properties>
-   <property name="type" value="&quot;spike&quot;"/>
+   <property name="type" value="&quot;spikey&quot;"/>
   </properties>
  </tile>
  <tile id="167">
   <properties>
-   <property name="type" value="&quot;spike&quot;"/>
+   <property name="type" value="&quot;spikey&quot;"/>
   </properties>
  </tile>
  <tile id="193">
