@@ -10,7 +10,8 @@ class Platform(pygame.sprite.Sprite):
         self.width = width
         self.height = height
         if image:
-            self.image = image
+            self.image = pygame.transform.scale(image,(width,height)) 
+
         else:
             self.image = pygame.Surface((width, height))
             self.image.fill(color)

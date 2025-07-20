@@ -8,6 +8,7 @@ class AssetManager :
     enemy_assets = {}
     bullet_assets = {}
     player_sounds = {}
+    platform_images = {}
 
     def load_frames(sheet,frame_width,frame_hight ,startpoint, numframes):
         frames = []
@@ -173,7 +174,12 @@ class AssetManager :
             "arrow" : arrow_image ,
             "fireball" : fireball_frames
         }
-        
+    def load_platform_images () :
+        forest_platform = pygame.image.load("src/assets/images/platforms/forest.png")
+        AssetManager.platform_images = {
+            "forest" : forest_platform 
+        }   
     def load_assets():
         AssetManager.load_player_assets()
         AssetManager.load_bullet_assets()
+        AssetManager.load_platform_images()
