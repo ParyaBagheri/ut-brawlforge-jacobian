@@ -8,7 +8,7 @@ class AssetManager :
     enemy_assets = {}
     bullet_assets = {}
     player_sounds = {}
-
+    game_sounds = {}
     def load_frames(sheet,frame_width,frame_hight ,startpoint, numframes):
         frames = []
         for i in range (numframes) :

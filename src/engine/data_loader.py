@@ -1,5 +1,4 @@
 import pygame
-from pytmx.util_pygame import load_pygame
 from src.engine.platform import Platform
 from src.engine.collectible import Powerup
 import config

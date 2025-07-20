@@ -36,7 +36,7 @@ class Player:
         self.damage_sound = False
         self.attack_sound = False
         self.bounce_sound = False
-
+        self.running_channel = None
         # images
         self.character_type = character_type
         self.state = "idle" 
@@ -173,7 +173,8 @@ class Player:
 
     def update(self, platforms, enemies, powerups):
         keys = pygame.key.get_pressed()
-        self.update_animation(keys)
+        if not self.is_dead:
+            self.update_animation(keys)
         if self.state != "die" :
             # Horizontal movement
             self.velocity_x = config.MOVE_SPEED - 3 if self.is_slowed else config.MOVE_SPEED
@@ -317,10 +318,11 @@ class Player:
                 self.sound_effects["jump"].play()
 
             if self.state == "run" and prev_state != "run" :
-                self.sound_effects ["running"].play(loops=-1)
+                self.running_channel = self.sound_effects ["running"].play(loops=-1)
 
             if (self.state != "run" and prev_state == "run"):
-                self.sound_effects["running"].fadeout(300)
+                self.running_channel.stop()
+                self.running_channel = None
 
             if self.damage_sound :
                 self.sound_effects["damage"].play()
@@ -329,9 +331,24 @@ class Player:
             if self.attack_sound :
                 self.sound_effects["attack"].play()
                 self.attack_sound = False
-            if self.is_dead :
+            if self.is_dead and self.state == "die" :
                 self.sound_effects["game over"].play()
 
+    def reset (self) :
+        self.rect.x = 100
+        self.rect.top = 0
+        self.invincibility_timer = 0
+        self.is_invincible = False
+        self.max_jumps = 1
+        self.health = config.MAX_PLAYER_HEALTH
+        self.state = "idle"
+        self.is_dead = False
+        self.current_frame = 0 
+        self.color = (255, 0, 0)
+        if self.running_channel != None :
+            self.running_channel.stop()
+            self.running_channel = None
+                    
 
     def shoot (self) :
 

@@ -313,6 +313,7 @@ class Game:
         if self.state == "playing" and self.level != None:
             if self.level.won() :
                 self.state = "won"
+                self.player.reset()
                 self.finish_menu()
             self.player.update(self.level.platforms, self.enemies, self.level.powerups)
             self.update_camera()
@@ -414,7 +415,6 @@ class Game:
         self.state = "gameover"
         self.player.color = (0, 0, 0)
     def gameover_render(self):
-
         gameover_font = pygame.font.Font("src/assets/fonts/OCRAEXT.ttf", 72)
         gameover_message = gameover_font.render("GAME OVER!", True, 'black')
         text_rect = gameover_message.get_rect()
@@ -422,12 +422,7 @@ class Game:
         self.screen.blit(gameover_message, text_rect)
 
     def restart(self):
-        self.player.rect.x = 100
-        self.player.rect.top = 0
-        self.player.invincibility_timer = 0
-        self.player.is_invincible = False
-        self.player.max_jumps = 1
-        self.player.health = config.MAX_PLAYER_HEALTH
+        self.player.reset()
         for platform in self.level.platforms :
             if isinstance(platform, Platform):
                 platform.activated = False
@@ -436,7 +431,7 @@ class Game:
             powerup.visible = True
             powerup.timer = 0
             powerup.is_inview = False
-        self.player.color = (255, 0, 0)
+        
         self.state = "playing"
 
     def pause_render(self):
