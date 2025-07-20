@@ -8,7 +8,8 @@ class AssetManager :
     enemy_assets = {}
     bullet_assets = {}
     player_sounds = {}
-    game_sounds = {}
+    platform_images = {}
+
     def load_frames(sheet,frame_width,frame_hight ,startpoint, numframes):
         frames = []
         for i in range (numframes) :
@@ -173,7 +174,25 @@ class AssetManager :
             "arrow" : arrow_image ,
             "fireball" : fireball_frames
         }
-        
+    def load_platform_images () :
+        forest_platform = pygame.image.load("src/assets/images/platforms/forest.png")
+        desert_platform = pygame.image.load("src/assets/images/platforms/desert.png")
+        lostcity_platform = pygame.image.load("src/assets/images/platforms/lostcity.png")
+        underwater_platform = pygame.image.load("src/assets/images/platforms/underwater.png")
+        slowing_platform = pygame.image.load("src/assets/images/platforms/slowing.png")
+        timed_platform = pygame.image.load("src/assets/images/platforms/timed.png")
+        spikey_platform = pygame.image.load("src/assets/images/platforms/spikey.png")
+
+        AssetManager.platform_images = {
+            "forest" : forest_platform ,
+            "desert" : desert_platform ,
+            "lostcity" : lostcity_platform ,
+            "underwater": underwater_platform ,
+            "slowing" : slowing_platform ,
+            "timed" : timed_platform ,
+            "spikey" : spikey_platform
+        }   
     def load_assets():
         AssetManager.load_player_assets()
         AssetManager.load_bullet_assets()
+        AssetManager.load_platform_images()
