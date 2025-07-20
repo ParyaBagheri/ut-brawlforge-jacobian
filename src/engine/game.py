@@ -24,7 +24,7 @@ from src.engine import data_loader
 from src.engine.assetmanager import AssetManager
 
 class Game:
-    
+
     def __init__(self):
         pygame.init()
         self.screen = pygame.display.set_mode((config.BASE_SCREEN_WIDTH, config.BASE_SCREEN_HEIGHT), pygame.RESIZABLE)
@@ -33,10 +33,10 @@ class Game:
         self.is_paused = False
         self.update_dimensions()
         self.PAUSE_BUTTON = Button(self, None, [750,10], "Pause", 'Blox2', 30, 'white', 'grey') #Add pause button image later
-                
+
         #self.platforms = self.platform_maker()
-        
-        
+
+
         AssetManager.load_assets()
 
         self.Fired_bullets_list = []
@@ -46,6 +46,8 @@ class Game:
         self.enemies = pygame.sprite.Group()
         enemy = Enemy(self)
         self.enemies.add(enemy)
+
+        self.isGameover = False
 
         self.level = None
         self.state = "main_menu"
@@ -75,7 +77,7 @@ class Game:
             main_menu_event_handler()
             pygame.display.flip()
             self.clock.tick(config.FPS)
-            
+
     def character_menu(self):
         background = pygame.image.load(background_path)
         background = pygame.transform.scale(background, (800,600))
@@ -87,9 +89,9 @@ class Game:
         self.screen.blit(char_menu_text, char_menu_text_rect)
 
         self.screen.blit(char_menu_text, char_menu_text_rect)
-        CHAR_1 = Button(self, AssetManager.player_images["knight"]["idle"], [self.screen_width//4,self.screen_height//2], "knight",'OCRAEXT', 40, (0, 38, 21), (0, 89, 21))
-        CHAR_2 = Button(self, AssetManager.player_images["girl"]["idle"], [3 *self.screen_width//4, self.screen_height//2], "girl", 'OCRAEXT', 40, (117, 96,0), (42, 32, 0))
-        CHAR_3 = Button(self, AssetManager.player_images["wizard"]["idle"], [self.screen_width//4, 5 * self.screen_height//6], "wizard","OCRAEXT", 40, (255, 181, 118), (81, 1, 109))
+        CHAR_1 = Button(self, None, [self.screen_width//4,self.screen_height//2], "knight",'OCRAEXT', 40, (0, 38, 21), (0, 89, 21))
+        CHAR_2 = Button(self, None, [3 *self.screen_width//4, self.screen_height//2], "girl", 'OCRAEXT', 40, (117, 96,0), (42, 32, 0))
+        CHAR_3 = Button(self, None, [self.screen_width//4, 5 * self.screen_height//6], "wizard","OCRAEXT", 40, (255, 181, 118), (81, 1, 109))
         CHAR_4 = Button(self, None, [3 * self.screen_width//4, 5 * self.screen_height//6], "char 4","OCRAEXT", 40, (0, 13, 72), (229, 134, 169))
         CHAR_MENU_MOUSE_POS = pygame.mouse.get_pos
         def char_menu_render():
@@ -122,7 +124,7 @@ class Game:
             char_menu_events()
             pygame.display.flip()
             self.clock.tick(config.FPS)
-    
+
     def forest_win(self):
         if self.player.rect.x >= 3200 :
             return True
@@ -186,7 +188,7 @@ class Game:
                         self.state = "playing"
                         self.level = Level("underwater", self, self.underwater_win)
                         self.run()
-                    
+
         while True:
             map_menu_render()
             map_menu_event_handler()
@@ -268,7 +270,7 @@ class Game:
         self.camera_x = self.player.rect.centerx - self.screen_width // 2
         max_camera_x = self.ground_rect.width - self.screen_width
         self.camera_x = max(0, min(self.camera_x, max_camera_x))
-    
+
     def run(self):
         while True:
             self.handle_events()
@@ -276,7 +278,7 @@ class Game:
             self.draw()
             pygame.display.flip()
             self.clock.tick(60)
-    
+
     def handle_events(self):
         GAME_MOUSE_POS = pygame.mouse.get_pos
         for event in pygame.event.get():
@@ -291,7 +293,7 @@ class Game:
                   (event.type == pygame.MOUSEBUTTONDOWN and self.PAUSE_BUTTON.is_pressed(GAME_MOUSE_POS()))) and self.state != "gameover" :
                 # Press esc or pause button to pause
                 self.state = "paused"
-                
+
             elif event.type == pygame.MOUSEBUTTONDOWN :
                 if event.button == 1 : #left mouse button
                     self.player.is_shooting = True
@@ -305,14 +307,14 @@ class Game:
             # Restart after game over
             elif self.state == "gameover" and event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 self.restart()
-    
+
     def update(self):
         #if self.isGameover == False and self.is_paused == False:
         if self.state == "playing" and self.level != None:
             if self.level.won() :
                 self.state = "won"
                 self.finish_menu()
-            self.player.update(self.level.platforms, self.enemies, self.level.powerups, dt)
+            self.player.update(self.level.platforms, self.enemies, self.level.powerups)
             self.update_camera()
 
             for platform in self.level.platforms :
@@ -324,21 +326,20 @@ class Game:
             # Update all fired bullets
             for bullet in self.Fired_bullets_list :
                 if isinstance(bullet, Bullet) :
-                    bullet.update(dt)
+                    bullet.update()
 
             # Remove dead enemies and spawn new ones
             for enemy in self.enemies:
-                if enemy.rect.x <= 0 + self.camera_x or enemy.health <= 0 or self.state == "gameover" :
+                if enemy.rect.x <= 0 + self.camera_x or enemy.health <= 0 or self.isGameover == True :
                     enemy.kill()
                     new_enemy = Enemy(self)
                     self.enemies.add(new_enemy)
             for powerup in self.level.powerups :
                 powerup.update()
 
-    
+
     def draw(self):
         self.screen.fill((135, 206, 235))  # Sky blue background
-        #self.level.tilemap.render(self.screen, self.camera_x)
         '''if self.level.background_layers is not None:
             for image, scroll_factor in self.level.background_layers :
                 offset = int(self.camera_x * scroll_factor)
@@ -359,14 +360,14 @@ class Game:
                                           platform.y, 
                                           platform.width, 
                                           platform.height))
-        
+
         # Draw player
         if(self.player.visible == True) :
             if self.player.direction == "left" :
                 self.screen.blit( pygame.transform.flip(self.player.image,True,False), (self.player.rect.x - self.camera_x, self.player.rect.y))
             else :
                 self.screen.blit( self.player.image, (self.player.rect.x - self.camera_x, self.player.rect.y))
-        
+
         # Draw all fired bullets with camera offset
         for bullet in self.Fired_bullets_list :
             if isinstance(bullet, Bullet) :
@@ -394,7 +395,7 @@ class Game:
             ls_text_rect = loadingscreen_text.get_rect()
             ls_text_rect.center = (self.screen_width //2, self.screen_height //2)
             self.screen.blit(loadingscreen_text, ls_text_rect)'''
-        
+
     def draw_enemies(self):
         for enemy in self.enemies:
             pygame.draw.rect(self.screen, enemy.color,
@@ -423,8 +424,6 @@ class Game:
     def restart(self):
         self.player.rect.x = 100
         self.player.rect.top = 0
-        self.player.pos_x = 100
-        self.player.pos_y = 0
         self.player.invincibility_timer = 0
         self.player.is_invincible = False
         self.player.max_jumps = 1

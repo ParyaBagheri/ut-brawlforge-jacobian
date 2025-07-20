@@ -54,13 +54,13 @@ class Bullet :
             
 
 
-    def update (self, dt) :
+    def update (self) :
 
         if self.is_fired == True :
             #fired bullet animation 
             self.update_image ()
             # Bullet is in flight - move it horizontally
-            self.rect.x += self.changex * dt
+            self.rect.x += self.changex 
 
             # Check for collisions, remove if hit something
             if self.check_platform_collision() or self.check_enemy_collision() :
