@@ -47,8 +47,6 @@ class Game:
         enemy = Enemy(self)
         self.enemies.add(enemy)
 
-        self.isGameover = False
-
         self.level = None
         self.state = "main_menu"
 
@@ -309,7 +307,7 @@ class Game:
                 self.restart()
     
     def update(self):
-        dt = self.clock.tick(60) / 1000
+        dt = self.clock.tick(60) / 1000 
         #if self.isGameover == False and self.is_paused == False:
         if self.state == "playing" and self.level != None:
             if self.level.won() :
@@ -331,7 +329,7 @@ class Game:
 
             # Remove dead enemies and spawn new ones
             for enemy in self.enemies:
-                if enemy.rect.x <= 0 + self.camera_x or enemy.health <= 0 or self.isGameover == True :
+                if enemy.rect.x <= 0 + self.camera_x or enemy.health <= 0 or self.state == "gameover" :
                     enemy.kill()
                     new_enemy = Enemy(self)
                     self.enemies.add(new_enemy)
@@ -426,6 +424,8 @@ class Game:
     def restart(self):
         self.player.rect.x = 100
         self.player.rect.top = 0
+        self.player.pos_x = 100
+        self.player.pos_y = 0
         self.player.invincibility_timer = 0
         self.player.is_invincible = False
         self.player.max_jumps = 1

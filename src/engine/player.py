@@ -21,13 +21,16 @@ class Player:
         self.is_invincible = False
         self.invincibility_timer = 0
         self.visible = True
-        self.velocity_x = config.MOVE_SPEED
+        self.velocity_x = 0
+        self.acceleration_x = 0
+        self.acceleration_y = config.GRAVITY
+        self.friction = config.FRICTION
         self.is_slowed = False
         self.slowing_timer = 0
 
         self.direction = "right" # Track facing direction ( default : right- facing )
         self.collision_direction = "none" 
-        self.collision_direction = "none"''
+        self.collision_direction = "none"
 
         # player's asset managing
         #sounds
@@ -59,6 +62,8 @@ class Player:
 
         self.held_bullet = Bullet(self, self.bullet_type) # Create a bullet that follows the player (not fired yet)
 
+        self.pos_x = self.rect.x
+        self.pos_y = self.rect.bottom
         self.max_jumps = 1
         self.jump_count = 0
         self.jumped = False
@@ -75,11 +80,13 @@ class Player:
                         self.rect.top < platform.rect.top and
                         self.rect.right > platform.rect.left and 
                         self.rect.left < platform.rect.right):
-                        self.rect.bottom = platform.rect.top
+                        #self.rect.bottom = platform.rect.top
+                        self.pos_y = platform.rect.top
                         self.velocity_y = 0
                         self.on_ground = True
                         landed_on = platform
                         self.jump_count = 0
+                        self.rect.y = int(self.pos_y - self.rect.height)
                         #return platform
                         break
                 elif not isinstance(platform, Platform):
@@ -87,10 +94,12 @@ class Player:
                         self.rect.top < platform.top and
                         self.rect.right > platform.left and 
                         self.rect.left < platform.right):
-                        self.rect.bottom = platform.top
+                        #self.rect.bottom = platform.top
+                        self.pos_y = platform.rect.top
                         self.velocity_y = 0
                         self.on_ground = True
                         self.jump_count = 0
+                        self.rect.y = int(self.pos_y - self.rect.height)
                         break
                         #return platform
         
@@ -170,29 +179,52 @@ class Player:
                 if powerup.type == "damageboost":
                     self.held_bullet.damage += 1
                     powerup.visible = False
-
     def update(self, platforms, enemies, powerups, dt):
         keys = pygame.key.get_pressed()
         self.update_animation(keys)
-        if self.state != "die" :
-            # Horizontal movement
-            self.velocity_x = config.MOVE_SPEED - 300 if self.is_slowed else config.MOVE_SPEED
 
-            if (keys[pygame.K_a] and self.collision_direction != "left"):
-                self.rect.x -= self.velocity_x * dt
-                self.direction = "left" # Update facing direction
+        if self.state != "die":
+            # Horizontal movement 
+            move_accel = 1800  
+            max_speed = 400   
+            friction = 0.8     
 
-            if (keys[pygame.K_d] and self.collision_direction != "right"):
-                self.rect.x += self.velocity_x * dt
-                self.direction = "right" # Update facing direction
-            if self.rect.x <= 0 :
-                self.rect.x = 0
-            
-            # Apply gravity
-            self.velocity_y += config.GRAVITY
-            self.rect.y += self.velocity_y *dt
-        
-            # Check collisions
+            if keys[pygame.K_a]:
+                self.velocity_x -= move_accel * dt
+                self.direction = "left"
+            if keys[pygame.K_d]:
+                self.velocity_x += move_accel * dt
+                self.direction = "right"
+
+            if self.velocity_x > max_speed:
+                self.velocity_x = max_speed
+            elif self.velocity_x < -max_speed:
+                self.velocity_x = -max_speed
+
+            if not (keys[pygame.K_a] or keys[pygame.K_d]) and self.on_ground:
+                self.velocity_x *= friction
+
+            gravity = 1800  
+            self.velocity_y += gravity * dt
+
+            # --- Jumping ---
+            if (keys[pygame.K_UP] or keys[pygame.K_SPACE]):
+                if not self.jumped and (self.on_ground or self.jump_count < self.max_jumps):
+                    self.jump_count += 1
+                    self.velocity_y = -650  
+                    self.on_ground = False
+                self.jumped = True
+            else:
+                self.jumped = False
+
+            # --- Move and check collisions ---
+            self.pos_x += self.velocity_x * dt
+            self.pos_y += self.velocity_y * dt
+
+            self.rect.x = int(round(self.pos_x))
+            self.rect.y = int(round(self.pos_y - self.rect.height))
+
+            # Collisions          
             collided_platform = self.check_vertical_collision(platforms)
             #print("collided:", collided_platform.type if collided_platform else None)
             if collided_platform != None and collided_platform != self.game.ground_rect :
@@ -213,7 +245,6 @@ class Player:
             self.check_horizontal_collision(platforms)
             self.check_enemy_collision(enemies)
             self.check_powerup_collision(powerups)
-
 
             # Temporary flickering after collision with an enemy
             if self.is_invincible :
@@ -236,16 +267,6 @@ class Player:
                 if self.slowing_timer >= 15 :
                     self.is_slowed = False
                     self.slowing_timer = 0
-   
-            # Jumping (only if on ground)
-            if (keys[pygame.K_UP] or keys[pygame.K_SPACE]):
-                if not self.jumped and (self.on_ground or self.jump_count < self.max_jumps) :
-                    self.jump_count += 1
-                    self.velocity_y = config.JUMP_VELOCITY
-                    self.on_ground = False
-                self.jumped = True
-            else :
-                self.jumped = False
 
             #shoot_animation
             if self.is_shooting == True :
@@ -260,10 +281,16 @@ class Player:
 
             
             # Update held bullet (follows player if not fired)
-            self.held_bullet.update()
-        elif self.is_dead == True :
-            # Game over when player dies
+            self.held_bullet.update(dt)
+
+
+            # Always sync position floats to rect at end
+            self.pos_x = self.rect.x
+            self.pos_y = self.rect.y + self.rect.height
+
+        elif self.is_dead:
             self.game.gameover()
+
 
     def update_animation (self, keys) :
         prev_state = self.state
