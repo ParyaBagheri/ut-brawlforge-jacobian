@@ -21,10 +21,13 @@ class Powerup(pygame.sprite.Sprite):
     def draw(self):
         shield_img = pygame.image.load("src/assets/images/powerups/shield.png").convert_alpha()
         doublejump_img = pygame.image.load("src/assets/images/powerups/doublejump.png").convert_alpha()
+        boost_img = pygame.image.load("src/assets/images/powrups/boost.png").convert_alpha()
         pos = self.x - self.game.camera_x 
         if self.visible:
             if self.type == "shield":
                 self.game.screen.blit(shield_img, (pos,self.y))
             if self.type == "doublejump":
                 self.game.screen.blit(doublejump_img, (pos, self.y))
+            if self.type == "damageboost" :
+                self.game.screen.blit(boost_img, (pos, self.y))
 

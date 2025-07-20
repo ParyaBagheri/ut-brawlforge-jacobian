@@ -90,7 +90,13 @@ def get_level_data(name, game):
                 #Finish Line at 6000
             ],
             "enemies" : [],
-            "powerups" : []
+            "powerups" : [
+                Powerup(game, 1200, 350, 'shield'),
+                Powerup(game, 2300, 400, 'damageboost'),
+                Powerup(game, 3950, 400, 'doublejump'),
+                Powerup(game, 4580, 350, 'shield'),
+                Powerup(game, 5300, 350, 'damageboost')
+            ]
         }
     elif name == "lost_city":
         return{
@@ -129,7 +135,13 @@ def get_level_data(name, game):
                 Platform(game, 7100, 100, 900, 20) #Finish line at 7700
                 
             ],
-            "powerups" : []
+            "powerups" : [
+                Powerup(game, 1150, 200, 'shield'),
+                Powerup(game, 2850, 50, 'health'),
+                Powerup(game, 4150, 250, 'doublejump'),
+                Powerup(game, 5300, 300, 'shield'),
+                Powerup(game, 6750, 250, 'damageboost')
+            ]
         }
     elif name == "underwater":
         return{
@@ -167,7 +179,8 @@ def get_level_data(name, game):
                 Platform(game, 9350, 300, 150, 50),
                 Platform(game, 9600, 200, 100, 50),
                 Platform(game, 9800, 300, 200, 50),
-                Platform(game, 10050, 450, 350, 50),
+                Platform(game, 10050, 450, 200, 50, 'slowing'),
+                Platform(game, 10250, 450, 150, 50),
                 Platform(game, 10500, 300, 100, 50),
                 Platform(game, 10550, 370, 400, 20, 'spikey'),
                 Platform(game, 10700, 200, 100, 50),
@@ -186,7 +199,20 @@ def get_level_data(name, game):
                 Platform(game, 14100, 300, 1900, 50) # Finish platform
 
             ],
-            "powerups" : []
+            "powerups" : [
+                Powerup(game, 900, 300, 'damageboost'),
+                Powerup(game, 1600, 250, 'shield'),
+                Powerup(game, 3000, 450, 'doublejump'),
+                Powerup(game, 3400, 150, 'damageboost'),
+                Powerup(game, 4000, 300, 'shield'),
+                Powerup(game, 6500, 250, 'shield'),
+                Powerup(game, 7600, 250, 'damageboost'),
+                Powerup(game, 9420, 250, 'shield'),
+                Powerup(game, 10200, 400, 'damageboost'),
+                Powerup(game, 10550, 250, 'shield'),
+                Powerup(game, 13050, 250, 'damageboost'),
+                Powerup(game, 14200, 250, 'damageboost')
+            ],
         }
     else:
         raise ValueError(f"Unknown level : {name}")
