@@ -8,13 +8,7 @@ import config
 def get_level_data(name, game):
     if name == "forest":
         platform_img = pygame.image.load("src/assets/images/platform.png").convert_alpha()
-        tmx_data = load_pygame("src/assets/tiles and maps/forest.tmx")
-        platforms = []
-        for obj in tmx_data.objects:
-            if obj.name == "platform":
-                platforms.append(Platform(game, obj.x, obj.y, obj.width, obj.height, getattr(obj, "class", "solid")))
-
-
+        
         return{
             "background_layers" : [
                 (pygame.image.load("src/assets/images/forest/backgrounds/L7.png").convert(), 0.1),
@@ -26,8 +20,7 @@ def get_level_data(name, game):
                 (pygame.image.load("src/assets/images/forest/backgrounds/L0.png").convert_alpha(), 0.7),
                 (pygame.image.load("src/assets/images/forest/backgrounds/L1.png").convert_alpha(), 0.7),
             ],
-            "platforms" : platforms,
-            '''"platforms" : [
+            "platforms" : [
                 Platform(game, 300, 400, 150, 20, 'solid', image=platform_img),
                 Platform(game, 600, 300, 150, 20, 'solid', image=platform_img),
                 Platform(game, 750, 300, 250, 20, 'solid'), #Fragile platform
@@ -45,7 +38,7 @@ def get_level_data(name, game):
                 Platform(game, 3150, 250, 200, 100, 'solid'), #Finish platform
                 #Platform(self, 3050, 560 - config.BASE_GROUND_HEIGHT, 50, 40, 'bouncy')
                 game.ground_rect
-            ],'''
+            ],
             "enemies" : [],
             "powerups" : [
                 Powerup(game, 1100, 50, 'shield'),
