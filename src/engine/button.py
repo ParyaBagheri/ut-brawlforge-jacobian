@@ -6,7 +6,7 @@ class Button :
         self.game = game
         self.frames = frames
         self.current_frame = 0
-        self.font = pygame.font.Font("src/assets/fonts/"+ font + ".ttf", fontsize)
+        self.font = pygame.font.Font("src/assets/fonts/" + font + ".ttf", fontsize)
         self.x = pos[0]
         self.y = pos[1]
         self.text_input = text_input
