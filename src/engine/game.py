@@ -174,19 +174,19 @@ class Game:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if MAP_1.is_pressed(MAP_MENU_MOUSE_POS()):
                         self.state = "playing"
-                        self.level = Level("forest", self, self.forest_win)
+                        self.level = Level("forest", self, 3350, self.forest_win)
                         self.run()
                     if MAP_2.is_pressed(MAP_MENU_MOUSE_POS()):
                         self.state = "playing"
-                        self.level = Level("desert", self, self.desert_win)
+                        self.level = Level("desert", self, 6600, self.desert_win)
                         self.run()
                     if MAP_3.is_pressed(MAP_MENU_MOUSE_POS()):
                         self.state = "playing"
-                        self.level = Level("lost_city", self, self.lostcity_win)
+                        self.level = Level("lost_city", self, 8000, self.lostcity_win)
                         self.run()
                     if MAP_4.is_pressed(MAP_MENU_MOUSE_POS()):
                         self.state = "playing"
-                        self.level = Level("underwater", self, self.underwater_win)
+                        self.level = Level("underwater", self, 16000, self.underwater_win)
                         self.run()
 
         while True:
@@ -219,11 +219,11 @@ class Game:
                     if NEXTLEVEL_BUTTON.is_pressed(MOUSE_POS()):
                         self.state = "playing"
                         if self.level.name == "forest":
-                            self.level = Level("desert", self, self.desert_win)
+                            self.level = Level("desert", self, 6600, self.desert_win)
                         elif self.level.name == "desert":
-                            self.level = Level("lost_city", self, self.lostcity_win)
+                            self.level = Level("lost_city", self, 8000,self.lostcity_win)
                         elif self.level.name == "lost_city":
-                            self.level = Level("underwater", self, self.underwater_win)
+                            self.level = Level("underwater", self, 16000, self.underwater_win)
                         self.run()
                     if MENU_BUTTON.is_pressed(MOUSE_POS()):
                         self.state = "main_menu"
@@ -268,7 +268,7 @@ class Game:
     def update_camera(self):
         # Camera follows the player horizontally
         self.camera_x = self.player.rect.centerx - self.screen_width // 2
-        max_camera_x = self.ground_rect.width - self.screen_width
+        max_camera_x = self.level.width - self.screen_width
         self.camera_x = max(0, min(self.camera_x, max_camera_x))
 
     def run(self):
