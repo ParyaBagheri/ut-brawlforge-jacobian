@@ -339,3 +339,4 @@ class Player:
         self.held_bullet.fire()
 
         # Create a new bullet that will follow the player (for next shot)
+        self.held_bullet = Bullet(self, self.held_bullet.type)
