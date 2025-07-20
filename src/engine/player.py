@@ -179,6 +179,8 @@ class Player:
                 if powerup.type == "damageboost":
                     self.held_bullet.damage += 1
                     powerup.visible = False
+                if powerup.type == "health" :
+                    self.health += 1
     def update(self, platforms, enemies, powerups, dt):
         keys = pygame.key.get_pressed()
         self.update_animation(keys)
