@@ -1,9 +1,10 @@
 from src.engine import data_loader
 from src.utils import Tiledmap
 class Level:
-    def __init__(self,name, game, winFunc=None, loseFunc=None):
+    def __init__(self,name, game, width, winFunc=None, loseFunc=None):
         self.name = name
         self.game = game
+        self.width = width
         #self.tilemap = Tiledmap(f"src/assets/tiles and maps/{name}.tmx")
         #self.platforms = platforms
         #self.entities = entities
