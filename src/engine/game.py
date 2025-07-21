@@ -267,10 +267,13 @@ class Game:
 
     def update_camera(self):
         # Camera follows the player horizontally
+        
         self.camera_x = self.player.rect.centerx - self.screen_width // 2
         max_camera_x = self.level.width - self.screen_width
         self.camera_x = max(0, min(self.camera_x, max_camera_x))
-
+        if self.camera_x + self.screen_width > config.FINISHING_POINTS[self.level.name] :
+            self.camera_x = config.FINISHING_POINTS[self.level.name] - self.screen_width
+ 
     def run(self):
         while True:
             self.handle_events()
@@ -361,6 +364,10 @@ class Game:
                                           platform.y, 
                                           platform.width, 
                                           platform.height))
+        # Draw map
+        if self.level.map != None:
+            self.screen.blit(self.level.map,( 0 - self.camera_x , 0))
+            
 
         # Draw player
         if(self.player.visible == True) :

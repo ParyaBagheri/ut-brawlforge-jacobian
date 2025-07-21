@@ -5,7 +5,7 @@ FPS = 60
 GRAVITY = 1
 JUMP_VELOCITY = -18
 MOVE_SPEED = 5
-BASE_GROUND_HEIGHT = 100
+BASE_GROUND_HEIGHT = 104
 BASE_SCREEN_WIDTH = 800
 BASE_SCREEN_HEIGHT = 600
 MAX_ENEMY_HEALTH = 1
@@ -35,3 +35,10 @@ BULLET_FRAMES_SPEED = 0.45
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 BUTTON_FRAMES_SPEED = 0.15
+FINISHING_POINTS = {
+    "forest" : 3200 ,
+    "desert" : 6000,
+    "lost_city" : 7700,
+    "underwater" : 14500 
+
+}

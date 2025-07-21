@@ -7,8 +7,9 @@ import config
 
 def get_level_data(name, game):
     if name == "forest":
-        
+        forest_image = AssetManager.platform_images["forest"]
         return{
+            "map" : AssetManager.map_image["forest"] ,
             "background_layers" : [
                 (pygame.image.load("src/assets/images/forest/backgrounds/L7.png").convert(), 0.1),
                 (pygame.image.load("src/assets/images/forest/backgrounds/L5.png").convert_alpha(), 0.2),
@@ -20,21 +21,21 @@ def get_level_data(name, game):
                 (pygame.image.load("src/assets/images/forest/backgrounds/L1.png").convert_alpha(), 0.7),
             ],
             "platforms" : [
-                Platform(game, 300, 400, 150, 20, 'solid', image = AssetManager.platform_images["forest"]),
-                Platform(game, 600, 300, 150, 20, 'solid', image = AssetManager.platform_images["forest"]),
-                Platform(game, 750, 300, 250, 20, 'solid'), #Fragile platform
-                Platform(game, 1050, 200, 100, 20, 'solid', image = AssetManager.platform_images["forest"]), # Bonus on this platform
+                Platform(game, 304, 384, 160, 24, 'solid' ),
+                Platform(game, 600, 304, 192, 40, 'solid'),
+                Platform(game, 750, 304, 250, 20, 'timed', image = AssetManager.platform_images["timed"]), #Fragile platform
+                Platform(game, 1048, 200, 112, 16, 'solid'), # Bonus on this platform
                 Platform(game, 1140, 560 - config.BASE_GROUND_HEIGHT, 50, 40, 'bouncy'), #Bouncy platform
-                Platform(game, 1250, 300, 300, 20, 'solid', image = AssetManager.platform_images["forest"]),
-                Platform(game, 1400, 600 - config.BASE_GROUND_HEIGHT, 350, 20, 'slowing', image = AssetManager.platform_images["slowing"] ), #Muddy platform
+                Platform(game, 1248, 296, 304, 24, 'solid'),
+                Platform(game, 1416, 600 - config.BASE_GROUND_HEIGHT, 350, 20, 'slowing' ), #Muddy platform
                 Platform(game, 1630, 200, 100, 20, 'timed', image = AssetManager.platform_images["timed"]),
-                Platform(game, 1700, 300, 100, 20, 'solid', image = AssetManager.platform_images["forest"]),
-                Platform(game, 1800, 300, 250, 20, 'slowing',image = AssetManager.platform_images["slowing"]),
-                Platform(game, 2250, 200, 100, 20, 'timed'),
-                Platform(game, 2400, 300, 300, 20, 'solid', image = AssetManager.platform_images["forest"]),
+                Platform(game, 1696, 296, 112, 48, 'solid'),
+                Platform(game, 1808, 296, 248, 48, 'slowing'),
+                Platform(game, 2250, 200, 100, 20, 'timed', image = AssetManager.platform_images["timed"]),
+                Platform(game, 2400, 296, 304, 24, 'solid'),
                 Platform(game, 2800, 200, 100, 20, 'timed', image = AssetManager.platform_images["timed"]),
                 Platform(game, 3000, 100, 100, 20, 'timed', image = AssetManager.platform_images["timed"]),
-                Platform(game, 3150, 250, 200, 100, 'solid', image = AssetManager.platform_images["forest"]), #Finish platform
+                Platform(game, 3112, 248, 88, 72, 'solid'), #Finish platform
                 #Platform(self, 3050, 560 - config.BASE_GROUND_HEIGHT, 50, 40, 'bouncy')
                 game.ground_rect
             ],
@@ -46,39 +47,40 @@ def get_level_data(name, game):
         }
     elif name == "desert":
         return{
+            "map" : AssetManager.map_image["desert"] ,
             "background_layers" : [
                 (pygame.image.load("src/assets/images/forest/backgrounds/L7.png").convert(), 0),
             ],
             "platforms" : [
-                Platform(game, 0, 100, 400, 500, image = AssetManager.platform_images["desert"]),
-                Platform(game, 500, 0, 4850, 100, image = AssetManager.platform_images["desert"]),
-                Platform(game, 400, 400, 300, 200, image = AssetManager.platform_images["desert"]), 
-                Platform(game, 700, 500, 300, 100, image = AssetManager.platform_images["desert"]),
-                Platform(game, 1000, 510, 400, 90, 'spikey', image = AssetManager.platform_images["spikey"]),
-                Platform(game, 1100, 450, 200, 20, image = AssetManager.platform_images["desert"]),
-                Platform(game, 1400, 300, 600, 300, image = AssetManager.platform_images["desert"]),
-                Platform(game, 2000, 500, 500, 100, 'spikey', image = AssetManager.platform_images["spikey"]),
-                Platform(game, 2050, 450, 100, 20, image = AssetManager.platform_images["desert"]),
+                Platform(game, 0, 96, 400, 496),
+                Platform(game, 504, 0, 4848, 96),
+                Platform(game, 408, 400, 296, 296), 
+                Platform(game, 712, 496, 280, 100),
+                Platform(game, 1000, 504, 400, 24, 'spikey'),
+                Platform(game, 1096, 448, 200, 24),
+                Platform(game, 1408, 304, 592, 288),
+                Platform(game, 2008, 504, 488, 32, 'spikey'),
+                Platform(game, 2048, 448, 112, 24),
                 Platform(game, 2200, 450, 200, 20, 'timed',image = AssetManager.platform_images["timed"]),
-                Platform(game, 2500, 450, 200, 150, image = AssetManager.platform_images["desert"]),
-                Platform(game, 2700, 500, 700, 100, 'spikey', image = AssetManager.platform_images["spikey"]),
+                Platform(game, 2504, 448, 196, 144),
+                Platform(game, 2704, 504, 696, 32, 'spikey'),
                 Platform(game, 2800, 350, 100, 20, 'timed', image = AssetManager.platform_images["timed"]),
-                Platform(game, 3000, 400, 100, 20, image = AssetManager.platform_images["desert"]),
-                Platform(game, 3200, 300, 150, 20, image = AssetManager.platform_images["desert"]),
-                Platform(game, 3400, 400, 200, 200, image = AssetManager.platform_images["desert"]),
-                Platform(game, 3600, 500, 300, 100, 'spikey', image = AssetManager.platform_images["spikey"]),
-                Platform(game, 3700, 350, 100, 20, image = AssetManager.platform_images["desert"]),
-                Platform(game, 3900, 400, 50, 200, image = AssetManager.platform_images["desert"]),
-                Platform(game, 3950, 450, 50, 150, image = AssetManager.platform_images["desert"]),
-                Platform(game, 4000, 480, 100, 120, image = AssetManager.platform_images["desert"]),
+                Platform(game, 3000, 400, 112, 24),
+                Platform(game, 3200, 304, 144, 24),
+                Platform(game, 3408, 400, 192, 192),
+                Platform(game, 3608, 504, 288, 24, 'spikey'),
+                Platform(game, 3696, 352, 112, 24),
+                Platform(game, 3904, 400, 48, 192),
+                Platform(game, 3952, 448, 56, 144),
+                Platform(game, 4008, 480, 96, 112),
                 Platform(game, 4025, 440, 50, 40, 'bouncy'),
-                Platform(game, 4100, 500, 850, 100, 'spikey', image = AssetManager.platform_images["spikey"]),
-                Platform(game, 4180, 300, 200, 20, image = AssetManager.platform_images["desert"]),
-                Platform(game, 4500, 400, 150, 20, image = AssetManager.platform_images["desert"]),
-                Platform(game, 4700, 300, 150, 20, image = AssetManager.platform_images["desert"]),
-                Platform(game, 4950, 400, 450, 200, image = AssetManager.platform_images["desert"]),
-                Platform(game, 5400, 300, 150, 300, image = AssetManager.platform_images["desert"]),
-                Platform(game, 5550, 200, 6600, 400, image = AssetManager.platform_images["desert"]) 
+                Platform(game, 4104, 496, 736, 24, 'spikey'),
+                Platform(game, 4176, 296, 208, 32),
+                Platform(game, 4496, 400, 152, 24),
+                Platform(game, 4696, 296, 152, 24),
+                Platform(game, 4848, 400, 544, 192),
+                Platform(game, 5400, 296, 240, 296),
+                Platform(game, 5648, 200, 344, 392) 
                 #Finish Line at 6000
             ],
             "enemies" : [],
@@ -92,6 +94,7 @@ def get_level_data(name, game):
         }
     elif name == "lost_city":
         return{
+            "map" : None ,
             "platforms" : [
                 Platform(game, 0, 300, 500, 300, image = AssetManager.platform_images["lostcity"]),
                 Platform(game, 600, 400, 150, 200, image = AssetManager.platform_images["lostcity"]),
@@ -137,6 +140,7 @@ def get_level_data(name, game):
         }
     elif name == "underwater":
         return{
+            "map" : None ,
             "platforms" : [
                 Platform(game, 0, 300, 300, 100),
                 Platform(game, 450, 400, 300, 100),

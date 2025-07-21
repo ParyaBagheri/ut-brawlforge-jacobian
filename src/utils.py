@@ -1,5 +1,6 @@
-import pygame, pytmx
-from pytmx.util_pygame import load_pygame
+import pygame
+''', pytmx
+from pytmx.util_pygame import load_pygame'''
 
 class Tile(pygame.sprite.Sprite):
     def __init__(self, image, x, y):
