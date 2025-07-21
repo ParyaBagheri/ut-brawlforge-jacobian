@@ -7,7 +7,7 @@ from src.engine.assetmanager import AssetManager
 
 
 class Player:
-    def __init__(self, game,character_type):
+    def __init__(self, game,character_type, start_x=100):
         self.game = game
         self.color = (255, 0, 0)  # Player color (red)
         '''if image:
@@ -43,7 +43,7 @@ class Player:
         self.assets = AssetManager.player_images[character_type]
         self.current_frame = 0
         self.image = self.assets[self.state][self.current_frame]
-        self.rect = self.image.get_rect(topleft=(100, 0))
+        self.rect = self.image.get_rect(topleft=(start_x, 0))
         # type of weapon
         self.weapon = config.WEAPONS[self.character_type]
         # attack 
@@ -58,6 +58,7 @@ class Player:
         self.is_dead = False
 
         self.held_bullet = Bullet(self, self.bullet_type) # Create a bullet that follows the player (not fired yet)
+        self.held_bullet.owner = self
 
         self.max_jumps = 1
         self.jump_count = 0
@@ -169,6 +170,9 @@ class Player:
                     powerup.visible = False
                 if powerup.type == "damageboost":
                     self.held_bullet.damage += 1
+                    powerup.visible = False
+                if powerup.type == "health" :
+                    self.health += 1
                     powerup.visible = False
 
     def update(self, platforms, enemies, powerups):
@@ -357,3 +361,4 @@ class Player:
 
         # Create a new bullet that will follow the player (for next shot)
         self.held_bullet = Bullet(self, self.held_bullet.type)
+        self.held_bullet.owner = self

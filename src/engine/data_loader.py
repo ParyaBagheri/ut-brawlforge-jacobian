@@ -1,4 +1,4 @@
-import pygame
+import pygame , random
 from src.engine.platform import Platform
 from src.engine.collectible import Powerup
 from src.engine.assetmanager import AssetManager
@@ -206,5 +206,35 @@ def get_level_data(name, game):
                 Powerup(game, 14200, 250, 'damageboost')
             ],
         }
+    elif name == "multiplayer" : 
+        powerups = ['shield', 'damageboost', 'doublejump', 'health']
+        p_idx = random.randint(0, 3)
+        p_x = random.randint(100, 3300)
+        p_y = random.randint(200, 450)
+
+        return{
+            "platforms" : [
+                Platform(game, 300, 400, 150, 20, 'solid', image = AssetManager.platform_images["forest"]),
+                Platform(game, 600, 300, 150, 20, 'solid', image = AssetManager.platform_images["forest"]),
+                Platform(game, 750, 300, 250, 20, 'solid'), #Fragile platform
+                Platform(game, 1050, 200, 100, 20, 'solid', image = AssetManager.platform_images["forest"]), # Bonus on this platform
+                Platform(game, 1140, 560 - config.BASE_GROUND_HEIGHT, 50, 40, 'bouncy'), #Bouncy platform
+                Platform(game, 1250, 300, 300, 20, 'solid', image = AssetManager.platform_images["forest"]),
+                Platform(game, 1400, 600 - config.BASE_GROUND_HEIGHT, 350, 20, 'slowing', image = AssetManager.platform_images["slowing"] ), #Muddy platform
+                Platform(game, 1630, 200, 100, 20, 'timed', image = AssetManager.platform_images["timed"]),
+                Platform(game, 1700, 300, 100, 20, 'solid', image = AssetManager.platform_images["forest"]),
+                Platform(game, 1800, 300, 250, 20, 'slowing',image = AssetManager.platform_images["slowing"]),
+                Platform(game, 2250, 200, 100, 20, 'timed'),
+                Platform(game, 2400, 300, 300, 20, 'solid', image = AssetManager.platform_images["forest"]),
+                Platform(game, 2800, 200, 100, 20, 'timed', image = AssetManager.platform_images["timed"]),
+                Platform(game, 3000, 100, 100, 20, 'timed', image = AssetManager.platform_images["timed"]),
+                Platform(game, 3150, 250, 200, 100, 'solid', image = AssetManager.platform_images["forest"]), #Finish platform
+                #Platform(self, 3050, 560 - config.BASE_GROUND_HEIGHT, 50, 40, 'bouncy')
+                game.ground_rect
+            ],
+            "powerups" : []
+            
+        }
+
     else:
         raise ValueError(f"Unknown level : {name}")

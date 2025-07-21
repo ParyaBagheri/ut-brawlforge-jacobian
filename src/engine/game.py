@@ -1,4 +1,4 @@
-import pygame
+import pygame, time, random
 import sys
 import os
 
@@ -51,6 +51,11 @@ class Game:
 
         self.level = None
         self.state = "main_menu"
+        self.mode = "single_player"
+        self.player = None
+        self.other_player = None
+        self.powerup_spawn_interval = 10
+        self.last_powerup_spawn = time.time()
 
     def main_menu(self):
         #self.screen.fill((0, 0, 0))
@@ -59,10 +64,12 @@ class Game:
         self.screen.blit(background, (0,0))
         MENU_PLAY = Button(self, None, [400, 100], "PLAY","OCRAEXT", 50, (255,255,255), (0,146,155))
         MENU_HOWTO = Button(self, None, [400, 300], "HOW TO PLAY",'OCRAEXT', 50, 'white', (0, 146, 155))
+        MENU_MULTIPLAYER = Button(self, None, [400, 500], "MULTIPLAYER", "OCRAEXT", 50, 'white', (0, 146, 155)) 
         MENU_MOUSE_POS = pygame.mouse.get_pos
         def main_menu_render():        
             MENU_PLAY.draw(MENU_MOUSE_POS())
             MENU_HOWTO.draw(MENU_MOUSE_POS())
+            MENU_MULTIPLAYER.draw(MENU_MOUSE_POS())
         def main_menu_event_handler():
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -72,11 +79,26 @@ class Game:
                     if MENU_PLAY.is_pressed(MENU_MOUSE_POS()):
                         self.state = "char_menu"
                         self.character_menu()
+                    if MENU_MULTIPLAYER.is_pressed(MENU_MOUSE_POS()):
+                        self.mode ="multiplayer"
+                        self.state = "char_menu"
+                        self.character_menu()
         while True:
             main_menu_render()
             main_menu_event_handler()
             pygame.display.flip()
             self.clock.tick(config.FPS)
+
+    def mp_win(self):
+        if self.other_player :
+            if self.other_player.health == 0:
+                return True
+        return False
+    def mp_lose(self):
+        if self.player :
+            if self.player.health == 0 :
+                return True
+        return False
 
     def character_menu(self):
         background = pygame.image.load(background_path)
@@ -100,6 +122,7 @@ class Game:
             CHAR_3.draw(CHAR_MENU_MOUSE_POS())
             CHAR_4.draw(CHAR_MENU_MOUSE_POS())
 
+
         def char_menu_events():
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -107,17 +130,35 @@ class Game:
                     sys.exit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if CHAR_1.is_pressed(CHAR_MENU_MOUSE_POS()):
-                        self.state = "map_menu"
                         self.player = Player(self, character_type='knight')
-                        self.map_menu()
+                        if self.mode == "single_player" :
+                            self.state = "map_menu"
+                            self.map_menu()
+                        elif self.mode == "multiplayer" :
+                            self.other_player = Player(self, 'wizard', 3300)
+                            self.level = Level("multiplayer", self, 3350, self.mp_win, self.mp_lose)
+                            self.state = "playing"
+                            self.run()
                     elif CHAR_2.is_pressed(CHAR_MENU_MOUSE_POS()):
-                        self.state = "map_menu"
                         self.player = Player(self, character_type='girl')
-                        self.map_menu()
+                        if self.mode == "single_player" :
+                            self.state = "map_menu"
+                            self.map_menu()
+                        elif self.mode == "multiplayer" :
+                            self.other_player = Player(self, 'knight', 3300)
+                            self.level = Level("multiplayer", self, 3350, self.mp_win, self.mp_lose)
+                            self.state = "playing"
+                            self.run()                   
                     elif CHAR_3.is_pressed(CHAR_MENU_MOUSE_POS()):
-                        self.state = "map_menu"
                         self.player = Player(self, character_type='wizard')
-                        self.map_menu()
+                        if self.mode == "single_player" :
+                            self.state = "map_menu"
+                            self.map_menu()
+                        elif self.mode == "multiplayer" :
+                            self.other_player = Player(self, 'girl', 3300)
+                            self.level = Level("multiplayer", self, 3350, self.mp_win, self.mp_lose)
+                            self.state = "playing"
+                            self.run()
 
         while True:
             char_menu_render()
@@ -141,7 +182,6 @@ class Game:
         if self.player.rect.x >= 15600 :
             return True
         return False
-    
 
     def map_menu(self):
         #self.screen.fill((22, 15, 133))
@@ -234,7 +274,20 @@ class Game:
             pygame.display.flip()
             self.clock.tick(config.FPS)
 
-
+    def lose_screen(self):
+        self.screen.fill((0, 0, 0))
+        lose_font = pygame.font.Font("src/assets/fonts/OCRAEXT.ttf", 72)
+        lose_msg = lose_font.render("YOU LOST !", True, 'yellow')
+        text_rect = lose_msg.get_rect()
+        text_rect.center = (self.screen_width//2, 200)
+        self.screen.blit(lose_msg, text_rect)
+    def win_screen(self):
+        self.screen.fill((0, 0, 0))
+        win_font = pygame.font.Font("src/assets/fonts/OCRAEXT.ttf", 72)
+        win_msg = win_font.render("YOU WIN!", True, 'yellow')
+        text_rect = win_msg.get_rect()
+        text_rect.center = (self.screen_width//2, 200)
+        self.screen.blit(win_msg, text_rect)
 
     def platform_maker(self):
         platform_img = pygame.image.load("src/assets/images/platform.png").convert_alpha()
@@ -258,6 +311,21 @@ class Game:
             self.ground_rect
         ]
         return platforms
+    def spawn_random_powerup(self):
+        from src.engine.collectible import Powerup
+        powerup_types = ['shield', 'doublejump', 'damageboost', 'health']
+        p_type = random.choice(powerup_types)
+
+        valid_platforms = [p for p in self.level.platforms if isinstance(p, Platform) and p.visible]
+        if not valid_platforms:
+            return
+
+        platform = random.choice(valid_platforms)
+        x = platform.rect.centerx
+        y = platform.rect.top - 50
+
+        new_powerup = Powerup(self, x, y, p_type)
+        self.level.powerups.append(new_powerup)
 
     def update_dimensions(self):
         # Update screen and ground dimensions based on current window size
@@ -311,10 +379,18 @@ class Game:
     def update(self):
         #if self.isGameover == False and self.is_paused == False:
         if self.state == "playing" and self.level != None:
-            if self.level.won() :
+            if self.mode != "multiplayer" and self.level.won() :
                 self.state = "won"
                 self.player.reset()
                 self.finish_menu()
+            if self.mode == "multiplayer" :
+                if self.level.won():
+                    self.player.reset()
+                    self.win_screen()
+                if self.level.lost() :
+                    self.player.reset()
+                    self.lose_screen()
+                #self.other_player.update(self.level.platforms, self.enemies, self.level.powerups)
             self.player.update(self.level.platforms, self.enemies, self.level.powerups)
             self.update_camera()
 
@@ -328,6 +404,14 @@ class Game:
             for bullet in self.Fired_bullets_list :
                 if isinstance(bullet, Bullet) :
                     bullet.update()
+            if self.mode == "multiplayer" :
+                for bullet in self.Fired_bullets_list:
+                    if isinstance(bullet, Bullet) and self.other_player:
+                        if bullet.owner == self.player and bullet.rect.colliderect(self.other_player.rect):
+                            if not self.other_player.is_invincible:
+                                self.other_player.health -= bullet.damage
+                                self.other_player.is_invincible = True
+                                bullet.visible = False
 
             # Remove dead enemies and spawn new ones
             for enemy in self.enemies:
@@ -335,6 +419,14 @@ class Game:
                     enemy.kill()
                     new_enemy = Enemy(self)
                     self.enemies.add(new_enemy)
+
+            # spawning random powerups :
+            if self.mode == "multiplayer":
+                current_time = time.time()
+                if current_time - self.last_powerup_spawn > self.powerup_spawn_interval:
+                    self.spawn_random_powerup()
+                    self.last_powerup_spawn = current_time
+
             for powerup in self.level.powerups :
                 powerup.update()
 
@@ -368,6 +460,8 @@ class Game:
                 self.screen.blit( pygame.transform.flip(self.player.image,True,False), (self.player.rect.x - self.camera_x, self.player.rect.y))
             else :
                 self.screen.blit( self.player.image, (self.player.rect.x - self.camera_x, self.player.rect.y))
+        if self.other_player :
+            self.screen.blit(self.other_player.image, (self.other_player.rect.x - self.camera_x, self.player.rect.y))
 
         # Draw all fired bullets with camera offset
         for bullet in self.Fired_bullets_list :
@@ -405,12 +499,16 @@ class Game:
                                         enemy.rect.width, 
                                         enemy.rect.height))
     def show_health(self):
-        health_display = font.render("Health: " + str(self.player.health), True, 'white')
+        health_display = font.render("Your Health: " + str(self.player.health), True, 'white')
         self.screen.blit(health_display, (20,20))
         heart = heartfont.render("♥", True, "red")
         if self.player.health >= 0:
             for i in range(0,self.player.health):
                 self.screen.blit(heart, (40 + 30*i , 40))
+        if self.other_player:
+            other_health_display = font.render("Enemy: " + str(self.other_player.health), True, 'red')
+            self.screen.blit(other_health_display, (20, 80))
+                
     def gameover(self):
         self.state = "gameover"
         self.player.color = (0, 0, 0)

@@ -33,6 +33,7 @@ class Bullet :
         # Create bullet's rectangle at player's center (adjusted for image size)
         self.rect = pygame.Rect(self.player.rect.centerx, self.player.rect.centery-3, config.BULLET_SIZE [self.type][0],config.BULLET_SIZE [self.type][1])
 
+        owner = None
     
             
 
