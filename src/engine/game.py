@@ -451,12 +451,12 @@ class Game:
         for platform in self.level.platforms:
             if isinstance(platform, Platform) and platform.visible == True:
                 platform.draw(self.screen, self.camera_x)
-            elif not isinstance(platform, Platform) :
+            '''elif not isinstance(platform, Platform) :
                 pygame.draw.rect(self.screen, (34, 139, 34), 
                                pygame.Rect(platform.x - self.camera_x, 
                                           platform.y, 
                                           platform.width, 
-                                          platform.height))
+                                          platform.height))'''
         # Draw map
         if self.level.map != None:
             self.screen.blit(self.level.map,( 0 - self.camera_x , 0))
@@ -509,7 +509,7 @@ class Game:
     def show_health(self):
         health_display = font.render("Your Health: " + str(self.player.health), True, 'white')
         self.screen.blit(health_display, (20,20))
-        heart = heartfont.render("♥", True, "red")
+        heart = AssetManager.UI_images["heart"]
         if self.player.health >= 0:
             for i in range(0,self.player.health):
                 self.screen.blit(heart, (40 + 30*i , 40))

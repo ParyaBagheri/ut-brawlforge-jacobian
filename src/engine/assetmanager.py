@@ -11,6 +11,7 @@ class AssetManager :
     platform_images = {}
     map_image = {}
     backgrounds = {}
+    UI_images = {}
 
     def load_frames(sheet,frame_width,frame_hight ,startpoint, numframes):
         frames = []
@@ -184,7 +185,9 @@ class AssetManager :
         slowing_platform = pygame.image.load("src/assets/images/platforms/slowing.png")
         timed_platform = pygame.image.load("src/assets/images/platforms/timed.png")
         spikey_platform = pygame.image.load("src/assets/images/platforms/spikey.png")
-
+        bouncy_frames = pygame.image.load("src/assets/images/platforms/bouncy.png")
+        bouncy_frames = AssetManager.load_frames(bouncy_frames, 16,16,0,6)
+        bouncy_frames = AssetManager.scale_frames(bouncy_frames, 50, 40)
         AssetManager.platform_images = {
             "forest" : forest_platform ,
             "desert" : desert_platform ,
@@ -192,7 +195,8 @@ class AssetManager :
             "underwater": underwater_platform ,
             "slowing" : slowing_platform ,
             "timed" : timed_platform ,
-            "spikey" : spikey_platform
+            "spikey" : spikey_platform ,
+            "bouncy" : bouncy_frames
         }
     def load_map ( ) :
         forest_map =   pygame.image.load("src/assets/tiles and maps/forest.png")
@@ -215,8 +219,15 @@ class AssetManager :
             "lost_city" : lost_city_background ,
             "underwater" : underwater_background
         }
+    def load_UI_assets ():
+        heart_image = pygame.image.load("src/assets/images/UI/heart.png")
+        #heart_image = pygame.transform.scale(heart_image, (7, 6))
+        AssetManager.UI_images = {
+            "heart" : heart_image
+        }
     def load_assets():
         AssetManager.load_player_assets()
         AssetManager.load_bullet_assets()
         AssetManager.load_platform_images()
         AssetManager.load_map()
+        AssetManager.load_UI_assets ()

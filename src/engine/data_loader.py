@@ -16,7 +16,7 @@ def get_level_data(name, game):
                 Platform(game, 600, 304, 192, 40, 'solid'),
                 Platform(game, 750, 304, 250, 20, 'timed', image = AssetManager.platform_images["timed"]), #Fragile platform
                 Platform(game, 1048, 200, 112, 16, 'solid'), # Bonus on this platform
-                Platform(game, 1140, 560 - config.BASE_GROUND_HEIGHT, 50, 40, 'bouncy'), #Bouncy platform
+                Platform(game, 1140, 560 - config.BASE_GROUND_HEIGHT, 50, 40, 'bouncy',AssetManager.platform_images["bouncy"][0]), #Bouncy platform
                 Platform(game, 1248, 296, 304, 24, 'solid'),
                 Platform(game, 1416, 600 - config.BASE_GROUND_HEIGHT, 350, 20, 'slowing' ), #Muddy platform
                 Platform(game, 1630, 200, 100, 20, 'timed', image = AssetManager.platform_images["timed"]),
@@ -65,7 +65,7 @@ def get_level_data(name, game):
                 Platform(game, 3904, 400, 48, 192),
                 Platform(game, 3952, 448, 56, 144),
                 Platform(game, 4008, 480, 96, 112),
-                Platform(game, 4025, 440, 50, 40, 'bouncy'),
+                Platform(game, 4025, 440, 50, 40, 'bouncy',AssetManager.platform_images["bouncy"][0]),
                 Platform(game, 4104, 496, 736, 24, 'spikey'),
                 Platform(game, 4176, 296, 208, 32),
                 Platform(game, 4496, 400, 152, 24),
