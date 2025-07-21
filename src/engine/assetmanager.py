@@ -9,6 +9,7 @@ class AssetManager :
     bullet_assets = {}
     player_sounds = {}
     platform_images = {}
+    map_image = {}
 
     def load_frames(sheet,frame_width,frame_hight ,startpoint, numframes):
         frames = []
@@ -191,8 +192,16 @@ class AssetManager :
             "slowing" : slowing_platform ,
             "timed" : timed_platform ,
             "spikey" : spikey_platform
-        }   
+        }
+    def load_map ( ) :
+        forest_map =   pygame.image.load("src/assets/tiles and maps/forest.png")
+        desert_map = pygame.image.load("src/assets/tiles and maps/desert.png")
+        AssetManager.map_image = {
+            "forest" : forest_map ,
+            "desert" : desert_map
+        }
     def load_assets():
         AssetManager.load_player_assets()
         AssetManager.load_bullet_assets()
         AssetManager.load_platform_images()
+        AssetManager.load_map()
