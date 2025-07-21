@@ -22,6 +22,7 @@ from src.engine.button import Button
 from src.engine.level import Level
 from src.engine import data_loader
 from src.engine.assetmanager import AssetManager
+from src.engine.collectible import Powerup
 
 class Game:
 
@@ -40,13 +41,10 @@ class Game:
         AssetManager.load_assets()
 
         self.Fired_bullets_list = []
-
+        self.enemies = None
         #self.player = Player(self)
         self.camera_x = 0
-        self.enemies = pygame.sprite.Group()
-        enemy = Enemy(self)
-        self.enemies.add(enemy)
-
+        
         self.isGameover = False
 
         self.level = None
@@ -78,6 +76,10 @@ class Game:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if MENU_PLAY.is_pressed(MENU_MOUSE_POS()):
                         self.state = "char_menu"
+                        self.enemies = pygame.sprite.Group()
+                        enemy = Enemy(self)
+                        self.enemies.add(enemy)
+
                         self.character_menu()
                     if MENU_MULTIPLAYER.is_pressed(MENU_MOUSE_POS()):
                         self.mode ="multiplayer"
@@ -135,8 +137,8 @@ class Game:
                             self.state = "map_menu"
                             self.map_menu()
                         elif self.mode == "multiplayer" :
-                            self.other_player = Player(self, 'wizard', 3300)
-                            self.level = Level("multiplayer", self, 3350, self.mp_win, self.mp_lose)
+                            self.other_player = Player(self, 'wizard', 3200)
+                            self.level = Level("multiplayer", self, 3200, self.mp_win, self.mp_lose)
                             self.state = "playing"
                             self.run()
                     elif CHAR_2.is_pressed(CHAR_MENU_MOUSE_POS()):
@@ -145,8 +147,8 @@ class Game:
                             self.state = "map_menu"
                             self.map_menu()
                         elif self.mode == "multiplayer" :
-                            self.other_player = Player(self, 'knight', 3300)
-                            self.level = Level("multiplayer", self, 3350, self.mp_win, self.mp_lose)
+                            self.other_player = Player(self, 'knight', 3200)
+                            self.level = Level("multiplayer", self, 3200, self.mp_win, self.mp_lose)
                             self.state = "playing"
                             self.run()                   
                     elif CHAR_3.is_pressed(CHAR_MENU_MOUSE_POS()):
@@ -155,8 +157,8 @@ class Game:
                             self.state = "map_menu"
                             self.map_menu()
                         elif self.mode == "multiplayer" :
-                            self.other_player = Player(self, 'girl', 3300)
-                            self.level = Level("multiplayer", self, 3350, self.mp_win, self.mp_lose)
+                            self.other_player = Player(self, 'girl', 3200)
+                            self.level = Level("multiplayer", self, 3200, self.mp_win, self.mp_lose)
                             self.state = "playing"
                             self.run()
 
@@ -214,7 +216,7 @@ class Game:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if MAP_1.is_pressed(MAP_MENU_MOUSE_POS()):
                         self.state = "playing"
-                        self.level = Level("forest", self, 3350, self.forest_win)
+                        self.level = Level("forest", self, 3200, self.forest_win)
                         self.run()
                     if MAP_2.is_pressed(MAP_MENU_MOUSE_POS()):
                         self.state = "playing"
@@ -312,7 +314,6 @@ class Game:
         ]
         return platforms
     def spawn_random_powerup(self):
-        from src.engine.collectible import Powerup
         powerup_types = ['shield', 'doublejump', 'damageboost', 'health']
         p_type = random.choice(powerup_types)
 
@@ -325,7 +326,7 @@ class Game:
         y = platform.rect.top - 50
 
         new_powerup = Powerup(self, x, y, p_type)
-        self.level.powerups.append(new_powerup)
+        self.level.powerup_group.add(new_powerup)
 
     def update_dimensions(self):
         # Update screen and ground dimensions based on current window size
@@ -394,14 +395,18 @@ class Game:
                     self.player.reset()
                     self.lose_screen()
                 #self.other_player.update(self.level.platforms, self.enemies, self.level.powerups)
-            self.player.update(self.level.platforms, self.enemies, self.level.powerups)
+            if self.mode == "single_player" and self.enemies :
+                self.player.update(self.level.platforms, self.level.powerup_group, self.enemies)
+            elif self.mode == "multiplayer" :
+                self.player.update(self.level.platforms, self.level.powerup_group)
             self.update_camera()
 
             for platform in self.level.platforms :
                 if isinstance(platform, Platform):
                     platform.update()
-            for enemy in self.enemies:
-                enemy.update()
+            if self.mode == "single_player" :
+                for enemy in self.enemies:
+                    enemy.update()
 
             # Update all fired bullets
             for bullet in self.Fired_bullets_list :
@@ -417,11 +422,12 @@ class Game:
                                 bullet.visible = False
 
             # Remove dead enemies and spawn new ones
-            for enemy in self.enemies:
-                if enemy.rect.x <= 0 + self.camera_x or enemy.health <= 0 or self.isGameover == True :
-                    enemy.kill()
-                    new_enemy = Enemy(self)
-                    self.enemies.add(new_enemy)
+            if self.enemies :
+                for enemy in self.enemies:
+                    if enemy.rect.x <= 0 + self.camera_x or enemy.health <= 0 or self.isGameover == True :
+                        enemy.kill()
+                        new_enemy = Enemy(self)
+                        self.enemies.add(new_enemy)
 
             # spawning random powerups :
             if self.mode == "multiplayer":
@@ -429,6 +435,8 @@ class Game:
                 if current_time - self.last_powerup_spawn > self.powerup_spawn_interval:
                     self.spawn_random_powerup()
                     self.last_powerup_spawn = current_time
+                for powerup in self.level.powerup_group :
+                    powerup.update()
 
             for powerup in self.level.powerups :
                 powerup.update()
@@ -476,10 +484,14 @@ class Game:
                 self.screen.blit(bullet.image, (bullet.rect.x - self.camera_x, bullet.rect.y))
 
         # Draw enemies
-        self.draw_enemies()
+        if self.mode == "single_player":
+            self.draw_enemies()
         # Draw powerups 
         for powerup in self.level.powerups :
             powerup.draw()
+        if self.mode == "multiplayer" :
+            for powerup in self.level.powerup_group :
+                powerup.draw()
         # Show health
         self.show_health()
         # Draw pause button 
@@ -499,12 +511,13 @@ class Game:
             self.screen.blit(loadingscreen_text, ls_text_rect)'''
 
     def draw_enemies(self):
-        for enemy in self.enemies:
-            pygame.draw.rect(self.screen, enemy.color,
-                             pygame.Rect(enemy.rect.x - self.camera_x, 
-                                        enemy.rect.y, 
-                                        enemy.rect.width, 
-                                        enemy.rect.height))
+        if self.enemies:
+            for enemy in self.enemies:
+                pygame.draw.rect(self.screen, enemy.color,
+                                pygame.Rect(enemy.rect.x - self.camera_x, 
+                                            enemy.rect.y, 
+                                            enemy.rect.width, 
+                                            enemy.rect.height))
     def show_health(self):
         health_display = font.render("Your Health: " + str(self.player.health), True, 'white')
         self.screen.blit(health_display, (20,20))
@@ -536,6 +549,7 @@ class Game:
             powerup.visible = True
             powerup.timer = 0
             powerup.is_inview = False
+            self.level.powerup_group.add(powerup)
         
         self.state = "playing"
 

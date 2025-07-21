@@ -2,6 +2,7 @@ import pygame
 
 class Powerup(pygame.sprite.Sprite):
     def __init__(self, game, x, y, type):
+        super().__init__()
         self.game = game 
         self.x = x
         self.y = y

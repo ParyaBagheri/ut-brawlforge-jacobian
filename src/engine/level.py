@@ -1,3 +1,4 @@
+import pygame
 from src.engine import data_loader
 from src.utils import Tiledmap
 class Level:
@@ -23,6 +24,7 @@ class Level:
         #self.background_layers = data["background_layers"]
         self.platforms = data["platforms"]
         self.powerups = data["powerups"]
+        self.powerup_group = pygame.sprite.Group(self.powerups)
         print(f"[DEBUG] Loaded powerups: {len(self.powerups)}")
         #self.enemies = data["enemies"]
         #self.player = data["player"]

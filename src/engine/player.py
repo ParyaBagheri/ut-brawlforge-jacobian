@@ -174,8 +174,10 @@ class Player:
                 if powerup.type == "health" :
                     self.health += 1
                     powerup.visible = False
+                powerup.kill()
+                
 
-    def update(self, platforms, enemies, powerups):
+    def update(self, platforms, powerups, enemies=None):
         keys = pygame.key.get_pressed()
         if not self.is_dead:
             self.update_animation(keys)
@@ -216,7 +218,7 @@ class Player:
                     self.is_invincible = True
 
             self.check_horizontal_collision(platforms)
-            self.check_enemy_collision(enemies)
+            if enemies : self.check_enemy_collision(enemies)
             self.check_powerup_collision(powerups)
 
 
