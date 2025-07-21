@@ -10,16 +10,7 @@ def get_level_data(name, game):
         forest_image = AssetManager.platform_images["forest"]
         return{
             "map" : AssetManager.map_image["forest"] ,
-            "background_layers" : [
-                (pygame.image.load("src/assets/images/forest/backgrounds/L7.png").convert(), 0.1),
-                (pygame.image.load("src/assets/images/forest/backgrounds/L5.png").convert_alpha(), 0.2),
-                (pygame.image.load("src/assets/images/forest/backgrounds/L4.png").convert_alpha(), 0.3),
-                (pygame.image.load("src/assets/images/forest/backgrounds/L6.png").convert_alpha(), 0.4),
-                (pygame.image.load("src/assets/images/forest/backgrounds/L2.png").convert_alpha(), 0.5),
-                (pygame.image.load("src/assets/images/forest/backgrounds/L3.png").convert_alpha(), 0.5),
-                (pygame.image.load("src/assets/images/forest/backgrounds/L0.png").convert_alpha(), 0.7),
-                (pygame.image.load("src/assets/images/forest/backgrounds/L1.png").convert_alpha(), 0.7),
-            ],
+            "background_layers" : {AssetManager.backgrounds["forest"]},
             "platforms" : [
                 Platform(game, 304, 384, 160, 24, 'solid' ),
                 Platform(game, 600, 304, 192, 40, 'solid'),
@@ -48,9 +39,10 @@ def get_level_data(name, game):
     elif name == "desert":
         return{
             "map" : AssetManager.map_image["desert"] ,
-            "background_layers" : [
-                (pygame.image.load("src/assets/images/forest/backgrounds/L7.png").convert(), 0),
-            ],
+            "background_layers" : {
+                AssetManager.backgrounds["desert"]
+                },
+            
             "platforms" : [
                 Platform(game, 0, 96, 400, 496),
                 Platform(game, 504, 0, 4848, 96),
@@ -80,7 +72,7 @@ def get_level_data(name, game):
                 Platform(game, 4696, 296, 152, 24),
                 Platform(game, 4848, 400, 544, 192),
                 Platform(game, 5400, 296, 240, 296),
-                Platform(game, 5648, 200, 344, 392) 
+                Platform(game, 5648, 200, 344, 400) 
                 #Finish Line at 6000
             ],
             "enemies" : [],
@@ -95,6 +87,7 @@ def get_level_data(name, game):
     elif name == "lost_city":
         return{
             "map" : None ,
+            "background_layers" : {AssetManager.backgrounds["lost_city"]},
             "platforms" : [
                 Platform(game, 0, 300, 500, 300, image = AssetManager.platform_images["lostcity"]),
                 Platform(game, 600, 400, 150, 200, image = AssetManager.platform_images["lostcity"]),
@@ -141,6 +134,7 @@ def get_level_data(name, game):
     elif name == "underwater":
         return{
             "map" : None ,
+            "background_layers" : {AssetManager.backgrounds["underwater"]},
             "platforms" : [
                 Platform(game, 0, 300, 300, 100),
                 Platform(game, 450, 400, 300, 100),
@@ -218,6 +212,7 @@ def get_level_data(name, game):
 
         return{
             "map" : AssetManager.map_image["forest"] ,
+            "background_layers" :{ AssetManager.backgrounds["forest"]},
             "platforms" : [
                 Platform(game, 304, 384, 160, 24, 'solid' ),
                 Platform(game, 600, 304, 192, 40, 'solid'),

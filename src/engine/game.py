@@ -445,7 +445,8 @@ class Game:
                 #self.screen.blit(scaled_image, (-offset, 0))
             for i in range(-1, self.screen_width // image_width + 2):
                 self.screen.blit(scaled_image, (start_x + i * image_width, 0))
-'''
+'''     
+        self.screen.blit(self.level.background_layers,(0 - int(self.camera_x/10), 0))
         # Draw platforms and ground
         for platform in self.level.platforms:
             if isinstance(platform, Platform) and platform.visible == True:

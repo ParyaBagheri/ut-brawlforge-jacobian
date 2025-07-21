@@ -20,7 +20,7 @@ class Level:
     def load(self):
         data = data_loader.get_level_data(self.name, self.game)
         self.map = data["map"]
-        #self.background_layers = data["background_layers"]
+        self.background_layers = list(data["background_layers"])[0]
         self.platforms = data["platforms"]
         self.powerups = data["powerups"]
         print(f"[DEBUG] Loaded powerups: {len(self.powerups)}")
