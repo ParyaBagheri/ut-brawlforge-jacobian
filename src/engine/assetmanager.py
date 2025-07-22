@@ -12,6 +12,7 @@ class AssetManager :
     map_image = {}
     backgrounds = {}
     UI_images = {}
+    UI_sounds = {}
 
     def load_frames(sheet,frame_width,frame_hight ,startpoint, numframes):
         frames = []
@@ -222,10 +223,20 @@ class AssetManager :
             "underwater" : underwater_background
         }
     def load_UI_assets ():
+        AssetManager.load_UI_sounds()
         heart_image = pygame.image.load("src/assets/images/UI/heart.png")
         #heart_image = pygame.transform.scale(heart_image, (7, 6))
         AssetManager.UI_images = {
             "heart" : heart_image
+        }
+    def load_UI_sounds ():
+        hover_sound = pygame.mixer.Sound("src/assets/sounds/UI/hover.wav")
+        hover_sound.set_volume(0.2)
+        click_sound = pygame.mixer.Sound("src/assets/sounds/UI/click.wav")
+        click_sound.set_volume(0.2)
+        AssetManager.UI_sounds = {
+            "hover" : hover_sound ,
+            "click" : click_sound
         }
     def load_assets():
         AssetManager.load_player_assets()

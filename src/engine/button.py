@@ -1,6 +1,7 @@
 import pygame
 import sys
 import config
+from src.engine.assetmanager import AssetManager
 class Button :
     def __init__(self, game, frames, pos, text_input, font, fontsize, color, hovercolor):
         self.game = game
@@ -12,6 +13,7 @@ class Button :
         self.text_input = text_input
         self.color = color
         self.hovercolor = hovercolor
+        self.state = "default"
         self.text = self.font.render(text_input, True, color)
         if self.frames is None :
             self.image = self.text
@@ -25,7 +27,11 @@ class Button :
         self.rect = self.image_rect.union(self.text_rect)
 
     def draw(self, mouse_pos):
-        is_hovered = self.rect.collidepoint(mouse_pos[0], mouse_pos[1]) 
+        is_hovered = self.rect.collidepoint(mouse_pos[0], mouse_pos[1])
+        if is_hovered :
+            self.sound_manager("hovered")
+        else :
+            self.sound_manager("default")
         text_color = self.hovercolor if is_hovered else self.color
         self.text = self.font.render(self.text_input, True, text_color)
         if self.frames is not None:
@@ -43,7 +49,17 @@ class Button :
     
     def is_pressed(self, mouse_pos):
         if mouse_pos[0] in range(self.rect.left, self.rect.right) and mouse_pos[1] in range(self.rect.top, self.rect.bottom):
+            self.sound_manager("pressed")
             return True
+        self.sound_manager("default")
         return False    
-
-    
+    def sound_manager(self, newstate) :
+        if newstate != self.state :
+            if newstate == "pressed" :
+                AssetManager.UI_sounds["click"].play()
+                self.state = "pressed"
+            elif newstate == "hovered" :
+                AssetManager.UI_sounds["hover"].play()
+                self.state = "hovered"
+            elif newstate == "default" :
+                self.state= "default"
