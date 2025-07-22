@@ -208,9 +208,9 @@ class AssetManager :
         forest_background = pygame.image.load("src/assets/images/backgrounds/forest.jpeg")
         forest_background = pygame.transform.scale(forest_background,(forest_background.get_width() ,config.BASE_SCREEN_HEIGHT ))
         desert_background = pygame.image.load("src/assets/images/backgrounds/desert.jpeg")
-        desert_background = pygame.transform.scale(desert_background,(desert_background.get_width() * 1.5 ,config.BASE_SCREEN_HEIGHT ))
+        desert_background = pygame.transform.scale(desert_background,(desert_background.get_width() * 2.2 ,config.BASE_SCREEN_HEIGHT ))
         lost_city_background = pygame.image.load("src/assets/images/backgrounds/lost_city.jpeg")
-        lost_city_background = pygame.transform.scale(lost_city_background,(lost_city_background.get_width()*1.5,config.BASE_SCREEN_HEIGHT ))
+        lost_city_background = pygame.transform.scale(lost_city_background,(lost_city_background.get_width()*1.3,config.BASE_SCREEN_HEIGHT ))
         underwater_background = pygame.image.load("src/assets/images/backgrounds/underwater.jpeg")
         underwater_background = pygame.transform.scale(underwater_background,(underwater_background.get_width() *2.7,config.BASE_SCREEN_HEIGHT ))
         AssetManager.backgrounds = {
