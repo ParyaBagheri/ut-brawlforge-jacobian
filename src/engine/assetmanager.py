@@ -201,9 +201,11 @@ class AssetManager :
     def load_map ( ) :
         forest_map =   pygame.image.load("src/assets/tiles and maps/forest.png")
         desert_map = pygame.image.load("src/assets/tiles and maps/desert.png")
+        underwater_map = pygame.image.load("src/assets/tiles and maps/underwater.png")
         AssetManager.map_image = {
             "forest" : forest_map ,
-            "desert" : desert_map
+            "desert" : desert_map ,
+            "underwater" : underwater_map
         }
         forest_background = pygame.image.load("src/assets/images/backgrounds/forest.jpeg")
         forest_background = pygame.transform.scale(forest_background,(forest_background.get_width() ,config.BASE_SCREEN_HEIGHT ))
