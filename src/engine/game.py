@@ -78,12 +78,12 @@ class Game:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if MENU_PLAY.is_pressed(MENU_MOUSE_POS()):
                         self.state = "char_menu"
-                        self.character_menu()
+                        
                     if MENU_MULTIPLAYER.is_pressed(MENU_MOUSE_POS()):
                         self.mode ="multiplayer"
                         self.state = "char_menu"
-                        self.character_menu()
-        while True:
+                        
+        while self.state == "main_menu":
             main_menu_render()
             main_menu_event_handler()
             pygame.display.flip()
@@ -133,34 +133,34 @@ class Game:
                         self.player = Player(self, character_type='knight')
                         if self.mode == "single_player" :
                             self.state = "map_menu"
-                            self.map_menu()
+                            
                         elif self.mode == "multiplayer" :
                             self.other_player = Player(self, 'wizard', 3300)
                             self.level = Level("multiplayer", self, 3350, self.mp_win, self.mp_lose)
                             self.state = "playing"
-                            self.run()
+                            
                     elif CHAR_2.is_pressed(CHAR_MENU_MOUSE_POS()):
                         self.player = Player(self, character_type='girl')
                         if self.mode == "single_player" :
                             self.state = "map_menu"
-                            self.map_menu()
+                            
                         elif self.mode == "multiplayer" :
                             self.other_player = Player(self, 'knight', 3300)
                             self.level = Level("multiplayer", self, 3350, self.mp_win, self.mp_lose)
                             self.state = "playing"
-                            self.run()                   
+                                               
                     elif CHAR_3.is_pressed(CHAR_MENU_MOUSE_POS()):
                         self.player = Player(self, character_type='wizard')
                         if self.mode == "single_player" :
                             self.state = "map_menu"
-                            self.map_menu()
+                            
                         elif self.mode == "multiplayer" :
                             self.other_player = Player(self, 'girl', 3300)
                             self.level = Level("multiplayer", self, 3350, self.mp_win, self.mp_lose)
                             self.state = "playing"
-                            self.run()
+                            
 
-        while True:
+        while self.state == "char_menu":
             char_menu_render()
             char_menu_events()
             pygame.display.flip()
@@ -215,21 +215,21 @@ class Game:
                     if MAP_1.is_pressed(MAP_MENU_MOUSE_POS()):
                         self.state = "playing"
                         self.level = Level("forest", self, 3350, self.forest_win)
-                        self.run()
+                        
                     if MAP_2.is_pressed(MAP_MENU_MOUSE_POS()):
                         self.state = "playing"
                         self.level = Level("desert", self, 6600, self.desert_win)
-                        self.run()
+                        
                     if MAP_3.is_pressed(MAP_MENU_MOUSE_POS()):
                         self.state = "playing"
                         self.level = Level("lost_city", self, 8000, self.lostcity_win)
-                        self.run()
+                        
                     if MAP_4.is_pressed(MAP_MENU_MOUSE_POS()):
                         self.state = "playing"
                         self.level = Level("underwater", self, 16000, self.underwater_win)
-                        self.run()
+                        
 
-        while True:
+        while self.state == "map_menu":
             map_menu_render()
             map_menu_event_handler()
             pygame.display.flip()
@@ -237,7 +237,7 @@ class Game:
 
     def finish_menu(self):
         self.screen.fill((0,0,0))
-        self.restart()
+        self.player.reset()
         RESTART_BUTTON = Button(self, None, [400, 150], "restart", 'OCRAEXT', 50, 'white', 'yellow')
         NEXTLEVEL_BUTTON = Button(self, None, [400, 250], "next level", 'OCRAEXT', 50, 'white', 'yellow')
         MENU_BUTTON = Button(self, None, [400, 350], "main menu", 'OCRAEXT', 50, 'white', 'yellow')
@@ -255,8 +255,9 @@ class Game:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if RESTART_BUTTON.is_pressed(MOUSE_POS()):
                         self.state = "playing"
-                        self.run()
-                    if NEXTLEVEL_BUTTON.is_pressed(MOUSE_POS()):
+                        self.restart()
+                        
+                    elif NEXTLEVEL_BUTTON.is_pressed(MOUSE_POS()):
                         self.state = "playing"
                         if self.level.name == "forest":
                             self.level = Level("desert", self, 6600, self.desert_win)
@@ -264,11 +265,13 @@ class Game:
                             self.level = Level("lost_city", self, 8000,self.lostcity_win)
                         elif self.level.name == "lost_city":
                             self.level = Level("underwater", self, 16000, self.underwater_win)
-                        self.run()
-                    if MENU_BUTTON.is_pressed(MOUSE_POS()):
+                        self.restart()
+                        
+                    elif MENU_BUTTON.is_pressed(MOUSE_POS()):
                         self.state = "main_menu"
-                        self.main_menu()
-        while True :
+                        
+                        
+        while self.state == "won" :
             finish_menu_render()
             finish_menu_event_handler()
             pygame.display.flip()
@@ -344,11 +347,22 @@ class Game:
  
     def run(self):
         while True:
-            self.handle_events()
-            self.update()
-            self.draw()
-            pygame.display.flip()
-            self.clock.tick(60)
+            if self.state == "playing" or self.state == "paused" or self.state == "gameover" :
+                self.handle_events()
+                self.update()
+                self.draw()
+                pygame.display.flip()
+                self.clock.tick(60)
+            else :
+                if self.state == "main_menu" :
+                    self.main_menu()
+                if self.state == "char_menu" :
+                    self.character_menu()
+                if self.state == "map_menu" :
+                    self.map_menu()
+                if self.state == "won":
+                    self.finish_menu()
+                
 
     def handle_events(self):
         GAME_MOUSE_POS = pygame.mouse.get_pos
@@ -384,7 +398,6 @@ class Game:
         if self.state == "playing" and self.level != None:
             if self.mode != "multiplayer" and self.level.won() :
                 self.state = "won"
-                self.player.reset()
                 self.finish_menu()
             if self.mode == "multiplayer" :
                 if self.level.won():
