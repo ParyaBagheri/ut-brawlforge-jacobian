@@ -13,6 +13,7 @@ class AssetManager :
     backgrounds = {}
     UI_images = {}
     UI_sounds = {}
+    powerups_images ={}
 
     def load_frames(sheet,frame_width,frame_hight ,startpoint, numframes):
         frames = []
@@ -233,9 +234,25 @@ class AssetManager :
             "hover" : hover_sound ,
             "click" : click_sound
         }
+    def load_powerups_assets():
+        shield_image = pygame.image.load("src/assets/images/powerups/shield.png").convert_alpha()
+        shield_image = pygame.transform.scale(shield_image,(40,40))
+        doublejump_image = pygame.image.load("src/assets/images/powerups/doublejump.png").convert_alpha()
+        boost_image = pygame.image.load("src/assets/images/powerups/boost.png").convert_alpha()
+        boost_image = pygame.transform.scale(boost_image,(40,40))
+        health_image = pygame.image.load("src/assets/images/powerups/health.png").convert_alpha()
+        health_image = pygame.transform.scale(health_image,(40,40))
+        AssetManager.powerups_images ={
+            "shield" : shield_image,
+            "doublejump" : doublejump_image,
+            "damageboost" : boost_image,
+            "health" : health_image
+        }
+
     def load_assets():
         AssetManager.load_player_assets()
         AssetManager.load_bullet_assets()
         AssetManager.load_platform_images()
         AssetManager.load_map()
         AssetManager.load_UI_assets ()
+        AssetManager.load_powerups_assets()
