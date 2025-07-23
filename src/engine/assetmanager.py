@@ -153,13 +153,17 @@ class AssetManager :
         # game over sound
         gameover_sound = pygame.mixer.Sound("src/assets/sounds/player/gameover.mp3")
         gameover_sound.set_volume(0.4)
+        # Collect sound
+        collect_sound = pygame.mixer.Sound("src/assets/sounds/player/collect.mp3")
+        collect_sound.set_volume(0.05)
         AssetManager.player_sounds = {
             "running" : running_sound ,
             "jump" : jump_sound ,
             "attack" : attack_sound ,
             "damage" : damage_sound ,
             "bounce" : bounce_sound ,
-            "game over" : gameover_sound
+            "game over" : gameover_sound,
+            "collect" : collect_sound
         }
         
   
@@ -230,9 +234,12 @@ class AssetManager :
         hover_sound.set_volume(0.2)
         click_sound = pygame.mixer.Sound("src/assets/sounds/UI/click.wav")
         click_sound.set_volume(0.2)
+        win_sound = pygame.mixer.Sound("src/assets/sounds/UI/win.mp3")
+        win_sound.set_volume(0.5)
         AssetManager.UI_sounds = {
             "hover" : hover_sound ,
-            "click" : click_sound
+            "click" : click_sound,
+            "win": win_sound
         }
     def load_powerups_assets():
         shield_image = pygame.image.load("src/assets/images/powerups/shield.png").convert_alpha()

@@ -240,6 +240,7 @@ class Game:
     def finish_menu(self):
         self.screen.fill((0,0,0))
         self.player.reset()
+        AssetManager.UI_sounds["win"].play()
         RESTART_BUTTON = Button(self, None, [400, 150], "restart", 'OCRAEXT', 50, 'white', 'yellow')
         NEXTLEVEL_BUTTON = Button(self, None, [400, 250], "next level", 'OCRAEXT', 50, 'white', 'yellow')
         MENU_BUTTON = Button(self, None, [400, 350], "main menu", 'OCRAEXT', 50, 'white', 'yellow')
@@ -436,6 +437,7 @@ class Game:
         if self.state == "playing" and self.level != None:
             if self.mode != "multiplayer" and self.level.won() :
                 self.state = "won"
+                
                 
             if self.mode == "multiplayer" :
                 if self.level.won():

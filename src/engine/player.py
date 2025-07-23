@@ -24,7 +24,6 @@ class Player:
         self.velocity_x = config.MOVE_SPEED
         self.is_slowed = False
         self.slowing_timer = 0
-
         self.direction = "right" # Track facing direction ( default : right- facing )
         self.collision_direction = "none" 
         self.collision_direction = "none"''
@@ -36,7 +35,7 @@ class Player:
         self.damage_sound = False
         self.attack_sound = False
         self.bounce_sound = False
-        self.running_channel = None
+        self.collect_sound = False
         # images
         self.character_type = character_type
         self.state = "idle" 
@@ -161,6 +160,7 @@ class Player:
     def check_powerup_collision(self, powerups):
         for powerup in powerups:
             if self.rect.colliderect(powerup.rect):
+                self.collect_sound = True
                 if powerup.type == "doublejump":
                     self.max_jumps = 2
                     powerup.visible = False
@@ -315,6 +315,9 @@ class Player:
 
     def sound_manager(self, prev_state) :
         if not self.mute :
+            if self.collect_sound :
+                self.sound_effects["collect"].play()
+                self.collect_sound = False
             if self.bounce_sound == True :
                 self.sound_effects["bounce"].play()
                 self.bounce_sound = False
@@ -322,11 +325,11 @@ class Player:
                 self.sound_effects["jump"].play()
 
             if self.state == "run" and prev_state != "run" :
-                self.running_channel = self.sound_effects ["running"].play(loops=-1)
+                self.sound_effects ["running"].play(loops=-1)
 
             if (self.state != "run" and prev_state == "run"):
-                self.running_channel.stop()
-                self.running_channel = None
+                self.sound_effects["running"].stop()
+                
 
             if self.damage_sound :
                 self.sound_effects["damage"].play()
@@ -349,9 +352,9 @@ class Player:
         self.is_dead = False
         self.current_frame = 0 
         self.color = (255, 0, 0)
-        if self.running_channel != None :
-            self.running_channel.stop()
-            self.running_channel = None
+        
+        self.sound_effects["running"].stop()
+         
                     
 
     def shoot (self) :
