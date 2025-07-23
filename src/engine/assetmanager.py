@@ -179,10 +179,8 @@ class AssetManager :
             "fireball" : fireball_frames
         }
     def load_platform_images () :
-        forest_platform = pygame.image.load("src/assets/images/platforms/forest.png")
-        desert_platform = pygame.image.load("src/assets/images/platforms/desert.png")
+        
         lostcity_platform = pygame.image.load("src/assets/images/platforms/lostcity.png")
-        underwater_platform = pygame.image.load("src/assets/images/platforms/underwater.png")
         slowing_platform = pygame.image.load("src/assets/images/platforms/slowing.png")
         timed_platform = pygame.image.load("src/assets/images/platforms/timed.png")
         spikey_platform = pygame.image.load("src/assets/images/platforms/spikey.png")
@@ -190,10 +188,7 @@ class AssetManager :
         bouncy_frames = AssetManager.load_frames(bouncy_frames, 16,16,0,6)
         bouncy_frames = AssetManager.scale_frames(bouncy_frames, 50, 40)
         AssetManager.platform_images = {
-            "forest" : forest_platform ,
-            "desert" : desert_platform ,
             "lostcity" : lostcity_platform ,
-            "underwater": underwater_platform ,
             "slowing" : slowing_platform ,
             "timed" : timed_platform ,
             "spikey" : spikey_platform ,
@@ -211,11 +206,11 @@ class AssetManager :
         forest_background = pygame.image.load("src/assets/images/backgrounds/forest.jpeg")
         forest_background = pygame.transform.scale(forest_background,(forest_background.get_width() ,config.BASE_SCREEN_HEIGHT ))
         desert_background = pygame.image.load("src/assets/images/backgrounds/desert.jpeg")
-        desert_background = pygame.transform.scale(desert_background,(desert_background.get_width() * 2.2 ,config.BASE_SCREEN_HEIGHT ))
+        desert_background = pygame.transform.scale(desert_background,(desert_background.get_width()*1.1  ,config.BASE_SCREEN_HEIGHT ))
         lost_city_background = pygame.image.load("src/assets/images/backgrounds/lost_city.jpeg")
         lost_city_background = pygame.transform.scale(lost_city_background,(lost_city_background.get_width()*1.3,config.BASE_SCREEN_HEIGHT ))
-        underwater_background = pygame.image.load("src/assets/images/backgrounds/underwater.jpeg")
-        underwater_background = pygame.transform.scale(underwater_background,(underwater_background.get_width() *2.7,config.BASE_SCREEN_HEIGHT ))
+        underwater_background = pygame.image.load("src/assets/images/backgrounds/underwater.jpg")
+        underwater_background = pygame.transform.scale(underwater_background,(underwater_background.get_width() *1.6,config.BASE_SCREEN_HEIGHT ))
         AssetManager.backgrounds = {
             "forest" : forest_background ,
             "desert" : desert_background ,

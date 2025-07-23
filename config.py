@@ -39,7 +39,10 @@ FINISHING_POINTS = {
     "forest" : 3200 ,
     "desert" : 6000,
     "lost_city" : 7700,
-    "underwater" : 14500,
+    "underwater" : 16000,
     "multiplayer" : 3200
 
+}
+MUSIC_PATHS = {
+    "game_music" : "src/assets/sounds/UI/game_music.mp3"
 }

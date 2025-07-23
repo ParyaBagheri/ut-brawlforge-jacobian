@@ -7,7 +7,7 @@ import config
 
 def get_level_data(name, game):
     if name == "forest":
-        forest_image = AssetManager.platform_images["forest"]
+        
         return{
             "map" : AssetManager.map_image["forest"] ,
             "background_layers" : {AssetManager.backgrounds["forest"]},
