@@ -80,7 +80,8 @@ class Game:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if MENU_PLAY.is_pressed(MENU_MOUSE_POS()):
                         self.state = "char_menu"
-                        
+                    if MENU_HOWTO.is_pressed(MENU_MOUSE_POS()):
+                        self.state = "how_to_play"    
                     if MENU_MULTIPLAYER.is_pressed(MENU_MOUSE_POS()):
                         self.mode ="multiplayer"
                         self.state = "char_menu"
@@ -101,6 +102,179 @@ class Game:
             if self.player.health == 0 :
                 return True
         return False
+    def how_to_play(self) :
+        background = pygame.image.load(background_path)
+        background = pygame.transform.scale(background, (800,600))
+        self.screen.blit(background, (0,0))
+        BACK = Button(self, None, [50, 550], "BACK", "OCRAEXT", 50, 'white', (0, 146, 155)) 
+        HOW_TO_PLAY_MOUSE_POS = pygame.mouse.get_pos
+        
+        demo_state = "idle"
+        demo_direction ="right"
+        demo_frames = AssetManager.player_images["knight"]
+        demo_image = demo_frames["idle"][0]
+        demo_rect = demo_image.get_rect(topleft=(500, 250))
+        demo_current_frame = 0
+        demo_can_jump = True
+        demo_can_attack = True
+        # keys' animations 
+        A_key_is_pressed = False
+        A_key_frames = AssetManager.UI_images["A_key"]
+        A_key_image = A_key_frames[0]
+        A_current_frame = 0
+        A_rect = A_key_image.get_rect(topleft=( 100, 120))
+        D_key_is_pressed = False
+        D_key_frames = AssetManager.UI_images["D_key"]
+        D_key_image = D_key_frames[0]
+        D_current_frame = 0
+        D_rect = D_key_image.get_rect(topleft=( 100, 240))
+        SPACE_key_is_pressed = False
+        SPACE_key_frames = AssetManager.UI_images["SPACE_key"]
+        SPACE_key_image = SPACE_key_frames[0]
+        SPACE_current_frame = 0
+        SPACE_rect = SPACE_key_image.get_rect(topleft=( 100, 360))
+        SHIFT_key_is_pressed = False
+        SHIFT_key_frames = AssetManager.UI_images["SHIFT_key"]
+        SHIFT_key_image = SHIFT_key_frames[0]
+        SHIFT_current_frame = 0 
+        SHIFT_rect = SHIFT_key_image.get_rect(topleft=( 100, 480))
+        def how_to_play_render():        
+            BACK.draw(HOW_TO_PLAY_MOUSE_POS())
+            self.screen.blit (demo_image,demo_rect)
+            self.screen.blit (A_key_image,A_rect)
+            self.screen.blit (D_key_image,D_rect)
+            self.screen.blit (SPACE_key_image,SPACE_rect)
+            self.screen.blit (SHIFT_key_image,SHIFT_rect)
+            
+        def how_to_play_event_handler():
+            nonlocal demo_current_frame
+            nonlocal demo_state
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                elif event.type == pygame.MOUSEBUTTONDOWN :
+                    if event.button == 1 : #left mouse button
+                        if demo_state != "attack" :
+                            demo_current_frame = 0
+                        demo_state = "attack"
+                    if BACK.is_pressed(HOW_TO_PLAY_MOUSE_POS()):
+                        self.state = "main_menu"
+            
+        def how_to_play_update() :
+            nonlocal demo_state 
+            nonlocal demo_direction 
+            nonlocal demo_frames 
+            nonlocal demo_image 
+            nonlocal demo_current_frame 
+            nonlocal demo_can_jump 
+            nonlocal demo_can_attack 
+            # demo animation update
+            if demo_direction == "right" :
+                demo_image = demo_frames[demo_state][int(demo_current_frame)]
+            else :
+                demo_image = pygame.transform.flip(demo_frames[demo_state][int(demo_current_frame)], True, False)
+            demo_current_frame += config.PLAYER_FRAMES_SPEED
+            if(demo_current_frame >= len(demo_frames[demo_state])) :
+                demo_current_frame = 0
+                if demo_state == "jumping" :
+                    demo_can_jump = True
+                    demo_state = "idle"
+                if demo_state == "attack" :
+                    demo_can_attack = True
+                    demo_state = "idle"
+            keys = pygame.key.get_pressed() 
+            if keys[pygame.K_a] :
+                if demo_state != "run" :
+                    demo_current_frame = 0
+                demo_direction ="left"
+                demo_state = "run"
+            elif keys[pygame.K_d] :
+                if demo_state != "run" :
+                    demo_current_frame = 0
+                demo_direction ="right"
+                demo_state = "run"
+            elif keys[pygame.K_SPACE] and demo_can_jump :
+                demo_state = "jumping"
+                demo_current_frame = 0
+                demo_can_jump = False
+            elif (keys[pygame.K_LSHIFT] or keys[pygame.K_RSHIFT] )and demo_can_attack:
+                if demo_state != "attack":
+                    demo_current_frame = 0
+                    demo_can_attack = False
+                demo_state = "attack" 
+            else :
+                if demo_state != "idle" :
+                    demo_current_frame =0
+                demo_state ="idle"
+            update_keys(keys)
+        def update_keys(keys) :
+            nonlocal A_key_is_pressed 
+            nonlocal A_key_frames 
+            nonlocal A_key_image 
+            nonlocal A_current_frame 
+            nonlocal D_key_is_pressed 
+            nonlocal D_key_frames 
+            nonlocal D_key_image 
+            nonlocal D_current_frame 
+            nonlocal SPACE_key_is_pressed 
+            nonlocal SPACE_key_frames 
+            nonlocal SPACE_key_image 
+            nonlocal SPACE_current_frame 
+            nonlocal SHIFT_key_is_pressed 
+            nonlocal SHIFT_key_frames 
+            nonlocal SHIFT_key_image 
+            nonlocal SHIFT_current_frame  
+            
+            if keys[pygame.K_a] :
+                A_key_is_pressed = True
+                A_current_frame = 1 
+            
+
+            if keys[pygame.K_d] :
+                D_key_is_pressed = True
+                D_current_frame = 1 
+                
+            if keys[pygame.K_SPACE]  :
+                SPACE_key_is_pressed = True
+                SPACE_current_frame = 1
+             
+            if (keys[pygame.K_LSHIFT] or keys[pygame.K_RSHIFT] ):
+                SHIFT_key_is_pressed = True
+                SHIFT_current_frame = 1
+                
+            if A_key_is_pressed :
+                A_key_image = A_key_frames[int(A_current_frame)]
+                A_current_frame += 0.15
+                if A_current_frame >= len(A_key_frames) :
+                    A_current_frame = 0
+                    A_key_is_pressed = False
+            if D_key_is_pressed :
+                D_key_image = D_key_frames[int(D_current_frame)]
+                D_current_frame += 0.15
+                if D_current_frame >= len(D_key_frames) :
+                    D_current_frame = 0
+                    D_key_is_pressed = False
+            if SPACE_key_is_pressed :
+                SPACE_key_image = SPACE_key_frames[int(SPACE_current_frame)]
+                SPACE_current_frame += 0.15
+                if SPACE_current_frame >= len(SPACE_key_frames) :
+                    SPACE_current_frame = 0
+                    SPACE_key_is_pressed = False
+            if SHIFT_key_is_pressed :
+                SHIFT_key_image = SHIFT_key_frames[int(SHIFT_current_frame)]
+                SHIFT_current_frame += 0.15
+                if SHIFT_current_frame >= len(SHIFT_key_frames) :
+                    SHIFT_current_frame = 0
+                    SHIFT_key_is_pressed = False
+        while self.state == "how_to_play":
+            how_to_play_render()
+            how_to_play_event_handler()
+            how_to_play_update()
+            pygame.display.flip()
+            self.clock.tick(config.FPS)
+
+
 
     def character_menu(self):
         background = pygame.image.load(background_path)
@@ -360,6 +534,8 @@ class Game:
             else :
                 if self.state == "main_menu" :
                     self.main_menu()
+                if self.state == "how_to_play":
+                    self.how_to_play()
                 if self.state == "char_menu" :
                     self.character_menu()
                 if self.state == "map_menu" :

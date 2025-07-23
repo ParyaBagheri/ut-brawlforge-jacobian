@@ -229,8 +229,22 @@ class AssetManager :
         AssetManager.load_UI_sounds()
         heart_image = pygame.image.load("src/assets/images/UI/heart.png")
         #heart_image = pygame.transform.scale(heart_image, (7, 6))
+
+        A_key_sheet = pygame.image.load("src/assets/images/UI/keys/A.png")
+        A_key_frames = AssetManager.load_frames(A_key_sheet, 19,21,0,3)
+        D_key_sheet =  pygame.image.load("src/assets/images/UI/keys/D.png")
+        D_key_frames = AssetManager.load_frames(D_key_sheet, 19,21,0,3)
+        SPACE_key_sheet = pygame.image.load("src/assets/images/UI/keys/space.png")
+        SPACE_key_frames = AssetManager.load_frames(SPACE_key_sheet, 98,21,0,3)
+        SHIFT_key_sheet = pygame.image.load("src/assets/images/UI/keys/shift.png")
+        SHIFT_key_frames = AssetManager.load_frames(SHIFT_key_sheet, 61,21,0,3)
+        
         AssetManager.UI_images = {
-            "heart" : heart_image
+            "heart" : heart_image,
+            "A_key" : A_key_frames,
+            "D_key" : D_key_frames,
+            "SPACE_key" : SPACE_key_frames,
+            "SHIFT_key" : SHIFT_key_frames,
         }
     def load_UI_sounds ():
         hover_sound = pygame.mixer.Sound("src/assets/sounds/UI/hover.wav")
