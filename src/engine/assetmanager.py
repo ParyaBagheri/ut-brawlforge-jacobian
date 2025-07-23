@@ -202,11 +202,14 @@ class AssetManager :
     def load_map ( ) :
         forest_map =   pygame.image.load("src/assets/tiles and maps/forest.png")
         desert_map = pygame.image.load("src/assets/tiles and maps/desert.png")
+        lost_city_map = pygame.image.load("src/assets/tiles and maps/lostcity.png")
         underwater_map = pygame.image.load("src/assets/tiles and maps/underwater.png")
+        
         AssetManager.map_image = {
             "forest" : forest_map ,
             "desert" : desert_map ,
-            "underwater" : underwater_map
+            "underwater" : underwater_map,
+            "lost_city" : lost_city_map
         }
         forest_background = pygame.image.load("src/assets/images/backgrounds/forest.jpeg")
         forest_background = pygame.transform.scale(forest_background,(forest_background.get_width() ,config.BASE_SCREEN_HEIGHT ))
@@ -248,7 +251,7 @@ class AssetManager :
         boost_image = pygame.image.load("src/assets/images/powerups/boost.png").convert_alpha()
         boost_image = pygame.transform.scale(boost_image,(40,40))
         health_image = pygame.image.load("src/assets/images/powerups/health.png").convert_alpha()
-        health_image = pygame.transform.scale(health_image,(40,40))
+        health_image = pygame.transform.scale(health_image,(50,50))
         AssetManager.powerups_images ={
             "shield" : shield_image,
             "doublejump" : doublejump_image,
