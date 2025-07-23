@@ -36,8 +36,10 @@ class Game:
 
         #self.platforms = self.platform_maker()
 
-
+        # Load all assets
         AssetManager.load_assets()
+        # Track which music is playing
+        self.current_music_state = None
 
         self.Fired_bullets_list = []
 
@@ -347,6 +349,7 @@ class Game:
  
     def run(self):
         while True:
+            self.music_manager()
             if self.state == "playing" or self.state == "paused" or self.state == "gameover" :
                 self.handle_events()
                 self.update()
@@ -362,7 +365,42 @@ class Game:
                     self.map_menu()
                 if self.state == "won":
                     self.finish_menu()
+            
+
+    def music_manager(self):
+        if self.current_music_state == None :
+            if self.state == "playing" :
+                pygame.mixer.music.load(config.MUSIC_PATHS["game_music"])
+                pygame.mixer.music.set_volume(0.1)
+                pygame.mixer.music.play (loops=-1)
                 
+                self.current_music_state = "playing"
+            elif self.state == "main_menu" :
+                pygame.mixer.music.load(config.MUSIC_PATHS["menu_music"])
+                pygame.mixer.music.set_volume(0.1)
+                pygame.mixer.music.play (loops=-1)
+                
+                self.current_music_state = "menu"
+        elif self.current_music_state == "playing" :
+            if self.state != "playing" :
+                pygame.mixer.music.stop()
+                if self.state == "main_menu" :
+                    pygame.mixer.music.load(config.MUSIC_PATHS["menu_music"])
+                    pygame.mixer.music.set_volume(0.1)
+                    pygame.mixer.music.play (loops=-1)
+                    
+                    self.current_music_state = "menu"
+                else :
+                    self.current_music_state = None
+        elif self.current_music_state == "menu" :
+            if self.state == "playing" :
+                pygame.mixer.music.stop()
+                pygame.mixer.music.load(config.MUSIC_PATHS["game_music"])
+                pygame.mixer.music.set_volume(0.1)
+                pygame.mixer.music.play (loops=-1)
+                
+                self.current_music_state = "playing"
+
 
     def handle_events(self):
         GAME_MOUSE_POS = pygame.mouse.get_pos
@@ -398,7 +436,7 @@ class Game:
         if self.state == "playing" and self.level != None:
             if self.mode != "multiplayer" and self.level.won() :
                 self.state = "won"
-                self.finish_menu()
+                
             if self.mode == "multiplayer" :
                 if self.level.won():
                     self.player.reset()

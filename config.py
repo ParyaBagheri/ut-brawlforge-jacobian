@@ -44,5 +44,6 @@ FINISHING_POINTS = {
 
 }
 MUSIC_PATHS = {
-    "game_music" : "src/assets/sounds/UI/game_music.mp3"
+    "game_music" : "src/assets/sounds/music/game_music.mp3",
+    "menu_music" :"src/assets/sounds/music/menu_music.mp3"
 }
