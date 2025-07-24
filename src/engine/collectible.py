@@ -1,4 +1,5 @@
 import pygame
+from src.engine.assetmanager import AssetManager
 
 class Powerup(pygame.sprite.Sprite):
     def __init__(self, game, x, y, type):
@@ -20,18 +21,9 @@ class Powerup(pygame.sprite.Sprite):
             if self.timer >= 300:
                 self.visible = False
     def draw(self):
-        shield_img = pygame.image.load("src/assets/images/powerups/shield.png").convert_alpha()
-        doublejump_img = pygame.image.load("src/assets/images/powerups/doublejump.png").convert_alpha()
-        boost_img = pygame.image.load("src/assets/images/powerups/boost.png").convert_alpha()
-        heart_img = pygame.image.load("src/assets/images/powerups/heart.png").convert_alpha()
+        
         pos = self.x - self.game.camera_x 
         if self.visible:
-            if self.type == "shield":
-                self.game.screen.blit(shield_img, (pos,self.y))
-            if self.type == "doublejump":
-                self.game.screen.blit(doublejump_img, (pos, self.y))
-            if self.type == "damageboost" :
-                self.game.screen.blit(boost_img, (pos, self.y))
-            if self.type == "health" :
-                self.game.screen.blit(heart_img, (pos, self.y))
+            self.game.screen.blit(AssetManager.powerups_images[self.type], (pos,self.y))
+            
 

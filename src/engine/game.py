@@ -10,6 +10,7 @@ background_path = os.path.join("src", "assets", "images", "background.jpg")
 # Fonts 
 pygame.font.init()
 font = pygame.font.SysFont('Arial',  32, True, False)
+font2 = pygame.font.Font("src/assets/fonts/MinimalPixelFont.ttf",50)
 heartfont = pygame.font.SysFont('Segoe UI Symbol', 40)
 gameoverfont = pygame.font.SysFont('OCR A Extended', 72)
 loadingscreen_font = pygame.font.SysFont('OCR A Extended', 36)
@@ -37,8 +38,10 @@ class Game:
 
         #self.platforms = self.platform_maker()
 
-
+        # Load all assets
         AssetManager.load_assets()
+        # Track which music is playing
+        self.current_music_state = None
 
         self.Fired_bullets_list = []
         self.enemies = None
@@ -80,12 +83,14 @@ class Game:
                         enemy = Enemy(self)
                         self.enemies.add(enemy)
 
-                        self.character_menu()
+                        
+                    if MENU_HOWTO.is_pressed(MENU_MOUSE_POS()):
+                        self.state = "how_to_play"    
                     if MENU_MULTIPLAYER.is_pressed(MENU_MOUSE_POS()):
                         self.mode ="multiplayer"
                         self.state = "char_menu"
-                        self.character_menu()
-        while True:
+                        
+        while self.state == "main_menu":
             main_menu_render()
             main_menu_event_handler()
             pygame.display.flip()
@@ -101,13 +106,207 @@ class Game:
             if self.player.health == 0 :
                 return True
         return False
+    def how_to_play(self) :
+        background = pygame.image.load(background_path)
+        background = pygame.transform.scale(background, (800,600))
+        self.screen.blit(background, (0,0))
+        BACK = Button(self, None, [60, 550], "BACK", "OCRAEXT", 40, 'white', (0, 146, 155)) 
+        HOW_TO_PLAY_MOUSE_POS = pygame.mouse.get_pos
+        demo_state = "idle"
+        demo_direction ="right"
+        demo_frames = AssetManager.player_images["knight"]
+        demo_image = demo_frames["idle"][0]
+        demo_rect = demo_image.get_rect(topleft=(500, 250))
+        demo_current_frame = 0
+        demo_can_jump = True
+        demo_attack_animation = False
+        font = pygame.font.Font("src/assets/fonts/MinimalPixelFont.ttf",50)
+        text1 =font.render ('Move right', True,'black' )
+        text1_rect =text1.get_rect()
+        text1_rect.center = (80 , 100 )
+        text2 = font.render ('Move left', True,'black' )
+        text2_rect =text2.get_rect()
+        text2_rect.center = (75 , 220 )
+        text3 = font.render ('Jump', True,'black' )
+        text3_rect =text3.get_rect()
+        text3_rect.center = (50 , 340 )
+        text4 = font.render ('Shoot', True,'black' )
+        text4_rect = text4.get_rect()
+        text4_rect.center = (50 , 460 )
+        text5 = font.render ('or left mouse button',True,'black')
+        text5_rect =text5.get_rect()
+        text5_rect.center = (480 , 460 )
+        # keys' animations 
+        A_key_is_pressed = False
+        A_key_frames = AssetManager.UI_images["A_key"]
+        A_key_image = A_key_frames[0]
+        A_current_frame = 0
+        A_rect = A_key_image.get_rect(topleft=( 185, 80))
+        D_key_is_pressed = False
+        D_key_frames = AssetManager.UI_images["D_key"]
+        D_key_image = D_key_frames[0]
+        D_current_frame = 0
+        D_rect = D_key_image.get_rect(topleft=( 180, 200))
+        SPACE_key_is_pressed = False
+        SPACE_key_frames = AssetManager.UI_images["SPACE_key"]
+        SPACE_key_image = SPACE_key_frames[0]
+        SPACE_current_frame = 0
+        SPACE_rect = SPACE_key_image.get_rect(topleft=( 140, 320))
+        SHIFT_key_is_pressed = False
+        SHIFT_key_frames = AssetManager.UI_images["SHIFT_key"]
+        SHIFT_key_image = SHIFT_key_frames[0]
+        SHIFT_current_frame = 0 
+        SHIFT_rect = SHIFT_key_image.get_rect(topleft=( 140, 440))
+        def how_to_play_render():
+            self.screen.blit(background, (0,0))        
+            BACK.draw(HOW_TO_PLAY_MOUSE_POS())
+            self.screen.blit (pygame.transform.scale(demo_image, (75,120)),demo_rect)
+            self.screen.blit (A_key_image,A_rect)
+            self.screen.blit (D_key_image,D_rect)
+            self.screen.blit (SPACE_key_image,SPACE_rect)
+            self.screen.blit (SHIFT_key_image,SHIFT_rect)
+            self.screen.blit(text1, text1_rect)
+            self.screen.blit(text2, text2_rect)
+            self.screen.blit(text3, text3_rect)
+            self.screen.blit(text4, text4_rect)
+            self.screen.blit(text5, text5_rect)
+        def how_to_play_event_handler():
+            nonlocal demo_current_frame
+            nonlocal demo_state
+            nonlocal demo_attack_animation
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                elif event.type == pygame.MOUSEBUTTONDOWN :
+                    if event.button == 1 : #left mouse button
+                        if demo_state != "attack" :
+                            demo_current_frame = 0
+                        demo_state = "attack"
+                        demo_attack_animation = True
+                    if BACK.is_pressed(HOW_TO_PLAY_MOUSE_POS()):
+                        self.state = "main_menu"
+            
+        def how_to_play_update() :
+            nonlocal demo_state 
+            nonlocal demo_direction 
+            nonlocal demo_frames 
+            nonlocal demo_image 
+            nonlocal demo_current_frame 
+            nonlocal demo_can_jump 
+            nonlocal demo_attack_animation 
+            # demo animation update
+            if demo_direction == "right" :
+                demo_image = demo_frames[demo_state][int(demo_current_frame)]
+            else :
+                demo_image = pygame.transform.flip(demo_frames[demo_state][int(demo_current_frame)], True, False)
+            demo_current_frame += config.PLAYER_FRAMES_SPEED
+            if(demo_current_frame >= len(demo_frames[demo_state])) :
+                demo_current_frame = 0
+                if demo_attack_animation :
+                    demo_attack_animation = False
+                    demo_state = "idle"
+                
+            keys = pygame.key.get_pressed() 
+            if not demo_attack_animation :
+                if keys[pygame.K_a] :
+                    if demo_state != "run" :
+                        demo_current_frame = 0
+                    demo_direction ="left"
+                    demo_state = "run"
+                elif keys[pygame.K_d] :
+                    if demo_state != "run" :
+                        demo_current_frame = 0
+                    demo_direction ="right"
+                    demo_state = "run"
+                elif keys[pygame.K_SPACE] :
+                    if demo_state != "jumping" :
+                        demo_current_frame = 0
+                    demo_state = "jumping"
+                    
+                elif (keys[pygame.K_LSHIFT] or keys[pygame.K_RSHIFT] ):
+                    demo_current_frame = 0
+                    demo_state = "attack" 
+                    demo_attack_animation = True
+                else :
+                    if demo_state != "idle" :
+                        demo_current_frame =0
+                    demo_state ="idle"
+            update_keys(keys)
+        def update_keys(keys) :
+            nonlocal A_key_is_pressed 
+            nonlocal A_key_frames 
+            nonlocal A_key_image 
+            nonlocal A_current_frame 
+            nonlocal D_key_is_pressed 
+            nonlocal D_key_frames 
+            nonlocal D_key_image 
+            nonlocal D_current_frame 
+            nonlocal SPACE_key_is_pressed 
+            nonlocal SPACE_key_frames 
+            nonlocal SPACE_key_image 
+            nonlocal SPACE_current_frame 
+            nonlocal SHIFT_key_is_pressed 
+            nonlocal SHIFT_key_frames 
+            nonlocal SHIFT_key_image 
+            nonlocal SHIFT_current_frame  
+            
+            if keys[pygame.K_a] :
+                A_key_is_pressed = True
+                A_current_frame = 1 
+            
+
+            if keys[pygame.K_d] :
+                D_key_is_pressed = True
+                D_current_frame = 1 
+                
+            if keys[pygame.K_SPACE]  :
+                SPACE_key_is_pressed = True
+                SPACE_current_frame = 1
+             
+            if (keys[pygame.K_LSHIFT] or keys[pygame.K_RSHIFT] ):
+                SHIFT_key_is_pressed = True
+                SHIFT_current_frame = 1
+                
+            if A_key_is_pressed :
+                A_key_image = A_key_frames[int(A_current_frame)]
+                A_current_frame += 0.15
+                if A_current_frame >= len(A_key_frames) :
+                    A_current_frame = 0
+                    A_key_is_pressed = False
+            if D_key_is_pressed :
+                D_key_image = D_key_frames[int(D_current_frame)]
+                D_current_frame += 0.15
+                if D_current_frame >= len(D_key_frames) :
+                    D_current_frame = 0
+                    D_key_is_pressed = False
+            if SPACE_key_is_pressed :
+                SPACE_key_image = SPACE_key_frames[int(SPACE_current_frame)]
+                SPACE_current_frame += 0.15
+                if SPACE_current_frame >= len(SPACE_key_frames) :
+                    SPACE_current_frame = 0
+                    SPACE_key_is_pressed = False
+            if SHIFT_key_is_pressed :
+                SHIFT_key_image = SHIFT_key_frames[int(SHIFT_current_frame)]
+                SHIFT_current_frame += 0.15
+                if SHIFT_current_frame >= len(SHIFT_key_frames) :
+                    SHIFT_current_frame = 0
+                    SHIFT_key_is_pressed = False
+        while self.state == "how_to_play":
+            how_to_play_render()
+            how_to_play_event_handler()
+            how_to_play_update()
+            pygame.display.flip()
+            self.clock.tick(config.FPS)
+
+
 
     def character_menu(self):
         background = pygame.image.load(background_path)
         background = pygame.transform.scale(background, (800,600))
         self.screen.blit(background, (0,0))
 
-        char_menu_font = pygame.font.SysFont('OCR A Extended', 45)
+        char_menu_font = pygame.font.Font("src/assets/fonts/MinimalPixelFont.ttf",80)
         char_menu_text = char_menu_font.render("Choose a character!", True, 'indigo')
         char_menu_text_rect = char_menu_text.get_rect(center= (self.screen_width // 2, self.screen_height//6))
         self.screen.blit(char_menu_text, char_menu_text_rect)
@@ -135,34 +334,34 @@ class Game:
                         self.player = Player(self, character_type='knight')
                         if self.mode == "single_player" :
                             self.state = "map_menu"
-                            self.map_menu()
+                            
                         elif self.mode == "multiplayer" :
                             self.other_player = Player(self, 'wizard', 3200)
                             self.level = Level("multiplayer", self, 3200, self.mp_win, self.mp_lose)
                             self.state = "playing"
-                            self.run()
+                            
                     elif CHAR_2.is_pressed(CHAR_MENU_MOUSE_POS()):
                         self.player = Player(self, character_type='girl')
                         if self.mode == "single_player" :
                             self.state = "map_menu"
-                            self.map_menu()
+                            
                         elif self.mode == "multiplayer" :
                             self.other_player = Player(self, 'knight', 3200)
                             self.level = Level("multiplayer", self, 3200, self.mp_win, self.mp_lose)
                             self.state = "playing"
-                            self.run()                   
+                                               
                     elif CHAR_3.is_pressed(CHAR_MENU_MOUSE_POS()):
                         self.player = Player(self, character_type='wizard')
                         if self.mode == "single_player" :
                             self.state = "map_menu"
-                            self.map_menu()
+                            
                         elif self.mode == "multiplayer" :
                             self.other_player = Player(self, 'girl', 3200)
                             self.level = Level("multiplayer", self, 3200, self.mp_win, self.mp_lose)
                             self.state = "playing"
-                            self.run()
+                            
 
-        while True:
+        while self.state == "char_menu":
             char_menu_render()
             char_menu_events()
             pygame.display.flip()
@@ -194,7 +393,7 @@ class Game:
         background = pygame.transform.scale(background, (800,600))
         self.screen.blit(background, (0,0))
 
-        map_menu_font = pygame.font.SysFont('OCR A Extended', 45)
+        map_menu_font = pygame.font.Font("src/assets/fonts/MinimalPixelFont.ttf",80)
         map_menu_text = map_menu_font.render("Choose a map!", True, 'indigo')
         map_menu_text_rect = map_menu_text.get_rect(center= (self.screen_width // 2, self.screen_height//6))
         self.screen.blit(map_menu_text, map_menu_text_rect)
@@ -216,22 +415,22 @@ class Game:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if MAP_1.is_pressed(MAP_MENU_MOUSE_POS()):
                         self.state = "playing"
-                        self.level = Level("forest", self, 3200, self.forest_win)
-                        self.run()
+                        self.level = Level("forest", self, 3350, self.forest_win)
+                        
                     if MAP_2.is_pressed(MAP_MENU_MOUSE_POS()):
                         self.state = "playing"
                         self.level = Level("desert", self, 6600, self.desert_win)
-                        self.run()
+                        
                     if MAP_3.is_pressed(MAP_MENU_MOUSE_POS()):
                         self.state = "playing"
                         self.level = Level("lost_city", self, 8000, self.lostcity_win)
-                        self.run()
+                        
                     if MAP_4.is_pressed(MAP_MENU_MOUSE_POS()):
                         self.state = "playing"
                         self.level = Level("underwater", self, 16000, self.underwater_win)
-                        self.run()
+                        
 
-        while True:
+        while self.state == "map_menu":
             map_menu_render()
             map_menu_event_handler()
             pygame.display.flip()
@@ -239,7 +438,8 @@ class Game:
 
     def finish_menu(self):
         self.screen.fill((0,0,0))
-        self.restart()
+        self.player.reset()
+        AssetManager.UI_sounds["win"].play()
         RESTART_BUTTON = Button(self, None, [400, 150], "restart", 'OCRAEXT', 50, 'white', 'yellow')
         NEXTLEVEL_BUTTON = Button(self, None, [400, 250], "next level", 'OCRAEXT', 50, 'white', 'yellow')
         MENU_BUTTON = Button(self, None, [400, 350], "main menu", 'OCRAEXT', 50, 'white', 'yellow')
@@ -257,8 +457,9 @@ class Game:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if RESTART_BUTTON.is_pressed(MOUSE_POS()):
                         self.state = "playing"
-                        self.run()
-                    if NEXTLEVEL_BUTTON.is_pressed(MOUSE_POS()):
+                        self.restart()
+                        
+                    elif NEXTLEVEL_BUTTON.is_pressed(MOUSE_POS()):
                         self.state = "playing"
                         if self.level.name == "forest":
                             self.level = Level("desert", self, 6600, self.desert_win)
@@ -266,11 +467,13 @@ class Game:
                             self.level = Level("lost_city", self, 8000,self.lostcity_win)
                         elif self.level.name == "lost_city":
                             self.level = Level("underwater", self, 16000, self.underwater_win)
-                        self.run()
-                    if MENU_BUTTON.is_pressed(MOUSE_POS()):
+                        self.restart()
+                        
+                    elif MENU_BUTTON.is_pressed(MOUSE_POS()):
                         self.state = "main_menu"
-                        self.main_menu()
-        while True :
+                        
+                        
+        while self.state == "won" :
             finish_menu_render()
             finish_menu_event_handler()
             pygame.display.flip()
@@ -345,11 +548,60 @@ class Game:
  
     def run(self):
         while True:
-            self.handle_events()
-            self.update()
-            self.draw()
-            pygame.display.flip()
-            self.clock.tick(60)
+            self.music_manager()
+            if self.state == "playing" or self.state == "paused" or self.state == "gameover" :
+                self.handle_events()
+                self.update()
+                self.draw()
+                pygame.display.flip()
+                self.clock.tick(60)
+            else :
+                if self.state == "main_menu" :
+                    self.main_menu()
+                if self.state == "how_to_play":
+                    self.how_to_play()
+                if self.state == "char_menu" :
+                    self.character_menu()
+                if self.state == "map_menu" :
+                    self.map_menu()
+                if self.state == "won":
+                    self.finish_menu()
+            
+
+    def music_manager(self):
+        if self.current_music_state == None :
+            if self.state == "playing" :
+                pygame.mixer.music.load(config.MUSIC_PATHS["game_music"])
+                pygame.mixer.music.set_volume(0.1)
+                pygame.mixer.music.play (loops=-1)
+                
+                self.current_music_state = "playing"
+            elif self.state == "main_menu" :
+                pygame.mixer.music.load(config.MUSIC_PATHS["menu_music"])
+                pygame.mixer.music.set_volume(0.1)
+                pygame.mixer.music.play (loops=-1)
+                
+                self.current_music_state = "menu"
+        elif self.current_music_state == "playing" :
+            if self.state != "playing" :
+                pygame.mixer.music.stop()
+                if self.state == "main_menu" :
+                    pygame.mixer.music.load(config.MUSIC_PATHS["menu_music"])
+                    pygame.mixer.music.set_volume(0.1)
+                    pygame.mixer.music.play (loops=-1)
+                    
+                    self.current_music_state = "menu"
+                else :
+                    self.current_music_state = None
+        elif self.current_music_state == "menu" :
+            if self.state == "playing" :
+                pygame.mixer.music.stop()
+                pygame.mixer.music.load(config.MUSIC_PATHS["game_music"])
+                pygame.mixer.music.set_volume(0.1)
+                pygame.mixer.music.play (loops=-1)
+                
+                self.current_music_state = "playing"
+
 
     def handle_events(self):
         GAME_MOUSE_POS = pygame.mouse.get_pos
@@ -385,8 +637,8 @@ class Game:
         if self.state == "playing" and self.level != None:
             if self.mode != "multiplayer" and self.level.won() :
                 self.state = "won"
-                self.player.reset()
-                self.finish_menu()
+                
+                
             if self.mode == "multiplayer" :
                 if self.level.won():
                     self.player.reset()
@@ -453,17 +705,18 @@ class Game:
                 #self.screen.blit(scaled_image, (-offset, 0))
             for i in range(-1, self.screen_width // image_width + 2):
                 self.screen.blit(scaled_image, (start_x + i * image_width, 0))
-'''
+'''     
+        self.screen.blit(self.level.background_layers,(0 - int(self.camera_x/10), 0))
         # Draw platforms and ground
         for platform in self.level.platforms:
             if isinstance(platform, Platform) and platform.visible == True:
                 platform.draw(self.screen, self.camera_x)
-            elif not isinstance(platform, Platform) :
+            '''elif not isinstance(platform, Platform) :
                 pygame.draw.rect(self.screen, (34, 139, 34), 
                                pygame.Rect(platform.x - self.camera_x, 
                                           platform.y, 
                                           platform.width, 
-                                          platform.height))
+                                          platform.height))'''
         # Draw map
         if self.level.map != None:
             self.screen.blit(self.level.map,( 0 - self.camera_x , 0))
@@ -519,14 +772,14 @@ class Game:
                                             enemy.rect.width, 
                                             enemy.rect.height))
     def show_health(self):
-        health_display = font.render("Your Health: " + str(self.player.health), True, 'white')
+        health_display = font2.render("Your Health: " + str(self.player.health), True, 'black')
         self.screen.blit(health_display, (20,20))
-        heart = heartfont.render("♥", True, "red")
+        heart = AssetManager.UI_images["heart"]
         if self.player.health >= 0:
             for i in range(0,self.player.health):
-                self.screen.blit(heart, (40 + 30*i , 40))
+                self.screen.blit(heart, (40 + 30*i , 60))
         if self.other_player:
-            other_health_display = font.render("Enemy: " + str(self.other_player.health), True, 'red')
+            other_health_display = font2.render("Enemy: " + str(self.other_player.health), True, 'red')
             self.screen.blit(other_health_display, (20, 80))
                 
     def gameover(self):

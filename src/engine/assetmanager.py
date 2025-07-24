@@ -10,6 +10,10 @@ class AssetManager :
     player_sounds = {}
     platform_images = {}
     map_image = {}
+    backgrounds = {}
+    UI_images = {}
+    UI_sounds = {}
+    powerups_images ={}
 
     def load_frames(sheet,frame_width,frame_hight ,startpoint, numframes):
         frames = []
@@ -149,13 +153,17 @@ class AssetManager :
         # game over sound
         gameover_sound = pygame.mixer.Sound("src/assets/sounds/player/gameover.mp3")
         gameover_sound.set_volume(0.4)
+        # Collect sound
+        collect_sound = pygame.mixer.Sound("src/assets/sounds/player/collect.mp3")
+        collect_sound.set_volume(0.05)
         AssetManager.player_sounds = {
             "running" : running_sound ,
             "jump" : jump_sound ,
             "attack" : attack_sound ,
             "damage" : damage_sound ,
             "bounce" : bounce_sound ,
-            "game over" : gameover_sound
+            "game over" : gameover_sound,
+            "collect" : collect_sound
         }
         
   
@@ -176,32 +184,103 @@ class AssetManager :
             "fireball" : fireball_frames
         }
     def load_platform_images () :
-        forest_platform = pygame.image.load("src/assets/images/platforms/forest.png")
-        desert_platform = pygame.image.load("src/assets/images/platforms/desert.png")
+        
         lostcity_platform = pygame.image.load("src/assets/images/platforms/lostcity.png")
-        underwater_platform = pygame.image.load("src/assets/images/platforms/underwater.png")
         slowing_platform = pygame.image.load("src/assets/images/platforms/slowing.png")
         timed_platform = pygame.image.load("src/assets/images/platforms/timed.png")
         spikey_platform = pygame.image.load("src/assets/images/platforms/spikey.png")
-
+        bouncy_frames = pygame.image.load("src/assets/images/platforms/bouncy.png")
+        bouncy_frames = AssetManager.load_frames(bouncy_frames, 16,16,0,6)
+        bouncy_frames = AssetManager.scale_frames(bouncy_frames, 50, 40)
         AssetManager.platform_images = {
-            "forest" : forest_platform ,
-            "desert" : desert_platform ,
             "lostcity" : lostcity_platform ,
-            "underwater": underwater_platform ,
             "slowing" : slowing_platform ,
             "timed" : timed_platform ,
-            "spikey" : spikey_platform
+            "spikey" : spikey_platform ,
+            "bouncy" : bouncy_frames
         }
     def load_map ( ) :
         forest_map =   pygame.image.load("src/assets/tiles and maps/forest.png")
         desert_map = pygame.image.load("src/assets/tiles and maps/desert.png")
+        lost_city_map = pygame.image.load("src/assets/tiles and maps/lostcity.png")
+        underwater_map = pygame.image.load("src/assets/tiles and maps/underwater.png")
+        
         AssetManager.map_image = {
             "forest" : forest_map ,
-            "desert" : desert_map
+            "desert" : desert_map ,
+            "underwater" : underwater_map,
+            "lost_city" : lost_city_map
         }
+        forest_background = pygame.image.load("src/assets/images/backgrounds/forest.jpeg")
+        forest_background = pygame.transform.scale(forest_background,(forest_background.get_width() ,config.BASE_SCREEN_HEIGHT ))
+        desert_background = pygame.image.load("src/assets/images/backgrounds/desert.jpeg")
+        desert_background = pygame.transform.scale(desert_background,(desert_background.get_width()*1.1  ,config.BASE_SCREEN_HEIGHT ))
+        lost_city_background = pygame.image.load("src/assets/images/backgrounds/lost_city.jpeg")
+        lost_city_background = pygame.transform.scale(lost_city_background,(lost_city_background.get_width()*1.3,config.BASE_SCREEN_HEIGHT ))
+        underwater_background = pygame.image.load("src/assets/images/backgrounds/underwater.jpg")
+        underwater_background = pygame.transform.scale(underwater_background,(underwater_background.get_width() *1.6,config.BASE_SCREEN_HEIGHT ))
+        AssetManager.backgrounds = {
+            "forest" : forest_background ,
+            "desert" : desert_background ,
+            "lost_city" : lost_city_background ,
+            "underwater" : underwater_background
+        }
+    def load_UI_assets ():
+        AssetManager.load_UI_sounds()
+        heart_image = pygame.image.load("src/assets/images/UI/heart.png")
+        #heart_image = pygame.transform.scale(heart_image, (7, 6))
+
+        A_key_sheet = pygame.image.load("src/assets/images/UI/keys/A.png")
+        A_key_frames = AssetManager.load_frames(A_key_sheet, 19,21,0,3)
+        A_key_frames = AssetManager.scale_frames(A_key_frames,57,63)
+        D_key_sheet =  pygame.image.load("src/assets/images/UI/keys/D.png")
+        D_key_frames = AssetManager.load_frames(D_key_sheet, 19,21,0,3)
+        D_key_frames = AssetManager.scale_frames(D_key_frames,57,63)
+        SPACE_key_sheet = pygame.image.load("src/assets/images/UI/keys/space.png")
+        SPACE_key_frames = AssetManager.load_frames(SPACE_key_sheet, 98,21,0,3)
+        SPACE_key_frames = AssetManager.scale_frames(SPACE_key_frames,294,63)
+        SHIFT_key_sheet = pygame.image.load("src/assets/images/UI/keys/shift.png")
+        SHIFT_key_frames = AssetManager.load_frames(SHIFT_key_sheet, 61,21,0,3)
+        SHIFT_key_frames = AssetManager.scale_frames(SHIFT_key_frames,183,63)
+        
+        AssetManager.UI_images = {
+            "heart" : heart_image,
+            "A_key" : A_key_frames,
+            "D_key" : D_key_frames,
+            "SPACE_key" : SPACE_key_frames,
+            "SHIFT_key" : SHIFT_key_frames,
+        }
+    def load_UI_sounds ():
+        hover_sound = pygame.mixer.Sound("src/assets/sounds/UI/hover.wav")
+        hover_sound.set_volume(0.2)
+        click_sound = pygame.mixer.Sound("src/assets/sounds/UI/click.wav")
+        click_sound.set_volume(0.2)
+        win_sound = pygame.mixer.Sound("src/assets/sounds/UI/win.mp3")
+        win_sound.set_volume(0.5)
+        AssetManager.UI_sounds = {
+            "hover" : hover_sound ,
+            "click" : click_sound,
+            "win": win_sound
+        }
+    def load_powerups_assets():
+        shield_image = pygame.image.load("src/assets/images/powerups/shield.png").convert_alpha()
+        shield_image = pygame.transform.scale(shield_image,(40,40))
+        doublejump_image = pygame.image.load("src/assets/images/powerups/doublejump.png").convert_alpha()
+        boost_image = pygame.image.load("src/assets/images/powerups/boost.png").convert_alpha()
+        boost_image = pygame.transform.scale(boost_image,(40,40))
+        health_image = pygame.image.load("src/assets/images/powerups/health.png").convert_alpha()
+        health_image = pygame.transform.scale(health_image,(50,50))
+        AssetManager.powerups_images ={
+            "shield" : shield_image,
+            "doublejump" : doublejump_image,
+            "damageboost" : boost_image,
+            "health" : health_image
+        }
+
     def load_assets():
         AssetManager.load_player_assets()
         AssetManager.load_bullet_assets()
         AssetManager.load_platform_images()
         AssetManager.load_map()
+        AssetManager.load_UI_assets ()
+        AssetManager.load_powerups_assets()
