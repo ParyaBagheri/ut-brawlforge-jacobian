@@ -232,12 +232,16 @@ class AssetManager :
 
         A_key_sheet = pygame.image.load("src/assets/images/UI/keys/A.png")
         A_key_frames = AssetManager.load_frames(A_key_sheet, 19,21,0,3)
+        A_key_frames = AssetManager.scale_frames(A_key_frames,57,63)
         D_key_sheet =  pygame.image.load("src/assets/images/UI/keys/D.png")
         D_key_frames = AssetManager.load_frames(D_key_sheet, 19,21,0,3)
+        D_key_frames = AssetManager.scale_frames(D_key_frames,57,63)
         SPACE_key_sheet = pygame.image.load("src/assets/images/UI/keys/space.png")
         SPACE_key_frames = AssetManager.load_frames(SPACE_key_sheet, 98,21,0,3)
+        SPACE_key_frames = AssetManager.scale_frames(SPACE_key_frames,294,63)
         SHIFT_key_sheet = pygame.image.load("src/assets/images/UI/keys/shift.png")
         SHIFT_key_frames = AssetManager.load_frames(SHIFT_key_sheet, 61,21,0,3)
+        SHIFT_key_frames = AssetManager.scale_frames(SHIFT_key_frames,183,63)
         
         AssetManager.UI_images = {
             "heart" : heart_image,

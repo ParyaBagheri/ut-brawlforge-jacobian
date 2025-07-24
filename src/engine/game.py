@@ -10,6 +10,7 @@ background_path = os.path.join("src", "assets", "images", "background.jpg")
 # Fonts 
 pygame.font.init()
 font = pygame.font.SysFont('Arial',  32, True, False)
+font2 = pygame.font.Font("src/assets/fonts/MinimalPixelFont.ttf",50)
 heartfont = pygame.font.SysFont('Segoe UI Symbol', 40)
 gameoverfont = pygame.font.SysFont('OCR A Extended', 72)
 loadingscreen_font = pygame.font.SysFont('OCR A Extended', 36)
@@ -106,9 +107,8 @@ class Game:
         background = pygame.image.load(background_path)
         background = pygame.transform.scale(background, (800,600))
         self.screen.blit(background, (0,0))
-        BACK = Button(self, None, [50, 550], "BACK", "OCRAEXT", 50, 'white', (0, 146, 155)) 
+        BACK = Button(self, None, [60, 550], "BACK", "OCRAEXT", 40, 'white', (0, 146, 155)) 
         HOW_TO_PLAY_MOUSE_POS = pygame.mouse.get_pos
-        
         demo_state = "idle"
         demo_direction ="right"
         demo_frames = AssetManager.player_images["knight"]
@@ -116,39 +116,61 @@ class Game:
         demo_rect = demo_image.get_rect(topleft=(500, 250))
         demo_current_frame = 0
         demo_can_jump = True
-        demo_can_attack = True
+        demo_attack_animation = False
+        font = pygame.font.Font("src/assets/fonts/MinimalPixelFont.ttf",50)
+        text1 =font.render ('Move right', True,'black' )
+        text1_rect =text1.get_rect()
+        text1_rect.center = (80 , 100 )
+        text2 = font.render ('Move left', True,'black' )
+        text2_rect =text2.get_rect()
+        text2_rect.center = (75 , 220 )
+        text3 = font.render ('Jump', True,'black' )
+        text3_rect =text3.get_rect()
+        text3_rect.center = (50 , 340 )
+        text4 = font.render ('Shoot', True,'black' )
+        text4_rect = text4.get_rect()
+        text4_rect.center = (50 , 460 )
+        text5 = font.render ('or left mouse button',True,'black')
+        text5_rect =text5.get_rect()
+        text5_rect.center = (480 , 460 )
         # keys' animations 
         A_key_is_pressed = False
         A_key_frames = AssetManager.UI_images["A_key"]
         A_key_image = A_key_frames[0]
         A_current_frame = 0
-        A_rect = A_key_image.get_rect(topleft=( 100, 120))
+        A_rect = A_key_image.get_rect(topleft=( 185, 80))
         D_key_is_pressed = False
         D_key_frames = AssetManager.UI_images["D_key"]
         D_key_image = D_key_frames[0]
         D_current_frame = 0
-        D_rect = D_key_image.get_rect(topleft=( 100, 240))
+        D_rect = D_key_image.get_rect(topleft=( 180, 200))
         SPACE_key_is_pressed = False
         SPACE_key_frames = AssetManager.UI_images["SPACE_key"]
         SPACE_key_image = SPACE_key_frames[0]
         SPACE_current_frame = 0
-        SPACE_rect = SPACE_key_image.get_rect(topleft=( 100, 360))
+        SPACE_rect = SPACE_key_image.get_rect(topleft=( 140, 320))
         SHIFT_key_is_pressed = False
         SHIFT_key_frames = AssetManager.UI_images["SHIFT_key"]
         SHIFT_key_image = SHIFT_key_frames[0]
         SHIFT_current_frame = 0 
-        SHIFT_rect = SHIFT_key_image.get_rect(topleft=( 100, 480))
-        def how_to_play_render():        
+        SHIFT_rect = SHIFT_key_image.get_rect(topleft=( 140, 440))
+        def how_to_play_render():
+            self.screen.blit(background, (0,0))        
             BACK.draw(HOW_TO_PLAY_MOUSE_POS())
-            self.screen.blit (demo_image,demo_rect)
+            self.screen.blit (pygame.transform.scale(demo_image, (75,120)),demo_rect)
             self.screen.blit (A_key_image,A_rect)
             self.screen.blit (D_key_image,D_rect)
             self.screen.blit (SPACE_key_image,SPACE_rect)
             self.screen.blit (SHIFT_key_image,SHIFT_rect)
-            
+            self.screen.blit(text1, text1_rect)
+            self.screen.blit(text2, text2_rect)
+            self.screen.blit(text3, text3_rect)
+            self.screen.blit(text4, text4_rect)
+            self.screen.blit(text5, text5_rect)
         def how_to_play_event_handler():
             nonlocal demo_current_frame
             nonlocal demo_state
+            nonlocal demo_attack_animation
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -158,6 +180,7 @@ class Game:
                         if demo_state != "attack" :
                             demo_current_frame = 0
                         demo_state = "attack"
+                        demo_attack_animation = True
                     if BACK.is_pressed(HOW_TO_PLAY_MOUSE_POS()):
                         self.state = "main_menu"
             
@@ -168,7 +191,7 @@ class Game:
             nonlocal demo_image 
             nonlocal demo_current_frame 
             nonlocal demo_can_jump 
-            nonlocal demo_can_attack 
+            nonlocal demo_attack_animation 
             # demo animation update
             if demo_direction == "right" :
                 demo_image = demo_frames[demo_state][int(demo_current_frame)]
@@ -177,36 +200,35 @@ class Game:
             demo_current_frame += config.PLAYER_FRAMES_SPEED
             if(demo_current_frame >= len(demo_frames[demo_state])) :
                 demo_current_frame = 0
-                if demo_state == "jumping" :
-                    demo_can_jump = True
+                if demo_attack_animation :
+                    demo_attack_animation = False
                     demo_state = "idle"
-                if demo_state == "attack" :
-                    demo_can_attack = True
-                    demo_state = "idle"
+                
             keys = pygame.key.get_pressed() 
-            if keys[pygame.K_a] :
-                if demo_state != "run" :
+            if not demo_attack_animation :
+                if keys[pygame.K_a] :
+                    if demo_state != "run" :
+                        demo_current_frame = 0
+                    demo_direction ="left"
+                    demo_state = "run"
+                elif keys[pygame.K_d] :
+                    if demo_state != "run" :
+                        demo_current_frame = 0
+                    demo_direction ="right"
+                    demo_state = "run"
+                elif keys[pygame.K_SPACE] :
+                    if demo_state != "jumping" :
+                        demo_current_frame = 0
+                    demo_state = "jumping"
+                    
+                elif (keys[pygame.K_LSHIFT] or keys[pygame.K_RSHIFT] ):
                     demo_current_frame = 0
-                demo_direction ="left"
-                demo_state = "run"
-            elif keys[pygame.K_d] :
-                if demo_state != "run" :
-                    demo_current_frame = 0
-                demo_direction ="right"
-                demo_state = "run"
-            elif keys[pygame.K_SPACE] and demo_can_jump :
-                demo_state = "jumping"
-                demo_current_frame = 0
-                demo_can_jump = False
-            elif (keys[pygame.K_LSHIFT] or keys[pygame.K_RSHIFT] )and demo_can_attack:
-                if demo_state != "attack":
-                    demo_current_frame = 0
-                    demo_can_attack = False
-                demo_state = "attack" 
-            else :
-                if demo_state != "idle" :
-                    demo_current_frame =0
-                demo_state ="idle"
+                    demo_state = "attack" 
+                    demo_attack_animation = True
+                else :
+                    if demo_state != "idle" :
+                        demo_current_frame =0
+                    demo_state ="idle"
             update_keys(keys)
         def update_keys(keys) :
             nonlocal A_key_is_pressed 
@@ -281,7 +303,7 @@ class Game:
         background = pygame.transform.scale(background, (800,600))
         self.screen.blit(background, (0,0))
 
-        char_menu_font = pygame.font.SysFont('OCR A Extended', 45)
+        char_menu_font = pygame.font.Font("src/assets/fonts/MinimalPixelFont.ttf",80)
         char_menu_text = char_menu_font.render("Choose a character!", True, 'indigo')
         char_menu_text_rect = char_menu_text.get_rect(center= (self.screen_width // 2, self.screen_height//6))
         self.screen.blit(char_menu_text, char_menu_text_rect)
@@ -368,7 +390,7 @@ class Game:
         background = pygame.transform.scale(background, (800,600))
         self.screen.blit(background, (0,0))
 
-        map_menu_font = pygame.font.SysFont('OCR A Extended', 45)
+        map_menu_font = pygame.font.Font("src/assets/fonts/MinimalPixelFont.ttf",80)
         map_menu_text = map_menu_font.render("Choose a map!", True, 'indigo')
         map_menu_text_rect = map_menu_text.get_rect(center= (self.screen_width // 2, self.screen_height//6))
         self.screen.blit(map_menu_text, map_menu_text_rect)
@@ -736,14 +758,14 @@ class Game:
                                         enemy.rect.width, 
                                         enemy.rect.height))
     def show_health(self):
-        health_display = font.render("Your Health: " + str(self.player.health), True, 'white')
+        health_display = font2.render("Your Health: " + str(self.player.health), True, 'black')
         self.screen.blit(health_display, (20,20))
         heart = AssetManager.UI_images["heart"]
         if self.player.health >= 0:
             for i in range(0,self.player.health):
-                self.screen.blit(heart, (40 + 30*i , 40))
+                self.screen.blit(heart, (40 + 30*i , 60))
         if self.other_player:
-            other_health_display = font.render("Enemy: " + str(self.other_player.health), True, 'red')
+            other_health_display = font2.render("Enemy: " + str(self.other_player.health), True, 'red')
             self.screen.blit(other_health_display, (20, 80))
                 
     def gameover(self):
