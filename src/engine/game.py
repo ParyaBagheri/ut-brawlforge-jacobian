@@ -315,14 +315,11 @@ class Game:
         CHAR_1 = Button(self, AssetManager.player_images["knight"]["idle"], [self.screen_width//4,self.screen_height//2], "knight",'OCRAEXT', 40, (0, 38, 21), (0, 89, 21))
         CHAR_2 = Button(self, AssetManager.player_images["girl"]["idle"], [3 *self.screen_width//4, self.screen_height//2], "girl", 'OCRAEXT', 40, (117, 96,0), (42, 32, 0))
         CHAR_3 = Button(self, AssetManager.player_images["wizard"]["idle"], [self.screen_width//4, 5 * self.screen_height//6], "wizard","OCRAEXT", 40, (255, 181, 118), (81, 1, 109))
-        CHAR_4 = Button(self, None, [3 * self.screen_width//4, 5 * self.screen_height//6], "char 4","OCRAEXT", 40, (0, 13, 72), (229, 134, 169))
         CHAR_MENU_MOUSE_POS = pygame.mouse.get_pos
         def char_menu_render():
             CHAR_1.draw(CHAR_MENU_MOUSE_POS())
             CHAR_2.draw(CHAR_MENU_MOUSE_POS())
             CHAR_3.draw(CHAR_MENU_MOUSE_POS())
-            CHAR_4.draw(CHAR_MENU_MOUSE_POS())
-
 
         def char_menu_events():
             for event in pygame.event.get():
@@ -336,7 +333,7 @@ class Game:
                             self.state = "map_menu"
                             
                         elif self.mode == "multiplayer" :
-                            self.other_player = Player(self, 'wizard', 3200)
+                            self.other_player = Player(self, 'wizard', 3000)
                             self.level = Level("multiplayer", self, 3200, self.mp_win, self.mp_lose)
                             self.state = "playing"
                             
@@ -346,7 +343,7 @@ class Game:
                             self.state = "map_menu"
                             
                         elif self.mode == "multiplayer" :
-                            self.other_player = Player(self, 'knight', 3200)
+                            self.other_player = Player(self, 'knight', 3000)
                             self.level = Level("multiplayer", self, 3200, self.mp_win, self.mp_lose)
                             self.state = "playing"
                                                
@@ -356,7 +353,7 @@ class Game:
                             self.state = "map_menu"
                             
                         elif self.mode == "multiplayer" :
-                            self.other_player = Player(self, 'girl', 3200)
+                            self.other_player = Player(self, 'girl', 3000)
                             self.level = Level("multiplayer", self, 3200, self.mp_win, self.mp_lose)
                             self.state = "playing"
                             
@@ -618,11 +615,13 @@ class Game:
                 # Press esc or pause button to pause
                 self.state = "paused"
 
-            elif event.type == pygame.MOUSEBUTTONDOWN :
-                if event.button == 1 : #left mouse button
-                    self.player.is_shooting = True
+            elif (event.type == pygame.MOUSEBUTTONDOWN and event.button == 1) or \
+                (event.type == pygame.KEYDOWN and (event.key == pygame.K_RSHIFT or event.key == pygame.K_LSHIFT)) :                
+                self.player.is_shooting = True
 
-            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.state != "paused" and self.state != "gameover":
+            elif ((event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 ) or 
+                  (event.type == pygame.KEYDOWN and (event.key == pygame.K_RSHIFT or event.key == pygame.K_LSHIFT))) and \
+                    self.state != "paused" and self.state != "gameover" :
                 #if event.button == 1 : #left mouse button
                     self.player.shoot()
             elif (event.type == pygame.KEYDOWN or (event.type == pygame.MOUSEBUTTONDOWN and self.PAUSE_BUTTON.is_pressed(GAME_MOUSE_POS()))) and self.state == "paused": # press space to resume

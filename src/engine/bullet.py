@@ -84,22 +84,23 @@ class Bullet :
 
     def check_enemy_collision (self) :
         if self.is_fired == True :
-            for enemy in self.game.enemies :
-                #if isinstance (enemy, Enemy) :
-                if self.direction == "right" :
-                    if (self.rect.right >= enemy.rect.left and 
-                    self.rect.right <= enemy.rect.right and 
-                    self.rect.y >= enemy.rect.top and 
-                    self.rect.y <= enemy.rect.bottom ):
+            if self.game.enemies : 
+                for enemy in self.game.enemies :
+                    #if isinstance (enemy, Enemy) :
+                    if self.direction == "right" :
+                        if (self.rect.right >= enemy.rect.left and 
+                        self.rect.right <= enemy.rect.right and 
+                        self.rect.y >= enemy.rect.top and 
+                        self.rect.y <= enemy.rect.bottom ):
+                                enemy.got_shot(self.damage)
+                                return True
+                    elif self.direction == "left" :
+                        if (self.rect.left <= enemy.rect.right and 
+                        self.rect.left >= enemy.rect.left and 
+                        self.rect.y >= enemy.rect.top and 
+                        self.rect.y <= enemy.rect.bottom ):
                             enemy.got_shot(self.damage)
                             return True
-                elif self.direction == "left" :
-                    if (self.rect.left <= enemy.rect.right and 
-                    self.rect.left >= enemy.rect.left and 
-                    self.rect.y >= enemy.rect.top and 
-                    self.rect.y <= enemy.rect.bottom ):
-                        enemy.got_shot(self.damage)
-                        return True
 
 
 
