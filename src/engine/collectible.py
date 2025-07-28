@@ -20,6 +20,7 @@ class Powerup(pygame.sprite.Sprite):
             self.timer += 1
             if self.timer >= 300:
                 self.visible = False
+                self.kill()
     def draw(self):
         
         pos = self.x - self.game.camera_x 

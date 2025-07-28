@@ -611,7 +611,8 @@ class Game:
                 #self.screen = pygame.display.set_mode((event.w, event.h), pygame.RESIZABLE)
                 #self.update_dimensions()
             elif ((event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE) or 
-                  (event.type == pygame.MOUSEBUTTONDOWN and self.PAUSE_BUTTON.is_pressed(GAME_MOUSE_POS()))) and self.state != "gameover" :
+                  (event.type == pygame.MOUSEBUTTONDOWN and self.PAUSE_BUTTON.is_pressed(GAME_MOUSE_POS()))) and \
+                    self.state != "gameover" and self.mode == "single_player":
                 # Press esc or pause button to pause
                 self.state = "paused"
 
