@@ -75,11 +75,19 @@ class Server:
         for mode, queue in modes.items():
             if mode == "1v1" and len(queue) >= 2 :
                 self.create_room(queue[:2])
-                self.waiting_clients[pair for pair in self.waiting_clients if pair[0] not in queue[:2]]
+                remaining_clients = []
+                for pair in self.waiting_clients :
+                    if pair[0] not in queue[:2] :
+                        remaining_clients.append(pair)
+                self.waiting_clients = remaining_clients
     
             elif mode == "2v2" and len(queue) >= 4:
                 self.create_room(queue[:4])
-                self.waiting_clients[pair for pair in self.waiting_clients if pair[0] not in queue[:4]]
+                remaining_clients = []
+                for pair in self.waiting_clients :
+                    if pair[0] not in queue[:4] :
+                        remaining_clients.append(pair)
+                self.waiting_clients = remaining_clients
     
     def create_room(self, clients):
         team_ids = [1,2] * (len(clients)//2)
@@ -141,7 +149,7 @@ class Server:
         self.client_modes.pop(client, None)
         try :
             client.close()
-        except ; 
+        except : 
             pass
         
 
