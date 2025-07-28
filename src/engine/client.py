@@ -14,7 +14,8 @@ class Client :
             "x" : None,
             "y" : None,
             "state" : "idle",
-            "health": None
+            "health": None,
+            "direction" : None
         }
         self.info = {
             # Information required to create a new player
@@ -59,17 +60,17 @@ class Client :
                 break
     def handle_new_data (self, new_data):
         if new_data["type"] == "player_list":
-            #add new players to the client's player_list 
+            # Add new players to the client's player_list 
             new_players_count = len(new_data["player_list"])
             for i in range(self.players_count, new_players_count):
                 if new_data["player_list"][i] ["id"]== self.info["id"] :
                     self.all_players[i] = self.player
                 else :
                     new_player_info = new_data["player_list"][i]
-                    # self.all_players[i] = Player(self.game, start_x, new_player_info["id"], new_player_info["nickname"], new_player_info["character_type"])
+                    #self.all_players[i] = Player(self.game, start_x, new_player_info["id"], new_player_info["nickname"], new_player_info["character_type"])
             self.players_count = new_players_count -1
         elif new_data["type"] == "players_update" :
-            #update position and state of the player with the same id
+            # Update position and state of the player with the same id
             for player in self.all_players :
                 if isinstance(player, Player) :
                     if player.id == new_data["updated_status"]["id"] :
@@ -81,13 +82,18 @@ class Client :
             "x" : self.player.x,
             "y" : self.player.y,
             "state" : self.player.state,
-            "health" : self.player.health
+            "health" : self.player.health,
+            "direction" : self.player.direction
         }
-        if updated_status != self.status :
-            self.status = updated_status
-            self.send_status()
+        
+        self.status = updated_status
+        self.send_status()
     def send_status (self):
-        message = json.dumps(self.status) + "\n"
+        data = {
+            "type" : "players_update",
+            "updated_status" : self.status
+        }
+        message = json.dumps(data) + "\n"
         self.socket.sendall(message.encode('utf-8'))
 
     
