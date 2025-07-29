@@ -5,9 +5,9 @@ import json
 from src.engine.player import Player
 from src.engine.protocols import Protocol 
 class Client :
-    def __init__(self,game, host, port, nickname,character_type,request_type, team = None):
-        self.host = host
-        self.port = port
+    def __init__(self,game, nickname,character_type,request_type):
+        self.host = '192.168.1.204'
+        self.port = 55555
         self.status = {
             # Data sent periodically to update this player's state and position
             "id" : None,
@@ -25,7 +25,7 @@ class Client :
         }
         self.request_type = request_type
         self.players_count = 0
-        self.team = team
+        self.team = None
         self.player = None
         self.game = game
         self.all_players = {}
