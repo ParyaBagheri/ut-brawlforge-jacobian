@@ -14,6 +14,7 @@ class Protocol :
         OPPONENT = "response.opponent"
         START = "response.start"
         UPDATE = "response.update"
+        POWERUP_SPAWNED = "response.powerup_spawned"
         POWERUP_PICKED = "response.powerup_picked"
         OPPONENT_LEFT = "response.opponent_left"
         WINNER = "response.winner"

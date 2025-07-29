@@ -27,7 +27,7 @@ def get_level_data(name, game):
                 Platform(game, 2800, 200, 100, 20, 'timed', image = AssetManager.platform_images["timed"]),
                 Platform(game, 3000, 100, 100, 20, 'timed', image = AssetManager.platform_images["timed"]),
                 Platform(game, 3112, 248, 88, 72, 'solid'), #Finish platform
-                #Platform(self, 3050, 560 - config.BASE_GROUND_HEIGHT, 50, 40, 'bouncy')
+                Platform(game, 3050, 560 - config.BASE_GROUND_HEIGHT, 50, 40, 'bouncy', AssetManager.platform_images["bouncy"][0])
                 game.ground_rect
             ],
             "enemies" : [],

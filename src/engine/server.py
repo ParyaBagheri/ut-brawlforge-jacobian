@@ -1,6 +1,7 @@
 import socket, threading, json, time, random
 from room import Room
 from protocols import Protocol
+from src.engine.platform import Platform
 
 
 HOST = '192.168.1.204'
@@ -24,11 +25,16 @@ class Server:
 
     def start(self):
         print("server started.")
-        while True :
-            client, address = self.server.accept()
-            print(f"connected with {address}")
-            thread = threading.Thread(target=self.handle, args=(client,))
-            thread.start()
+        self.start_powerup_spawner()
+        try :
+            while True :
+                client, address = self.server.accept()
+                print(f"connected with {address}")
+                thread = threading.Thread(target=self.handle, args=(client,))
+                thread.start()
+        except KeyboardInterrupt:
+            print("Shutting down server")
+            self.server.close()
     
     def handle(self, client):
         self.handle_connect(client)
@@ -84,7 +90,7 @@ class Server:
                     self.match_players()
             except:
                 continue
-            
+
     
     def id_generator(self, client):
         id = random.randint(10000, 99999)
@@ -93,7 +99,18 @@ class Server:
                 id = random.randint(10000, 99999)
         self.client_ids.append((client, id))
         return id
-    
+
+    def start_powerup_spawner(self):
+        def spawner_loop():
+            while True : 
+                time.sleep(1)
+                for room in set(self.rooms.values()):
+                    powerup_data = room.spawn_random_powerup()
+                    if powerup_data :
+                        room.pending_powerups.append(powerup_data)
+                        self.broadcast(Protocol.Response.POWERUP_SPAWNED, powerup_data, sender=None)
+        thread = threading.Thread(target= spawner_loop, daemon=True)
+        thread.start()
 
     def match_players(self):
         modes = {"1v1" : [], "2v2" : []}
@@ -129,7 +146,7 @@ class Server:
 
     def wait_for_room(self, client):
         while client not in self.rooms :
-            time.sleep(1)
+            time.sleep(3)
 
     def handle_recieve(self, message, client):
         r_type = message.get("type")
@@ -140,8 +157,10 @@ class Server:
             room.update_player_states(client, data)
             self.broadcast(Protocol.Response.UPDATE, {"client" : self.client_names[client], "data": data}, client)
         elif r_type == Protocol.Request.POWERUP :
-            room.register_powerup(data)
-            self.broadcast(Protocol.Response.POWERUP_PICKED, data, client)
+                if data in room.pending_powerups:
+                room.register_powerup(data)
+                room.pending_powerups.remove(data)
+                self.broadcast(Protocol.Response.POWERUP_PICKED, data, client)
 
         if room.is_finished():
             loser = room.losing_team

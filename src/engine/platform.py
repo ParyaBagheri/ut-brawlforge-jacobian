@@ -3,7 +3,7 @@ import config
 from src.engine.assetmanager import AssetManager
 
 class Platform(pygame.sprite.Sprite):
-    def __init__(self,game, x, y, width, height, type='solid', is_solid=True, image=None):
+    def __init__(self,game= None, x, y, width, height, type='solid', is_solid=True, image=None):
         super().__init__()
         self.game = game
         self.x = x
@@ -56,12 +56,14 @@ class Platform(pygame.sprite.Sprite):
             screen.blit(self.image, (pos_x, pos_y))
             
     def slowing_platform(self):
-        self.game.player.is_slowed = True
-        self.game.player.slowing_timer = 0
+        if self.game :
+            self.game.player.is_slowed = True
+            self.game.player.slowing_timer = 0
 
     def bouncy_platform(self):
-        self.bounce_animation = True
-        self.game.player.velocity_y -= 20
+        if self.game:
+            self.bounce_animation = True
+            self.game.player.velocity_y -= 20
     def timed_platform(self):
         if not self.activated :
             self.activated = True
