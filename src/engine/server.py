@@ -1,4 +1,4 @@
-import socket, threading, json, time
+import socket, threading, json, time, random
 from room import Room
 from protocols import Protocol
 
@@ -16,6 +16,8 @@ class Server:
 
         self.client_names = {}
         self.client_modes = {}
+        self.client_characters = {}
+        self.client_ids = []
         self.waiting_clients = []
         self.rooms = {}
         self.teams = {}
@@ -43,7 +45,7 @@ class Server:
                 break
         
         self.broadcast(Protocol.Response.OPPONENT_LEFT, None, client)
-        self.disconnect()
+        self.disconnect(client)
 
     def handle_connect(self, client):
         while client not in self.client_names:
@@ -55,6 +57,21 @@ class Server:
                     self.client_names[client] = nickname
             except :
                 continue
+        
+        while client not in self.client_characters :
+            self.send(Protocol.Response.SETUP, "Choose character type", client)
+            try :
+                message = json.loads(client.recv(1024).decode("utf-8"))
+                if message.get("type") == Protocol.Request.CHAR_TYPE :
+                    char_type = message.get("data").get("char_type", "knight")
+                    self.client_characters[client] = char_type
+            except :
+                continue
+                    
+
+        while client not in self.client_ids:
+            id = self.id_generator(client)
+            self.send(Protocol.Response.ID, id, client)
 
         while client not in self.client_modes:
             self.send(Protocol.Response.SETUP, "Choose game mode", client)
@@ -67,6 +84,16 @@ class Server:
                     self.match_players()
             except:
                 continue
+            
+    
+    def id_generator(self, client):
+        id = random.randint(10000, 99999)
+        for client_id in self.client_ids:
+            if id == client_id[1]:
+                id = random.randint(10000, 99999)
+        self.client_ids.append((client, id))
+        return id
+    
 
     def match_players(self):
         modes = {"1v1" : [], "2v2" : []}

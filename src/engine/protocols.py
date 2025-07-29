@@ -2,6 +2,7 @@ class Protocol :
     class Request : # things the server requests from the client
         NICKNAME = "request.niskname"
         MATCHMAKING = "request.matchmaking" 
+        CHAR_TYPE = 'request.character_type'
         MOVE = "request.move"
         SHOOT = "request.shoot"
         HIT = "request.hit"
@@ -9,6 +10,7 @@ class Protocol :
         LEAVE = "request.leave"
     class Response :
         SETUP = "response.setup"
+        ID = "response.id"
         OPPONENT = "response.opponent"
         START = "response.start"
         UPDATE = "response.update"
