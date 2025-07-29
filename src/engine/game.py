@@ -421,29 +421,48 @@ class Game:
             nickname_menu_text = nickname_menu_font.render("Enter your nickname!", True, 'indigo')
             nickname_menu_text_rect = nickname_menu_text.get_rect(center= (self.screen_width // 2, self.screen_height//6))
             self.screen.blit(nickname_menu_text, nickname_menu_text_rect)
+
+            text_font = pygame.font.Font("src/assets/fonts/OCRAEXT.ttf",50)
+            nickname_text = text_font.render(nickname, True, 'black')
+            text_rect = nickname_text.get_rect(center=(400,300)) 
+            self.screen.blit(nickname_text,text_rect) 
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit
                     sys.exit()
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_RETURN :
-                        self.state == "playing" # or "waiting"
-                        self.client =  Client(self, nickname, character_type,request_type)
-                        self.client.start()
+                        self.state = "waiting" 
+                        #self.client =  Client(self, nickname, character_type,request_type)
+                        #self.client.start()
+                        break
                     elif event.key == pygame.K_BACKSPACE :
                         nickname = nickname[:-1]
                     else: 
                         nickname += event.unicode
             
-            text_font = pygame.font.Font("src/assets/fonts/OCRAEXT.ttf",50)
-            nickname_text = text_font.render(nickname, True, 'black')
-            text_rect = nickname_text.get_rect(center=(400,300)) 
-            self.screen.blit(nickname_text,text_rect) 
-            
-
             pygame.display.flip()
             self.clock.tick(config.FPS)
 
+        if self.state == "waiting" :
+            self.waiting_room()
+
+    def waiting_room (self):
+        background = pygame.image.load(background_path)
+        background = pygame.transform.scale(background, (800,600))
+        self.screen.blit(background, (0,0))
+        waiting_font = pygame.font.Font("src/assets/fonts/MinimalPixelFont.ttf",80)
+        waiting_text = waiting_font.render("waiting", True, 'indigo')
+        waiting_text_rect = waiting_text.get_rect(center= (self.screen_width // 2, self.screen_height//2))
+        self.screen.blit(waiting_text, waiting_text_rect)
+        while self.state == "waiting" :
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit
+                    sys.exit()
+            pygame.display.flip()
+            self.clock.tick(config.FPS)
 
 
     def forest_win(self):

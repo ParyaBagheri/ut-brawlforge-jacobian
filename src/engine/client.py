@@ -52,6 +52,7 @@ class Client :
                 while '\n' in buffer :
                     line,buffer = buffer.split('\n', 1)
                     line = json.loads(line)
+                    
                     if line.get("type") == Protocol.Response.SETUP :
                         if line.get("data") == "Enter your nickname" :
                             self.send(Protocol.Request.NICKNAME,self.info["nickname"].encode['utf-8'])
@@ -63,7 +64,8 @@ class Client :
                         self.info["id"] = line.get("data")
                         self.status["id"] = line.get("data")
                         self.player = Player(self.game, self.info["character_type"], self.info["id"],self.info["nickname"])
-
+                    elif line.get("type") == Protocol.Response.START :
+                        self.game.state = "playing"
                     elif line.get("type") == Protocol.Response.UPDATE :
                         self.update_other_players (line.get("data"))
                     elif line.get("type") == Protocol.Response.PLAYER_LIST :
