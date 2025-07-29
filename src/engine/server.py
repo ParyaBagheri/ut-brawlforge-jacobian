@@ -175,7 +175,7 @@ class Server:
     def send(self, r_type, data, client):
         try :
             messege = {"type" : r_type, "data" : data}
-            client.send(json.dumps(messege).encode("utf-8"))
+            client.send((json.dumps(messege) + "\n").encode("utf-8"))
         except :
             pass
 
