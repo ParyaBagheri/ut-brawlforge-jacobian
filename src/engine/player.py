@@ -7,7 +7,7 @@ from src.engine.assetmanager import AssetManager
 
 
 class Player:
-    def __init__(self, game,character_type, start_x=100):
+    def __init__(self, game,character_type, start_x=100, id = None, nickname = None):
         self.game = game
         self.color = (255, 0, 0)  # Player color (red)
         '''if image:
@@ -64,6 +64,9 @@ class Player:
         self.jumped = False
         self.shield_activated = False
 
+        # MULTIPLAYER
+        self.id = id
+        self.nickname = nickname
 
     def check_vertical_collision(self, platforms):
         landed_on = None
@@ -365,3 +368,37 @@ class Player:
         # Create a new bullet that will follow the player (for next shot)
         self.held_bullet = Bullet(self, self.held_bullet.type)
         self.held_bullet.owner = self
+
+    def sync_remote_players (self, updated_status) :
+        prev_state = self.state
+        if self.state != "die":
+            self.x =  updated_status["x"]
+            self.y =  updated_status["y"]
+            self.state = updated_status["state"]
+            self.health = updated_status["health"]
+            self.direction = updated_status["direction"]
+            #self.check_powerup_collision(self.game.level.powerups)
+            # Shoot
+            if (self.current_frame >= config.SHOOT_FRAME[self.weapon]  and 
+            self.current_frame < config.SHOOT_FRAME[self.weapon] + config.PLAYER_FRAMES_SPEED and 
+            self.state == "attack") :
+                self.attack_sound = True
+                self.shoot()
+        if not self.is_dead :
+            self.remote_players_animation_update(prev_state)
+    def remote_players_animation_update (self, prev_state) :
+        if self.state !=  prev_state :
+            self.current_frame = 0 
+        if self.state == "die" and self.current_frame >= len(self.assets [self.state]) - (3 * config.PLAYER_FRAMES_SPEED) :
+            self.is_dead = True
+        self.image = self.assets[self.state][int(self.current_frame)]
+
+        self.current_frame += config.PLAYER_FRAMES_SPEED
+        if(self.current_frame >= len(self.assets[self.state])) :
+            self.current_frame = 0
+        self.remote_players_sound_manager(prev_state)
+    def remote_players_sound_manager(self,prev_state) :
+        if self.attack_sound :
+            self.sound_effects["attack"].play()
+            self.attack_sound = False
+            
