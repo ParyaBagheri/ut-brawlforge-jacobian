@@ -1,26 +1,27 @@
 import random
-from src.engine.platform import Platform
-from src.engine.assetmanager import AssetManager
+from .platform import Platform
+from .assetmanager import AssetManager
 import config
-platforms = [
-    Platform(0, 600 - config.BASE_GROUND_HEIGHT, 3200, config.BASE_GROUND_HEIGHT, 'solid')
-    Platform(304, 384, 160, 24, 'solid' ),
-    Platform(600, 304, 192, 40, 'solid'),
-    Platform(750, 304, 250, 20, 'timed'), #Fragile platform
-    Platform(1048, 200, 112, 16, 'solid'), # Bonus on this platform
-    Platform(1140, 560 - config.BASE_GROUND_HEIGHT, 50, 40, 'bouncy'), #Bouncy platform
-    Platform(1248, 296, 304, 24, 'solid'),
-    Platform(1416, 600 - config.BASE_GROUND_HEIGHT, 350, 20, 'slowing' ), #Muddy platform
-    Platform(1630, 200, 100, 20, 'timed'),
-    Platform(1696, 296, 112, 48, 'solid'),
-    Platform(1808, 296, 248, 48, 'slowing'),
-    Platform(2250, 200, 100, 20, 'timed'),
-    Platform(2400, 296, 304, 24, 'solid'),
-    Platform(2800, 200, 100, 20, 'timed'),
-    Platform(3000, 100, 100, 20, 'timed'),
-    Platform(3112, 248, 88, 72, 'solid'), #Finish platform
-    Platform(3050, 560 - config.BASE_GROUND_HEIGHT, 50, 40, 'bouncy')
-]
+'''platforms = [
+    Platform(None,0, 600 - config.BASE_GROUND_HEIGHT, 3200, config.BASE_GROUND_HEIGHT, 'solid'),
+    Platform(None,304, 384, 160, 24, 'solid' ),
+    Platform(None,600, 304, 192, 40, 'solid'),
+    Platform(None,750, 304, 250, 20, 'timed'), #Fragile platform
+    Platform(None,1048, 200, 112, 16, 'solid'), # Bonus on this platform
+    Platform(None,1140, 560 - config.BASE_GROUND_HEIGHT, 50, 40, 'bouncy'), #Bouncy platform
+    Platform(None,1248, 296, 304, 24, 'solid'),
+    Platform(None,1416, 600 - config.BASE_GROUND_HEIGHT, 350, 20, 'slowing' ), #Muddy platform
+    Platform(None,1630, 200, 100, 20, 'timed'),
+    Platform(None,1696, 296, 112, 48, 'solid'),
+    Platform(None,1808, 296, 248, 48, 'slowing'),
+    Platform(None,2250, 200, 100, 20, 'timed'),
+    Platform(None,2400, 296, 304, 24, 'solid'),
+    Platform(None,2800, 200, 100, 20, 'timed'),
+    Platform(None,3000, 100, 100, 20, 'timed'),
+    Platform(None,3112, 248, 88, 72, 'solid'), #Finish platform
+    Platform(None,3050, 560 - config.BASE_GROUND_HEIGHT, 50, 40, 'bouncy')
+]'''
+
 class Room:
     def __init__(self, clients, teams):
         self.clients = clients
@@ -52,7 +53,7 @@ class Room:
     def spawn_random_powerup(self):
         powerup_types = ['shield', 'doublejump', 'damageboost', 'health']
         p_type = random.choice(powerup_types)
-
+        platforms = self.clients[0].game.level.platforms
         valid_platforms = [p for p in platforms if isinstance(p, Platform) and p.visible]
         if not valid_platforms:
             return

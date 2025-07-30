@@ -3,7 +3,7 @@ import config
 from src.engine.assetmanager import AssetManager
 
 class Platform(pygame.sprite.Sprite):
-    def __init__(self,game= None, x, y, width, height, type='solid', is_solid=True, image=None):
+    def __init__(self,game, x, y, width, height, type='solid', is_solid=True, image=None):
         super().__init__()
         self.game = game
         self.x = x

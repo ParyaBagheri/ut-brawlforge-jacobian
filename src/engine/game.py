@@ -434,8 +434,8 @@ class Game:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_RETURN :
                         self.state = "waiting" 
-                        #self.client =  Client(self, nickname, character_type,request_type)
-                        #self.client.start()
+                        self.client =  Client(self, nickname, character_type,request_type)
+                        self.client.start()
                         break
                     elif event.key == pygame.K_BACKSPACE :
                         nickname = nickname[:-1]

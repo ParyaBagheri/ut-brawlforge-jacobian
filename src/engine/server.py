@@ -1,10 +1,10 @@
 import socket, threading, json, time, random
-from room import Room
-from protocols import Protocol
-from src.engine.platform import Platform
+from .room import Room
+from .protocols import Protocol
+from .platform import Platform
+from threading import Lock
 
-
-HOST = '192.168.1.204'
+HOST = '192.168.1.38'
 PORT = 55555
 
 class Server:
@@ -18,7 +18,10 @@ class Server:
         self.client_names = {}
         self.client_modes = {}
         self.client_characters = {}
-        self.client_ids = []
+        #self.client_ids = []
+        self.client_ids = {}
+        self.id_lock = Lock()
+
         self.waiting_clients = []
         self.rooms = {}
         self.teams = {}
@@ -69,7 +72,7 @@ class Server:
             try :
                 message = json.loads(client.recv(1024).decode("utf-8"))
                 if message.get("type") == Protocol.Request.CHAR_TYPE :
-                    char_type = message.get("data").get("char_type", "knight")
+                    char_type = message.get("data")
                     self.client_characters[client] = char_type
             except :
                 continue
@@ -84,7 +87,7 @@ class Server:
             try :
                 message = json.loads(client.recv(1024).decode("utf-8"))
                 if message.get("type") == Protocol.Request.MATCHMAKING :
-                    mode = message.get("data").get("mode", "1v1")
+                    mode = message.get("data")
                     self.client_modes[client] = mode
                     self.waiting_clients.append((client, mode))
                     self.match_players()
@@ -93,12 +96,12 @@ class Server:
 
     
     def id_generator(self, client):
-        id = random.randint(10000, 99999)
-        for client_id in self.client_ids:
-            if id == client_id[1]:
+        with self.id_lock : # Guarantees unique IDs
+            while True :
                 id = random.randint(10000, 99999)
-        self.client_ids.append((client, id))
-        return id
+                if id not in self.client_ids.values():
+                    self.client_ids [ client ] = id
+                    return id
 
     def start_powerup_spawner(self):
         def spawner_loop():
@@ -140,7 +143,16 @@ class Server:
         for client in clients :
             self.rooms[client] = room
             self.teams[client] = teams[client]
-            opponents = [self.client_names[c] for c in clients if c != client]
+            #opponents = [self.client_names[c] for c in clients if c != client]
+            opponents = []
+            for c in clients :
+                if c != client :
+                    opponent_info = {
+                        "id" : self.client_ids[c],
+                        "nickname" : self.client_names[c],
+                        "character_type" : self.client_characters[c]
+                    }
+                opponents.append(opponent_info)
             self.send(Protocol.Response.OPPONENT, opponents, client)
             self.send(Protocol.Response.START, None, client)
 
@@ -157,7 +169,7 @@ class Server:
             room.update_player_states(client, data)
             self.broadcast(Protocol.Response.UPDATE, {"client" : self.client_names[client], "data": data}, client)
         elif r_type == Protocol.Request.POWERUP :
-                if data in room.pending_powerups:
+            if data in room.pending_powerups:
                 room.register_powerup(data)
                 room.pending_powerups.remove(data)
                 self.broadcast(Protocol.Response.POWERUP_PICKED, data, client)

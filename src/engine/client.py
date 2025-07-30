@@ -6,7 +6,7 @@ from src.engine.player import Player
 from src.engine.protocols import Protocol 
 class Client :
     def __init__(self,game, nickname,character_type,request_type):
-        self.host = '192.168.1.204'
+        self.host = '192.168.1.38'
         self.port = 55555
         self.status = {
             # Data sent periodically to update this player's state and position
@@ -24,11 +24,11 @@ class Client :
             "character_type" : character_type
         }
         self.request_type = request_type
-        self.players_count = 0
+        #self.players_count = 0
         self.team = None
         self.player = None
         self.game = game
-        self.all_players = {}
+        self.other_players = {}
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         
     def start (self):
@@ -68,27 +68,31 @@ class Client :
                         self.game.state = "playing"
                     elif line.get("type") == Protocol.Response.UPDATE :
                         self.update_other_players (line.get("data"))
-                    elif line.get("type") == Protocol.Response.PLAYER_LIST :
-                        self.add_new_player(line.get("data"))
+                    elif line.get("type") == Protocol.Response.OPPONENT :
+                        self.other_players = line.get("data")
+                    elif line.get("type") == Protocol.Response.POWERUP_SPAWNED :
+                        self.game.level.powerups = line.get("data")
 
             except:
                 self.socket.close()
                 break
-    def add_new_player (self, players_info):
+
+    '''def add_new_player (self, other_players_info):
         
         # Add new players to the client's player_list 
-        new_players_count = len(players_info)
+        new_players_count = len(other_players_info)
         for i in range(self.players_count, new_players_count):
-            if players_info[i] ["id"]== self.info["id"] :
-                self.all_players[i] = self.player
+            if other_players_info[i] ["id"]== self.info["id"] :
+                self.other_players[i] = self.player
             else :
-                new_player_info = players_info[i]
-                self.all_players[i] = Player(self.game, new_player_info["character_type"], new_player_info["id"],new_player_info["nickname"])
-        self.players_count = new_players_count -1
+                new_player_info = other_players_info[i]
+                self.other_players[i] = Player(self.game, new_player_info["character_type"], new_player_info["id"],new_player_info["nickname"])
+        self.players_count = new_players_count -1'''
+    
     def update_other_players(self,data) :        
         
         # Update position and state of the player with the same id
-        for player in self.all_players :
+        for player in self.other_players :
             if isinstance(player, Player) :
                 if player.id == data["id"] :
                     player.sync_remote_player(data)
