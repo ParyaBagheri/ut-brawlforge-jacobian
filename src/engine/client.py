@@ -50,13 +50,16 @@ class Client :
                     break
                 buffer += chunck
                 while '\n' in buffer :
+                    print("recieved")
                     line,buffer = buffer.split('\n', 1)
                     line = json.loads(line)
                     
                     if line.get("type") == Protocol.Response.SETUP :
+                        print("recieved1")
                         if line.get("data") == "Enter your nickname" :
+                            print("recieved2")
                             self.send(Protocol.Request.NICKNAME,self.info["nickname"].encode['utf-8'])
-                        elif line.get("type") == "Choose character type":
+                        elif line.get("data") == "Choose character type":
                             self.send(Protocol.Request.CHAR_TYPE,self.info["character_type"].encode['utf-8'])
                         elif line.get("data") == "Choose game mode" :
                             self.send(Protocol.Request.MATCHMAKING, self.request_type.encode['utf-8'])
@@ -98,17 +101,18 @@ class Client :
                     player.sync_remote_player(data)
 
     def update_status (self) :
-        updated_status = {
-            "id" : self.info["id"],
-            "x" : self.player.x,
-            "y" : self.player.y,
-            "state" : self.player.state,
-            "health" : self.player.health,
-            "direction" : self.player.direction
-        }
+        if self.game.state == "playing" :
+            updated_status = {
+                "id" : self.info["id"],
+                "x" : self.player.x,
+                "y" : self.player.y,
+                "state" : self.player.state,
+                "health" : self.player.health,
+                "direction" : self.player.direction
+            }
         
-        self.status = updated_status
-        self.send(Protocol.Request.MOVE, self.status) 
+            self.status = updated_status
+            self.send(Protocol.Request.MOVE, self.status) 
     def send (self, type, data):
         message = {
             "type" : type ,

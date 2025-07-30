@@ -66,7 +66,7 @@ class Server:
                     self.client_names[client] = nickname
             except :
                 continue
-        
+        print("nickname")
         while client not in self.client_characters :
             self.send(Protocol.Response.SETUP, "Choose character type", client)
             try :
@@ -77,11 +77,11 @@ class Server:
             except :
                 continue
                     
-
+        print("character")
         while client not in self.client_ids:
             id = self.id_generator(client)
             self.send(Protocol.Response.ID, id, client)
-
+        print("id")
         while client not in self.client_modes:
             self.send(Protocol.Response.SETUP, "Choose game mode", client)
             try :
@@ -93,7 +93,7 @@ class Server:
                     self.match_players()
             except:
                 continue
-
+        print("user defined")
     
     def id_generator(self, client):
         with self.id_lock : # Guarantees unique IDs
@@ -155,6 +155,7 @@ class Server:
                 opponents.append(opponent_info)
             self.send(Protocol.Response.OPPONENT, opponents, client)
             self.send(Protocol.Response.START, None, client)
+        print("room created")
 
     def wait_for_room(self, client):
         while client not in self.rooms :
