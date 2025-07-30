@@ -58,11 +58,11 @@ class Client :
                         print("recieved1")
                         if line.get("data") == "Enter your nickname" :
                             print("recieved2")
-                            self.send(Protocol.Request.NICKNAME,self.info["nickname"].encode['utf-8'])
+                            self.send(Protocol.Request.NICKNAME,self.info["nickname"])
                         elif line.get("data") == "Choose character type":
-                            self.send(Protocol.Request.CHAR_TYPE,self.info["character_type"].encode['utf-8'])
+                            self.send(Protocol.Request.CHAR_TYPE,self.info["character_type"])
                         elif line.get("data") == "Choose game mode" :
-                            self.send(Protocol.Request.MATCHMAKING, self.request_type.encode['utf-8'])
+                            self.send(Protocol.Request.MATCHMAKING, self.request_type)
                     elif line.get("type") == Protocol.Response.ID:
                         self.info["id"] = line.get("data")
                         self.status["id"] = line.get("data")
