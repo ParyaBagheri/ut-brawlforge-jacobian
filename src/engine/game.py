@@ -24,6 +24,7 @@ from src.engine.level import Level
 from src.engine import data_loader
 from src.engine.assetmanager import AssetManager
 from src.engine.collectible import Powerup
+from src.engine.client import Client
 
 class Game:
 
@@ -54,6 +55,7 @@ class Game:
         self.state = "main_menu"
         self.mode = "single_player"
         self.player = None
+        self.client = None
         self.other_player = None
         self.powerup_spawn_interval = 10
         self.last_powerup_spawn = time.time()
@@ -316,46 +318,52 @@ class Game:
         CHAR_2 = Button(self, AssetManager.player_images["girl"]["idle"], [3 *self.screen_width//4, self.screen_height//2], "girl", 'OCRAEXT', 40, (117, 96,0), (42, 32, 0))
         CHAR_3 = Button(self, AssetManager.player_images["wizard"]["idle"], [self.screen_width//4, 5 * self.screen_height//6], "wizard","OCRAEXT", 40, (255, 181, 118), (81, 1, 109))
         CHAR_MENU_MOUSE_POS = pygame.mouse.get_pos
+
+        character_type = None
         def char_menu_render():
             CHAR_1.draw(CHAR_MENU_MOUSE_POS())
             CHAR_2.draw(CHAR_MENU_MOUSE_POS())
             CHAR_3.draw(CHAR_MENU_MOUSE_POS())
 
         def char_menu_events():
+            nonlocal character_type
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit
                     sys.exit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if CHAR_1.is_pressed(CHAR_MENU_MOUSE_POS()):
-                        self.player = Player(self, character_type='knight')
+                        
                         if self.mode == "single_player" :
                             self.state = "map_menu"
+                            self.player = Player(self, character_type='knight')
                             
                         elif self.mode == "multiplayer" :
-                            self.other_player = Player(self, 'wizard', 3000)
+                            character_type = "knight"
                             self.level = Level("multiplayer", self, 3200, self.mp_win, self.mp_lose)
-                            self.state = "playing"
+                            self.state = "game_request_menu"
                             
                     elif CHAR_2.is_pressed(CHAR_MENU_MOUSE_POS()):
-                        self.player = Player(self, character_type='girl')
+                        
                         if self.mode == "single_player" :
                             self.state = "map_menu"
+                            self.player = Player(self, character_type='girl')
                             
                         elif self.mode == "multiplayer" :
-                            self.other_player = Player(self, 'knight', 3000)
+                            character_type = "girl"
                             self.level = Level("multiplayer", self, 3200, self.mp_win, self.mp_lose)
-                            self.state = "playing"
+                            self.state = "game_request_menu"
                                                
                     elif CHAR_3.is_pressed(CHAR_MENU_MOUSE_POS()):
-                        self.player = Player(self, character_type='wizard')
+                        
                         if self.mode == "single_player" :
+                            self.player = Player(self, character_type='wizard')
                             self.state = "map_menu"
                             
                         elif self.mode == "multiplayer" :
-                            self.other_player = Player(self, 'girl', 3000)
+                            character_type = "wizard"
                             self.level = Level("multiplayer", self, 3200, self.mp_win, self.mp_lose)
-                            self.state = "playing"
+                            self.state = "game_request_menu"
                             
 
         while self.state == "char_menu":
@@ -363,6 +371,99 @@ class Game:
             char_menu_events()
             pygame.display.flip()
             self.clock.tick(config.FPS)
+        if self.state == "game_request_menu" :
+            self.game_request_menu(character_type)
+
+    def game_request_menu (self, character_type) :
+        background = pygame.image.load(background_path)
+        background = pygame.transform.scale(background, (800,600))
+        self.screen.blit(background, (0,0))
+        request_type = None
+        ONEVONE = Button(self,None, [self.screen_width//4,self.screen_height//2], "1v1",'OCRAEXT', 40, (0, 38, 21), (0, 89, 21))
+        TWOVTWO = Button(self,None, [3 *self.screen_width//4, self.screen_height//2], "2v2", 'OCRAEXT', 40, (117, 96,0), (42, 32, 0))
+        GAME_REQUEST_MOUSE_POS = pygame.mouse.get_pos
+        
+        def game_request_render():
+            ONEVONE.draw(GAME_REQUEST_MOUSE_POS())
+            TWOVTWO.draw(GAME_REQUEST_MOUSE_POS())
+        def game_request_events():
+            for event in pygame.event.get():
+                nonlocal request_type
+                if event.type == pygame.QUIT:
+                    pygame.quit
+                    sys.exit()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if ONEVONE.is_pressed(GAME_REQUEST_MOUSE_POS()):
+                        request_type = "1v1"
+                        self.state = "nickname_menu" 
+                              
+                    elif TWOVTWO.is_pressed(GAME_REQUEST_MOUSE_POS()):
+                        request_type = "2v2"
+                        self.state = "nickname_menu" 
+                        
+                    
+        while self.state == "game_request_menu":
+            game_request_render()       
+            game_request_events()
+            pygame.display.flip()
+            self.clock.tick(config.FPS)
+        if self.state == "nickname_menu" :
+            self.nickname_menu(character_type, request_type)                   
+    def nickname_menu(self,character_type, request_type):
+        
+        nickname = ""
+        while self.state == "nickname_menu" :
+            background = pygame.image.load(background_path)
+            background = pygame.transform.scale(background, (800,600))
+            self.screen.blit(background, (0,0))
+            
+            nickname_menu_font = pygame.font.Font("src/assets/fonts/MinimalPixelFont.ttf",80)
+            nickname_menu_text = nickname_menu_font.render("Enter your nickname!", True, 'indigo')
+            nickname_menu_text_rect = nickname_menu_text.get_rect(center= (self.screen_width // 2, self.screen_height//6))
+            self.screen.blit(nickname_menu_text, nickname_menu_text_rect)
+
+            text_font = pygame.font.Font("src/assets/fonts/OCRAEXT.ttf",50)
+            nickname_text = text_font.render(nickname, True, 'black')
+            text_rect = nickname_text.get_rect(center=(400,300)) 
+            self.screen.blit(nickname_text,text_rect) 
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit
+                    sys.exit()
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_RETURN :
+                        self.state = "waiting" 
+                        #self.client =  Client(self, nickname, character_type,request_type)
+                        #self.client.start()
+                        break
+                    elif event.key == pygame.K_BACKSPACE :
+                        nickname = nickname[:-1]
+                    else: 
+                        nickname += event.unicode
+            
+            pygame.display.flip()
+            self.clock.tick(config.FPS)
+
+        if self.state == "waiting" :
+            self.waiting_room()
+
+    def waiting_room (self):
+        background = pygame.image.load(background_path)
+        background = pygame.transform.scale(background, (800,600))
+        self.screen.blit(background, (0,0))
+        waiting_font = pygame.font.Font("src/assets/fonts/MinimalPixelFont.ttf",80)
+        waiting_text = waiting_font.render("waiting", True, 'indigo')
+        waiting_text_rect = waiting_text.get_rect(center= (self.screen_width // 2, self.screen_height//2))
+        self.screen.blit(waiting_text, waiting_text_rect)
+        while self.state == "waiting" :
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit
+                    sys.exit()
+            pygame.display.flip()
+            self.clock.tick(config.FPS)
+
 
     def forest_win(self):
         if self.player.rect.x >= 3200 :

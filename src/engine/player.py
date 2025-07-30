@@ -223,7 +223,8 @@ class Player:
             self.check_horizontal_collision(platforms)
             if enemies : self.check_enemy_collision(enemies)
             self.check_powerup_collision(powerups)
-
+            if self.game.mode == "multiplayer":
+                self.check_bullet_collision()
 
             # Temporary flickering after collision with an enemy
             if self.is_invincible :
@@ -380,6 +381,7 @@ class Player:
             self.health = updated_status["health"]
             self.direction = updated_status["direction"]
             #self.check_powerup_collision(self.game.level.powerups)
+            self.check_bullet_collision()
             # Shoot
             if (self.current_frame >= config.SHOOT_FRAME[self.weapon]  and 
             self.current_frame < config.SHOOT_FRAME[self.weapon] + config.PLAYER_FRAMES_SPEED and 
@@ -403,4 +405,15 @@ class Player:
         if self.attack_sound :
             self.sound_effects["attack"].play()
             self.attack_sound = False
-            
+    def check_bullet_collision(self) : 
+        for bullet in self.game.Fired_bullets_list :
+            if isinstance(bullet,Bullet)  :
+                if (self.rect.x >= bullet.rect.left and 
+                self.rect.x <= bullet.rect.right and 
+                self.rect.y >= bullet.rect.top and 
+                self.rect.y <= bullet.rect.bottom and bullet.player != self):
+                    self.health -= bullet.damage
+                    self.damage_sound = True
+                    self.game.Fired_bullets_list.remove(bullet)
+
+                       
