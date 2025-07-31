@@ -4,7 +4,7 @@ from .protocols import Protocol
 from .platform import Platform
 from threading import Lock
 
-HOST = '0.0.0.0'
+HOST = '192.168.1.38'
 PORT = 55555
 
 class Server:
@@ -48,6 +48,7 @@ class Server:
                 data = client.recv(1024).decode("utf-8")
                 if not data :
                     break
+                data.rstrip('\n')
                 message = json.loads(data)
                 print(message)
                 self.handle_recieve(message, client)
@@ -61,7 +62,9 @@ class Server:
         while client not in self.client_names:
             self.send(Protocol.Response.SETUP, "Enter your nickname", client )
             try :
-                message = json.loads(client.recv(1024).decode("utf-8"))
+                line = client.recv(1024).decode("utf-8")
+                line = line.rstrip('\n')
+                message = json.loads(line)
                 if message.get("type") == Protocol.Request.NICKNAME:
                     nickname = message.get("data")
                     self.client_names[client] = nickname
@@ -72,7 +75,9 @@ class Server:
         while client not in self.client_characters :
             self.send(Protocol.Response.SETUP, "Choose character type", client)
             try :
-                message = json.loads(client.recv(1024).decode("utf-8"))
+                line = client.recv(1024).decode("utf-8")
+                line = line.rstrip('\n')
+                message = json.loads(line)
                 if message.get("type") == Protocol.Request.CHAR_TYPE :
                     char_type = message.get("data")
                     self.client_characters[client] = char_type
@@ -89,7 +94,9 @@ class Server:
         while client not in self.client_modes:
             self.send(Protocol.Response.SETUP, "Choose game mode", client)
             try :
-                message = json.loads(client.recv(1024).decode("utf-8"))
+                line = client.recv(1024).decode("utf-8")
+                line = line.rstrip('\n')
+                message = json.loads(line)
                 if message.get("type") == Protocol.Request.MATCHMAKING :
                     mode = message.get("data")
                     self.client_modes[client] = mode
@@ -164,7 +171,7 @@ class Server:
                     except Exception as e:
                         print(f"[ERROR getting opponent info]: {e}")
             self.send(Protocol.Response.OPPONENT, opponents, client)
-            self.send(Protocol.Response.START, None, client)
+            self.send(Protocol.Response.START, "", client)
         print("room created and start protocol sent")
 
     def wait_for_room(self, client):
@@ -179,7 +186,7 @@ class Server:
         if room :
             if r_type == Protocol.Request.MOVE:
                 room.update_player_states(client, data)
-                self.broadcast(Protocol.Response.UPDATE, {"client" : self.client_names[client], "data": data}, client)
+                self.broadcast(Protocol.Response.UPDATE, data, client)
             elif r_type == Protocol.Request.POWERUP :
                 if data in room.pending_powerups:
                     room.register_powerup(data)

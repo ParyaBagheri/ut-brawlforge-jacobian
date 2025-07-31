@@ -56,7 +56,7 @@ class Game:
         self.mode = "single_player"
         self.player = None
         self.client = None
-        self.other_player = None
+        self.other_players = []
         self.powerup_spawn_interval = 10
         self.last_powerup_spawn = time.time()
 
@@ -99,13 +99,15 @@ class Game:
             self.clock.tick(config.FPS)
 
     def mp_win(self):
-        if self.other_player :
-            if self.other_player.health == 0:
-                return True
-        return False
+        if self.other_players :
+            for player in self.other_players :
+                if not player.is_dead:
+                    return False
+        if not self.player.is_dead :
+            return True
     def mp_lose(self):
         if self.player :
-            if self.player.health == 0 :
+            if self.player.health <= 0 :
                 return True
         return False
     def how_to_play(self) :
@@ -765,14 +767,6 @@ class Game:
             for bullet in self.Fired_bullets_list :
                 if isinstance(bullet, Bullet) :
                     bullet.update()
-            if self.mode == "multiplayer" :
-                for bullet in self.Fired_bullets_list:
-                    if isinstance(bullet, Bullet) and self.other_player:
-                        if bullet.owner == self.player and bullet.rect.colliderect(self.other_player.rect):
-                            if not self.other_player.is_invincible:
-                                self.other_player.health -= bullet.damage
-                                self.other_player.is_invincible = True
-                                bullet.visible = False
 
             # Remove dead enemies and spawn new ones
             if self.enemies :
@@ -829,8 +823,10 @@ class Game:
                 self.screen.blit( pygame.transform.flip(self.player.image,True,False), (self.player.rect.x - self.camera_x, self.player.rect.y))
             else :
                 self.screen.blit( self.player.image, (self.player.rect.x - self.camera_x, self.player.rect.y))
-        if self.other_player :
-            self.screen.blit(self.other_player.image, (self.other_player.rect.x - self.camera_x, self.player.rect.y))
+        if self.other_players :
+            for player in self.other_players :
+                if isinstance(player, Player):
+                    self.screen.blit(player.image, (player.rect.x - self.camera_x, player.rect.y))
 
         # Draw all fired bullets with camera offset
         for bullet in self.Fired_bullets_list :
@@ -879,9 +875,11 @@ class Game:
         if self.player.health >= 0:
             for i in range(0,self.player.health):
                 self.screen.blit(heart, (40 + 30*i , 60))
-        if self.other_player:
-            other_health_display = font2.render("Enemy: " + str(self.other_player.health), True, 'red')
-            self.screen.blit(other_health_display, (20, 80))
+        if self.other_players :
+            for player in self.other_players:
+                if isinstance(player, Player):
+                    other_health_display = font2.render("Enemy: " + str(player.health), True, 'red')
+                    self.screen.blit(other_health_display, (20, 80))
                 
     def gameover(self):
         self.state = "gameover"

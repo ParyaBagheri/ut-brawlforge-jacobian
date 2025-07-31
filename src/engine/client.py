@@ -1,20 +1,21 @@
 import socket
 import threading
 import json
-
+import config
+import traceback
 from src.engine.player import Player
 from src.engine.protocols import Protocol 
 class Client :
     def __init__(self,game, nickname,character_type,request_type):
-        self.host = '192.168.1.204'
+        self.host = '192.168.1.38'
         self.port = 55555
         self.status = {
             # Data sent periodically to update this player's state and position
             "id" : None,
             "x" : None,
-            "y" : None,
+            "y" : 0,
             "state" : None,
-            "health": None,
+            "health": config.MAX_PLAYER_HEALTH,
             "direction" : None
         }
         self.info = {
@@ -28,30 +29,34 @@ class Client :
         self.team = None
         self.player = None
         self.game = game
-        self.other_players = {}
+        self.other_players = []
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.buffer = ""
+        self.is_connected = False
         
     def start (self):
-        self.socket.connect((self.host,self.port))
-        receive_thread = threading.Thread(target=self.recieve)
+        try:
+            self.socket.connect((self.host,self.port))
+            self.is_connected = True
+        except:
+            print("connection error")
+            return
+        recieve_thread = threading.Thread(target=self.recieve)
         update_thread = threading.Thread(target=self.update_status)
-        receive_thread.start()
+        recieve_thread.start()
         update_thread.start()
+   
+
 
     def recieve(self):
-        buffer = ""
-        while True :
-            buffer = ""
+        while self.is_connected :  
             try : 
                 chunck = self.socket.recv(1024).decode('utf-8')
-                if not chunck :
-                    #disconnected
-                    self.socket.close()
-                    break
-                buffer += chunck
-                while '\n' in buffer :
+                
+                self.buffer += chunck
+                while '\n' in self.buffer :
                     print("recieved")
-                    line,buffer = buffer.split('\n', 1)
+                    line,self.buffer = self.buffer.split('\n', 1)
                     line = json.loads(line)
                     
                     if line.get("type") == Protocol.Response.SETUP :
@@ -66,55 +71,62 @@ class Client :
                     elif line.get("type") == Protocol.Response.ID:
                         self.info["id"] = line.get("data")
                         self.status["id"] = line.get("data")
-                        self.player = Player(self.game, self.info["character_type"], self.info["id"],self.info["nickname"])
+                        self.player = Player(self.game, self.info["character_type"],100, self.info["id"],self.info["nickname"])
                         self.game.player = self.player
                     elif line.get("type") == Protocol.Response.START :
-                        print("start response recieved from server")
                         self.game.state = "playing"
+                        print ("recieved start")
                     elif line.get("type") == Protocol.Response.UPDATE :
                         self.update_other_players (line.get("data"))
                     elif line.get("type") == Protocol.Response.OPPONENT :
-                        self.other_players = line.get("data")
+                        self.add_other_players( line.get("data"))
+                        print ("other player func")
                     elif line.get("type") == Protocol.Response.POWERUP_SPAWNED :
                         self.game.level.powerups = line.get("data")
-
-            except:
+            except Exception as e:
+                print("closed",e)
+                traceback.print_exc()
+                self.is_connected = False
                 self.socket.close()
-                break
+                return
 
-    '''def add_new_player (self, other_players_info):
-        
-        # Add new players to the client's player_list 
-        new_players_count = len(other_players_info)
-        for i in range(self.players_count, new_players_count):
-            if other_players_info[i] ["id"]== self.info["id"] :
-                self.other_players[i] = self.player
-            else :
-                new_player_info = other_players_info[i]
-                self.other_players[i] = Player(self.game, new_player_info["character_type"], new_player_info["id"],new_player_info["nickname"])
-        self.players_count = new_players_count -1'''
+    def add_other_players (self, other_players_info):
+        try:
+            # Add new players to the client's player_list 
+            for player_info in other_players_info:
+                self.other_players.append(Player(self.game, player_info["character_type"],100, player_info["id"],player_info["nickname"]))
+            self.game.other_players = self.other_players
+        except:
+            print("error2")
     
     def update_other_players(self,data) :        
         
         # Update position and state of the player with the same id
         for player in self.other_players :
             if isinstance(player, Player) :
-                if player.id == data["id"] :
-                    player.sync_remote_player(data)
+                print("other player update")
+                player.sync_remote_player(data)
 
     def update_status (self) :
-        if self.game.state == "playing" :
-            updated_status = {
-                "id" : self.info["id"],
-                "x" : self.player.x,
-                "y" : self.player.y,
-                "state" : self.player.state,
-                "health" : self.player.health,
-                "direction" : self.player.direction
-            }
-        
-            self.status = updated_status
-            self.send(Protocol.Request.MOVE, self.status) 
+        while self.is_connected :
+            try:
+                if self.game.state == "playing" and self.player != None :
+                    updated_status = {
+                        "id" : self.info["id"],
+                        "x" : self.player.rect.x,
+                        "y" : self.player.rect.y,
+                        "state" : self.player.state,
+                        "health" : self.player.health,
+                        "direction" : self.player.direction
+                    }
+                    if self.status != updated_status :
+                        self.status = updated_status
+                        self.send(Protocol.Request.MOVE, self.status)
+            except Exception as e:
+                print("error3",e) 
+                traceback.print_exc()
+                self.is_connected =False
+                self.socket.close()
     def send (self, type, data):
         message = {
             "type" : type ,

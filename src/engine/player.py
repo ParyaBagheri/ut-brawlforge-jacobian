@@ -153,6 +153,7 @@ class Player:
                         return 
                     elif(enemy.is_collided == False) :
                         self.health -= 1
+                        print ("enemy")
 
                         # playing damage sound when the player is damaged
                         self.damage_sound = True
@@ -218,13 +219,14 @@ class Player:
                 elif collided_platform.type == 'spikey' and self.is_invincible == False :
                     self.damage_sound = True
                     self.health -= 1
+                    print("spikey")
                     self.is_invincible = True
 
             self.check_horizontal_collision(platforms)
             if enemies : self.check_enemy_collision(enemies)
             self.check_powerup_collision(powerups)
-            if self.game.mode == "multiplayer":
-                self.check_bullet_collision()
+            #if self.game.mode == "multiplayer":
+            self.check_bullet_collision()
 
             # Temporary flickering after collision with an enemy
             if self.is_invincible :
@@ -370,7 +372,7 @@ class Player:
 
         # Create a new bullet that will follow the player (for next shot)
         self.held_bullet = Bullet(self, self.held_bullet.type)
-        self.held_bullet.owner = self
+        #self.held_bullet.owner = self
 
     def sync_remote_players (self, updated_status) :
         prev_state = self.state
