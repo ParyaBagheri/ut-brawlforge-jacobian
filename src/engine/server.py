@@ -165,25 +165,25 @@ class Server:
         r_type = message.get("type")
         data = message.get("data")
         room = self.rooms.get(client)
+        if room :
+            if r_type == Protocol.Request.MOVE:
+                room.update_player_states(client, data)
+                self.broadcast(Protocol.Response.UPDATE, {"client" : self.client_names[client], "data": data}, client)
+            elif r_type == Protocol.Request.POWERUP :
+                if data in room.pending_powerups:
+                    room.register_powerup(data)
+                    room.pending_powerups.remove(data)
+                    self.broadcast(Protocol.Response.POWERUP_PICKED, data, client)
 
-        if r_type == Protocol.Request.MOVE:
-            room.update_player_states(client, data)
-            self.broadcast(Protocol.Response.UPDATE, {"client" : self.client_names[client], "data": data}, client)
-        elif r_type == Protocol.Request.POWERUP :
-            if data in room.pending_powerups:
-                room.register_powerup(data)
-                room.pending_powerups.remove(data)
-                self.broadcast(Protocol.Response.POWERUP_PICKED, data, client)
+            if room.is_finished():
+                loser = room.losing_team
+                winner = [t for t in room.team_health if t != loser][0]
 
-        if room.is_finished():
-            loser = room.losing_team
-            winner = [t for t in room.team_health if t != loser][0]
-
-            for c in room.clients :
-                if self.teams[c] == winner :
-                    self.send(Protocol.Response.WINNER, None, c)
-                else :
-                    self.send(Protocol.Response.LOSER, None, c)
+                for c in room.clients :
+                    if self.teams[c] == winner :
+                        self.send(Protocol.Response.WINNER, None, c)
+                    else :
+                        self.send(Protocol.Response.LOSER, None, c)
 
     def send(self, r_type, data, client):
         try :
@@ -194,9 +194,10 @@ class Server:
 
     def broadcast(self, r_type, data, sender):
         room = self.rooms.get(sender)
-        for client in room.clients :
-            if client != sender:
-                self.send(r_type, data, client)
+        if room :
+            for client in room.clients :
+                if client != sender:
+                    self.send(r_type, data, client)
     
     def disconnect(self, client):
         room = self.rooms.get(client)
