@@ -4,7 +4,7 @@ from .protocols import Protocol
 from .platform import Platform
 from threading import Lock
 
-HOST = '192.168.1.38'
+HOST = '0.0.0.0'
 PORT = 55555
 
 class Server:
@@ -49,6 +49,7 @@ class Server:
                 if not data :
                     break
                 message = json.loads(data)
+                print(message)
                 self.handle_recieve(message, client)
             except :
                 break
@@ -64,6 +65,7 @@ class Server:
                 if message.get("type") == Protocol.Request.NICKNAME:
                     nickname = message.get("data")
                     self.client_names[client] = nickname
+                    print(message)
             except :
                 continue
         print("nickname")
@@ -74,12 +76,14 @@ class Server:
                 if message.get("type") == Protocol.Request.CHAR_TYPE :
                     char_type = message.get("data")
                     self.client_characters[client] = char_type
+                    print(message)
             except :
                 continue
                     
         print("character")
         while client not in self.client_ids:
             id = self.id_generator(client)
+            print(id)
             self.send(Protocol.Response.ID, id, client)
         print("id")
         while client not in self.client_modes:
@@ -121,6 +125,7 @@ class Server:
             modes[mode].append(client)
         for mode, queue in modes.items():
             if mode == "1v1" and len(queue) >= 2 :
+                print("matched")
                 self.create_room(queue[:2])
                 remaining_clients = []
                 for pair in self.waiting_clients :
@@ -137,6 +142,7 @@ class Server:
                 self.waiting_clients = remaining_clients
     
     def create_room(self, clients):
+        print("creato room func")
         team_ids = [1,2] * (len(clients)//2)
         teams = dict(zip(clients, team_ids))
         room = Room(clients, teams)
@@ -147,18 +153,23 @@ class Server:
             opponents = []
             for c in clients :
                 if c != client :
-                    opponent_info = {
-                        "id" : self.client_ids[c],
-                        "nickname" : self.client_names[c],
-                        "character_type" : self.client_characters[c]
-                    }
-                opponents.append(opponent_info)
+                    try :
+                        opponent_info = {
+                            "id" : self.client_ids[c],
+                            "nickname" : self.client_names[c],
+                            "character_type" : self.client_characters[c]
+                        }
+                        print(opponent_info)
+                        opponents.append(opponent_info)
+                    except Exception as e:
+                        print(f"[ERROR getting opponent info]: {e}")
             self.send(Protocol.Response.OPPONENT, opponents, client)
             self.send(Protocol.Response.START, None, client)
-        print("room created")
+        print("room created and start protocol sent")
 
     def wait_for_room(self, client):
         while client not in self.rooms :
+            print("waiting for room")
             time.sleep(3)
 
     def handle_recieve(self, message, client):
@@ -189,8 +200,8 @@ class Server:
         try :
             messege = {"type" : r_type, "data" : data}
             client.send((json.dumps(messege) + "\n").encode("utf-8"))
-        except :
-            pass
+        except Exception as e:
+            print(f"[SEND ERROR]: {e}")
 
     def broadcast(self, r_type, data, sender):
         room = self.rooms.get(sender)

@@ -6,7 +6,7 @@ from src.engine.player import Player
 from src.engine.protocols import Protocol 
 class Client :
     def __init__(self,game, nickname,character_type,request_type):
-        self.host = '192.168.1.38'
+        self.host = '192.168.1.204'
         self.port = 55555
         self.status = {
             # Data sent periodically to update this player's state and position
@@ -67,7 +67,9 @@ class Client :
                         self.info["id"] = line.get("data")
                         self.status["id"] = line.get("data")
                         self.player = Player(self.game, self.info["character_type"], self.info["id"],self.info["nickname"])
+                        self.game.player = self.player
                     elif line.get("type") == Protocol.Response.START :
+                        print("start response recieved from server")
                         self.game.state = "playing"
                     elif line.get("type") == Protocol.Response.UPDATE :
                         self.update_other_players (line.get("data"))
