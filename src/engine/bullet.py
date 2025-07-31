@@ -20,7 +20,7 @@ class Bullet :
         self.image = self.asset [self.current_frame]
 
         self.player = player # Reference to the player who shot this bullet
-        
+        self.player_collision = False
         self.is_fired = False
         self.game = self.player.game 
         self.damage = config.BULLET_DAMAGE
@@ -64,7 +64,7 @@ class Bullet :
             self.rect.x += self.changex 
 
             # Check for collisions, remove if hit something
-            if self.check_platform_collision() or self.check_enemy_collision() :
+            if self.check_platform_collision() or self.check_enemy_collision() or self.player_collision:
                 self.game.Fired_bullets_list.remove(self)
     
         else :

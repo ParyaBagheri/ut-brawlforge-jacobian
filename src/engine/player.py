@@ -39,6 +39,7 @@ class Player:
         # images
         self.character_type = character_type
         self.state = "idle" 
+        self.prev_state = "nothing"
         self.assets = AssetManager.player_images[character_type]
         self.current_frame = 0
         self.image = self.assets[self.state][self.current_frame]
@@ -225,8 +226,8 @@ class Player:
             self.check_horizontal_collision(platforms)
             if enemies : self.check_enemy_collision(enemies)
             self.check_powerup_collision(powerups)
-            #if self.game.mode == "multiplayer":
-            self.check_bullet_collision()
+            if self.game.mode == "multiplayer":
+                self.check_bullet_collision()
 
             # Temporary flickering after collision with an enemy
             if self.is_invincible :
@@ -375,25 +376,43 @@ class Player:
         #self.held_bullet.owner = self
 
     def sync_remote_player (self, updated_status) :
-        prev_state = self.state
+        self.prev_state = self.state
+        self.rect.x =  updated_status["x"]
+        self.rect.y =  updated_status["y"]
+        self.state = updated_status["state"]
+        self.health = updated_status["health"]
+        self.direction = updated_status["direction"]
+    def update_remote_player(self):
         if self.state != "die":
-            self.rect.x =  updated_status["x"]
-            self.rect.y =  updated_status["y"]
-            self.state = updated_status["state"]
-            self.health = updated_status["health"]
-            self.direction = updated_status["direction"]
+            
             #self.check_powerup_collision(self.game.level.powerups)
             self.check_bullet_collision()
+            if self.is_invincible :
+                self.invincibility_timer += 1
+                if self.invincibility_timer % 15 < 8 :
+                    self.visible = True
+                else :
+                    self.visible = False
+                if self.shield_activated and self.invincibility_timer >= 180:
+                    self.is_invincible = False
+                    self.shield_activated = False
+                elif self.shield_activated == False and self.invincibility_timer >= 50 :
+                    self.is_invincible = False
+            else :
+                self.visible = True
+                self.invincibility_timer = 0
+            
             # Shoot
             if (self.current_frame >= config.SHOOT_FRAME[self.weapon]  and 
             self.current_frame < config.SHOOT_FRAME[self.weapon] + config.PLAYER_FRAMES_SPEED and 
             self.state == "attack") :
                 self.attack_sound = True
                 self.shoot()
+
         if not self.is_dead :
-            self.remote_players_animation_update(prev_state)
-    def remote_players_animation_update (self, prev_state) :
-        if self.state !=  prev_state :
+            self.remote_players_animation_update()
+    def remote_players_animation_update (self) :
+        if self.state !=  self.prev_state :
             self.current_frame = 0 
         if self.state == "die" and self.current_frame >= len(self.assets [self.state]) - (3 * config.PLAYER_FRAMES_SPEED) :
             self.is_dead = True
@@ -402,8 +421,8 @@ class Player:
         self.current_frame += config.PLAYER_FRAMES_SPEED
         if(self.current_frame >= len(self.assets[self.state])) :
             self.current_frame = 0
-        self.remote_players_sound_manager(prev_state)
-    def remote_players_sound_manager(self,prev_state) :
+        self.remote_players_sound_manager()
+    def remote_players_sound_manager(self) :
         if self.attack_sound :
             self.sound_effects["attack"].play()
             self.attack_sound = False
@@ -414,8 +433,9 @@ class Player:
                 self.rect.x <= bullet.rect.right and 
                 self.rect.y >= bullet.rect.top and 
                 self.rect.y <= bullet.rect.bottom and bullet.player != self):
-                    self.health -= bullet.damage
                     self.damage_sound = True
-                    self.game.Fired_bullets_list.remove(bullet)
+                    bullet.player_collision = True
+                    self.is_invincible = True
+
 
                        
