@@ -374,11 +374,11 @@ class Player:
         self.held_bullet = Bullet(self, self.held_bullet.type)
         #self.held_bullet.owner = self
 
-    def sync_remote_players (self, updated_status) :
+    def sync_remote_player (self, updated_status) :
         prev_state = self.state
         if self.state != "die":
-            self.x =  updated_status["x"]
-            self.y =  updated_status["y"]
+            self.rect.x =  updated_status["x"]
+            self.rect.y =  updated_status["y"]
             self.state = updated_status["state"]
             self.health = updated_status["health"]
             self.direction = updated_status["direction"]

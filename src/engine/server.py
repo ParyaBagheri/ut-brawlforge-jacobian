@@ -1,4 +1,4 @@
-import socket, threading, json, time, random
+import socket, threading, json, time, random,traceback
 from .room import Room
 from .protocols import Protocol
 from .platform import Platform
@@ -31,15 +31,16 @@ class Server:
         self.start_powerup_spawner()
         try :
             while True :
+                buffer = ""
                 client, address = self.server.accept()
                 print(f"connected with {address}")
-                thread = threading.Thread(target=self.handle, args=(client,))
+                thread = threading.Thread(target=self.handle, args=(client,buffer,))
                 thread.start()
         except KeyboardInterrupt:
             print("Shutting down server")
             self.server.close()
     
-    def handle(self, client):
+    def handle(self, client,buffer):
         self.handle_connect(client)
         self.wait_for_room(client)
 
@@ -48,11 +49,15 @@ class Server:
                 data = client.recv(1024).decode("utf-8")
                 if not data :
                     break
-                data.rstrip('\n')
-                message = json.loads(data)
-                print(message)
-                self.handle_recieve(message, client)
-            except :
+                buffer += data
+                while '\n' in buffer :
+                    line,buffer = buffer.split('\n',1)
+                    message = json.loads(line)
+                    print(message)
+                    self.handle_recieve(message, client)
+            except Exception as e:
+                print("????",e)
+                traceback.print_exc()
                 break
         
         self.broadcast(Protocol.Response.OPPONENT_LEFT, None, client)
@@ -185,7 +190,7 @@ class Server:
         room = self.rooms.get(client)
         if room :
             if r_type == Protocol.Request.MOVE:
-                room.update_player_states(client, data)
+                room.update_player_state(client, data)
                 self.broadcast(Protocol.Response.UPDATE, data, client)
             elif r_type == Protocol.Request.POWERUP :
                 if data in room.pending_powerups:
