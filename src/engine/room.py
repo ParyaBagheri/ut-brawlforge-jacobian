@@ -2,7 +2,7 @@ import random
 from .platform import Platform
 from .assetmanager import AssetManager
 import config
-'''platforms = [
+platforms = [
     Platform(None,0, 600 - config.BASE_GROUND_HEIGHT, 3200, config.BASE_GROUND_HEIGHT, 'solid'),
     Platform(None,304, 384, 160, 24, 'solid' ),
     Platform(None,600, 304, 192, 40, 'solid'),
@@ -20,7 +20,7 @@ import config
     Platform(None,3000, 100, 100, 20, 'timed'),
     Platform(None,3112, 248, 88, 72, 'solid'), #Finish platform
     Platform(None,3050, 560 - config.BASE_GROUND_HEIGHT, 50, 40, 'bouncy')
-]'''
+]
 
 class Room:
     def __init__(self, clients, teams):
@@ -53,7 +53,6 @@ class Room:
     def spawn_random_powerup(self):
         powerup_types = ['shield', 'doublejump', 'damageboost', 'health']
         p_type = random.choice(powerup_types)
-        platforms = self.clients[0].game.level.platforms
         valid_platforms = [p for p in platforms if isinstance(p, Platform) and p.visible]
         if not valid_platforms:
             return

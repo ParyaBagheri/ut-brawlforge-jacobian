@@ -6,19 +6,21 @@ class Platform(pygame.sprite.Sprite):
     def __init__(self,game, x, y, width, height, type='solid', is_solid=True, image=None):
         super().__init__()
         self.game = game
+        if game == None :
+            self.is_real = False
+        else :
+            self.is_real = True
         self.x = x
         self.y = y
         self.width = width
         self.height = height
 
-        if type == 'bouncy' :
+        if type == 'bouncy' and self.is_real:
             self.image = AssetManager.platform_images["bouncy"][0]
-        if type == 'timed' :
+        if type == 'timed' and self.is_real:
             self.image = AssetManager.platform_images["timed"]
         if image:
             self.image = pygame.transform.scale(image,(width,height))
-        
-
         else:
             self.image = pygame.Surface((width, height))
             #self.image.fill(color)
@@ -42,7 +44,7 @@ class Platform(pygame.sprite.Sprite):
 
     def draw(self, screen, camera_x):
         # Draw platform with camera offset
-        if self.visible :
+        if self.visible and self.is_real:
             pos_x = self.rect.x - camera_x
             pos_y = self.rect.y
             if self.bounce_animation :
