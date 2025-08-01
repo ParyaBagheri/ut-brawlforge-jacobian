@@ -830,8 +830,10 @@ class Game:
         if self.other_players :
             for player in self.other_players :
                 if isinstance(player, Player):
-                    self.screen.blit(player.image, (player.rect.x - self.camera_x, player.rect.y))
-
+                    if player.direction == "left" :
+                        self.screen.blit(pygame.transform.flip(player.image,True,False), (player.rect.x - self.camera_x, player.rect.y))
+                    else :
+                        self.screen.blit(player.image, (player.rect.x - self.camera_x, player.rect.y))
         # Draw all fired bullets with camera offset
         for bullet in self.Fired_bullets_list :
             if isinstance(bullet, Bullet) :

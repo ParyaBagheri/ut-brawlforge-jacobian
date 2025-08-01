@@ -68,6 +68,7 @@ class Player:
         # MULTIPLAYER
         self.id = id
         self.nickname = nickname
+        self.main = True
 
     def check_vertical_collision(self, platforms):
         landed_on = None
@@ -376,6 +377,7 @@ class Player:
         #self.held_bullet.owner = self
 
     def sync_remote_player (self, updated_status) :
+        self.main = False
         self.prev_state = self.state
         self.rect.x =  updated_status["x"]
         self.rect.y =  updated_status["y"]
@@ -408,7 +410,7 @@ class Player:
             self.state == "attack") :
                 self.attack_sound = True
                 self.shoot()
-
+            self.held_bullet.update()
         if not self.is_dead :
             self.remote_players_animation_update()
     def remote_players_animation_update (self) :
@@ -416,11 +418,10 @@ class Player:
             self.current_frame = 0 
         if self.state == "die" and self.current_frame >= len(self.assets [self.state]) - (3 * config.PLAYER_FRAMES_SPEED) :
             self.is_dead = True
-        self.image = self.assets[self.state][int(self.current_frame)]
-
         self.current_frame += config.PLAYER_FRAMES_SPEED
         if(self.current_frame >= len(self.assets[self.state])) :
             self.current_frame = 0
+        self.image = self.assets[self.state][int(self.current_frame)]
         self.remote_players_sound_manager()
     def remote_players_sound_manager(self) :
         if self.attack_sound :
@@ -429,13 +430,11 @@ class Player:
     def check_bullet_collision(self) : 
         for bullet in self.game.Fired_bullets_list :
             if isinstance(bullet,Bullet)  :
-                if (self.rect.x >= bullet.rect.left and 
-                self.rect.x <= bullet.rect.right and 
-                self.rect.y >= bullet.rect.top and 
-                self.rect.y <= bullet.rect.bottom and bullet.player != self):
-                    self.damage_sound = True
+                if self.rect.colliderect(bullet.rect) and bullet.player != self:
+
                     bullet.player_collision = True
-                    self.is_invincible = True
+                    if self.main :
+                        self.health -= bullet.damage
 
 
                        
