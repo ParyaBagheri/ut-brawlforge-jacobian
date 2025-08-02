@@ -4,7 +4,7 @@ from .protocols import Protocol
 from .platform import Platform
 from threading import Lock
 
-HOST = '192.168.1.38'
+HOST = '192.168.1.204'
 PORT = 55555
 
 class Server:
@@ -53,7 +53,6 @@ class Server:
                 while '\n' in buffer :
                     line,buffer = buffer.split('\n',1)
                     message = json.loads(line)
-                    print(message)
                     self.handle_recieve(message, client)
             except Exception as e:
                 print("????",e)
@@ -122,12 +121,14 @@ class Server:
     def start_powerup_spawner(self):
         def spawner_loop():
             while True : 
-                time.sleep(1)
+                time.sleep(3)
                 for room in set(self.rooms.values()):
                     powerup_data = room.spawn_random_powerup()
                     if powerup_data :
                         room.pending_powerups.append(powerup_data)
-                        self.broadcast(Protocol.Response.POWERUP_SPAWNED, powerup_data, sender=None)
+                        #self.broadcast(Protocol.Response.POWERUP_SPAWNED, powerup_data, sender=None)
+                        for client in room.clients:
+                            self.send(Protocol.Response.POWERUP_SPAWNED, powerup_data, client)
         thread = threading.Thread(target= spawner_loop, daemon=True)
         thread.start()
 
