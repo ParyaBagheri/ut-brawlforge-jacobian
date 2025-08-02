@@ -7,6 +7,7 @@ class Protocol :
         SHOOT = "request.shoot"
         HIT = "request.hit"
         POWERUP = "request.powerup"
+        KILL_POWERUP = "request.kill_powerup"
         LEAVE = "request.leave"
     class Response :
         SETUP = "response.setup"

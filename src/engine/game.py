@@ -616,7 +616,7 @@ class Game:
             self.ground_rect
         ]
         return platforms
-    def spawn_random_powerup(self):
+    '''def spawn_random_powerup(self):
         powerup_types = ['shield', 'doublejump', 'damageboost', 'health']
         p_type = random.choice(powerup_types)
 
@@ -629,7 +629,17 @@ class Game:
         y = platform.rect.top - 50
 
         new_powerup = Powerup(self, x, y, p_type)
+        self.level.powerup_group.add(new_powerup)'''
+    def powerup_spawner(self, data):
+        new_powerup = Powerup(self, data["x"], data["y"], data["type"])
         self.level.powerup_group.add(new_powerup)
+        self.level.powerups.append(new_powerup)
+    def powerup_killer(self, data):
+        for powerup in self.level.powerup_group:
+            if powerup.x == data["x"] and powerup.y == data["y"] and powerup.type == data["type"]:
+                powerup.kill()
+                self.level.powerups.remove(powerup)
+
 
     def update_dimensions(self):
         # Update screen and ground dimensions based on current window size
@@ -782,14 +792,14 @@ class Game:
 
             # spawning random powerups :
             if self.mode == "multiplayer":
-                current_time = time.time()
+                '''current_time = time.time()
                 if current_time - self.last_powerup_spawn > self.powerup_spawn_interval:
                     self.spawn_random_powerup()
-                    self.last_powerup_spawn = current_time
+                    self.last_powerup_spawn = current_time'''
                 for powerup in self.level.powerup_group :
                     powerup.update()
 
-            for powerup in self.level.powerups :
+            for powerup in self.level.powerup_group :
                 powerup.update()
 
 

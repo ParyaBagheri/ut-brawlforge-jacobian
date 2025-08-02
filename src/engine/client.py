@@ -7,7 +7,7 @@ from src.engine.player import Player
 from src.engine.protocols import Protocol 
 class Client :
     def __init__(self,game, nickname,character_type,request_type):
-        self.host = '192.168.1.38'
+        self.host = '192.168.1.204'
         self.port = 55555
         self.status = {
             # Data sent periodically to update this player's state and position
@@ -82,7 +82,9 @@ class Client :
                         self.add_other_players( line.get("data"))
                         print ("other player func")
                     elif line.get("type") == Protocol.Response.POWERUP_SPAWNED :
-                        self.game.level.powerups = line.get("data")
+                        self.game.powerup_spawner(line.get("data"))
+                    elif line.get("type") == Protocol.Response.POWERUP_PICKED :
+                        self.game.powerup_killer(line.get("data"))
             except Exception as e:
                 print("closed",e)
                 traceback.print_exc()

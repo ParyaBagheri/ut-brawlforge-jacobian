@@ -181,6 +181,7 @@ class Player:
                     self.health += 1
                     powerup.visible = False
                 powerup.kill()
+                self.game.level.powerups.remove(powerup)
                 
 
     def update(self, platforms, powerups, enemies=None):
@@ -387,7 +388,7 @@ class Player:
     def update_remote_player(self):
         if self.state != "die":
             
-            #self.check_powerup_collision(self.game.level.powerups)
+            self.check_powerup_collision(self.game.level.powerups)
             self.check_bullet_collision()
             if self.is_invincible :
                 self.invincibility_timer += 1
