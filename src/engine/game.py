@@ -108,7 +108,7 @@ class Game:
             return True
     def mp_lose(self):
         if self.player :
-            if self.player.health <= 0 :
+            if self.player.is_dead :
                 return True
         return False
     def how_to_play(self) :
@@ -773,7 +773,10 @@ class Game:
                 self.client.update_status()
                 for player in self.other_players :
                     if isinstance(player,Player):
-                        player.update_remote_player()
+                        if player.is_dead :
+                            self.other_players.remove(player)
+                        else :
+                            player.update_remote_player()
             self.update_camera()
 
             for platform in self.level.platforms :
@@ -846,7 +849,7 @@ class Game:
         if self.other_players :
             self.display_nicknames()
             for player in self.other_players :
-                if isinstance(player, Player):
+                if isinstance(player, Player) :
                     if player.direction == "left" :
                         self.screen.blit(pygame.transform.flip(player.image,True,False), (player.rect.x - self.camera_x, player.rect.y))
                     else :
