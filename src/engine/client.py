@@ -8,7 +8,7 @@ from src.engine.protocols import Protocol
 class Client :
     def __init__(self,game, nickname,character_type,request_type):
         self.host = '192.168.1.175'
-        self.port = 55555
+        self.port = 7337
         self.status = {
             # Data sent periodically to update this player's state and position
             "id" : None,
@@ -39,6 +39,8 @@ class Client :
         try:
             self.socket.connect((self.host,self.port))
             self.socket.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY,1)
+            self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, 65536)
+            self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 65536)
             self.is_connected = True
         except KeyboardInterrupt :
             print ("keyboard interrupt")

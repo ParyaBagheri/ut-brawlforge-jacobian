@@ -34,6 +34,8 @@ class Server:
                 buffer = ""
                 client, address = self.server.accept()
                 client.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY,1)
+                client.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, 65536)
+                client.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 65536)
                 print(f"connected with {address}")
                 thread = threading.Thread(target=self.handle, args=(client,buffer,))
                 thread.start()
