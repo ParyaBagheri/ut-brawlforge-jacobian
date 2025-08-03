@@ -39,6 +39,8 @@ class Client :
         try:
             self.socket.connect((self.host,self.port))
             self.socket.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY,1)
+            self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, 65536)
+            self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 65536)
             self.is_connected = True
         except KeyboardInterrupt :
             print ("keyboard interrupt")
