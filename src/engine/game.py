@@ -729,7 +729,10 @@ class Game:
                     if self.state == "map_menu" :
                         self.map_menu()
                     if self.state == "won":
-                        self.finish_menu()
+                        if self.mode == "single_player" :
+                            self.finish_menu()
+                        else :
+                            self.win_screen()
             except KeyboardInterrupt :
                 if self.client != None :
                     self.client.is_connected = False
