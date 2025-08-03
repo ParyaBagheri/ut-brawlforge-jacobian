@@ -8,7 +8,7 @@ from src.engine.protocols import Protocol
 class Client :
     def __init__(self,game, nickname,character_type,request_type):
         self.host = '192.168.1.175'
-        self.port = 55555
+        self.port = 7337
         self.status = {
             # Data sent periodically to update this player's state and position
             "id" : None,
@@ -138,7 +138,8 @@ class Client :
         # Update position and state of the player with the same id
         for player in self.other_players :
             if isinstance(player, Player) :
-                player.sync_remote_player(data)
+                if player.id == data["id"]:
+                    player.sync_remote_player(data)
 
     def update_status (self) :
         if self.is_connected :
