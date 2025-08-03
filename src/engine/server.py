@@ -20,8 +20,10 @@ class Server:
         self.client_characters = {}
         #self.client_ids = []
         self.client_ids = {}
+        self.ids = {}
         self.id_lock = Lock()
-
+        self.client_gamestyles = {}
+        self.client_invites = {}
         self.waiting_clients = []
         self.rooms = {}
         self.teams = {}
@@ -106,17 +108,49 @@ class Server:
                     mode = message.get("data")
                     self.client_modes[client] = mode
                     self.waiting_clients.append((client, mode))
-                    self.match_players()
             except:
                 continue
+        while client not in self.client_gamestyles :
+            self.send(Protocol.Response.GAME_STYLE, "Choose game style", client)
+            try :
+                line = client.recv(1024).decode("utf-8")
+                line = line.rstrip('\n')
+                message = json.loads(line)
+                if message.get("type") == Protocol.Request.LOCAL_GAME :
+                    self.match_players()
+                elif message.get("type") == Protocol.Request.INVITE_GAME :
+                    invitation = {
+                        "sender_id" : self.client_ids[client],
+                        "request_type" : self.client_modes[client],
+                        "nickname" : self.client_names[client]
+                    }
+                    self.client_invites[client] = self.ids[message.get("data")]
+                    self.send(Protocol.Response.SEND_INVITE, invitation, self.ids[message.get("data")])
+            except :
+                print("error setting the game style")
+        while client not in self.rooms :
+            try :
+                line = client.recv(1024).decode("utf-8")
+                line = line.rstrip('\n')
+                message = json.loads(line)
+                if message.get("type") == Protocol.Request.ACCEPT_INVITE :
+                    data = message.get("data")
+                    mode = data.get("request_type")
+                    id = data.get("sender_id")
+                    self.client_modes[client] = mode
+                    clients = [self.ids[id], client]
+                    self.create_room(clients)
+            except :
+                print("invitation handling failed")
         print("user defined")
-    
+ 
     def id_generator(self, client):
         with self.id_lock : # Guarantees unique IDs
             while True :
                 id = random.randint(10000, 99999)
                 if id not in self.client_ids.values():
                     self.client_ids [ client ] = id
+                    self.ids[id] = client
                     return id
 
     def start_powerup_spawner(self):

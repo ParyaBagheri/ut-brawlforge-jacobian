@@ -3,6 +3,11 @@ class Protocol :
         NICKNAME = "request.nickname"
         MATCHMAKING = "request.matchmaking" 
         CHAR_TYPE = 'request.character_type'
+        LOCAL_GAME = "request.local_game"
+        INVITE_GAME = "request.invite_game"
+        SEND_INVITE = 'request.send_invite'
+        ACCEPT_INVITE = 'request.accept_invite'
+        DISCONNECTED = 'request.disconnected'
         MOVE = "request.move"
         SHOOT = "request.shoot"
         HIT = "request.hit"
@@ -11,7 +16,10 @@ class Protocol :
         LEAVE = "request.leave"
     class Response :
         SETUP = "response.setup"
+        GAME_STYLE = "response.game_style"
         ID = "response.id"
+        SEND_INVITE = "response.send_invite"
+        INVITE_ACCEPTED = "response.invite_accepted"
         OPPONENT = "response.opponent"
         PLAYER_LIST = "response.player_list"
         TEAM = "response.team"
