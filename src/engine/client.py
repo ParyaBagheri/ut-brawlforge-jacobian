@@ -39,6 +39,10 @@ class Client :
             self.socket.connect((self.host,self.port))
             self.socket.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY,1)
             self.is_connected = True
+        except KeyboardInterrupt :
+            print ("keyboard interrupt")
+            self.send(Protocol.Request.DISCONNECTED,self.info["id"])
+            self.socket.close()
         except:
             print("connection error")
             return
@@ -46,6 +50,10 @@ class Client :
         #update_thread = threading.Thread(target=self.update_status)
         recieve_thread.start()
         #update_thread.start()
+        if not self.is_connected :
+            print ("keyboard interrupt")
+            self.send(Protocol.Request.DISCONNECTED,self.info["id"])
+            self.socket.close()
    
 
 
@@ -85,12 +93,31 @@ class Client :
                         self.game.powerup_spawner(line.get("data"))
                     elif line.get("type") == Protocol.Response.POWERUP_PICKED :
                         self.game.powerup_killer(line.get("data"))
+                    elif line.get("type") == Protocol.Response.OPPONENT_LEFT :
+                        for player in self.other_players :
+                            if isinstance(player, Player) :
+                                if player.id == line.get("data") :
+                                    print(player.id )
+                                    print("left")
+                                    self.other_players.remove(player)
+                                    self.game.other_players = self.other_players
+                                    self.game.state = "won"
+            except KeyboardInterrupt :
+                print ("keyboard interrupt")
+                self.send(Protocol.Request.DISCONNECTED,self.info["id"])
+                self.socket.close()
+                break
             except Exception as e:
                 print("closed",e)
                 traceback.print_exc()
                 self.is_connected = False
+                self.send(Protocol.Request.DISCONNECTED,self.info["id"])
                 self.socket.close()
                 return
+        if not self.is_connected :
+            print ("keyboard interrupt")
+            self.send(Protocol.Request.DISCONNECTED,self.info["id"])
+            self.socket.close()
 
     def add_other_players (self, other_players_info):
         try:
@@ -123,11 +150,19 @@ class Client :
                     
                     self.status = updated_status
                     self.send(Protocol.Request.MOVE, self.status)
+            except KeyboardInterrupt :
+                print ("keyboard interrupt")
+                self.send(Protocol.Request.DISCONNECTED,self.info["id"])
+                self.socket.close()
             except Exception as e:
                 print("error3",e) 
                 traceback.print_exc()
                 self.is_connected =False
                 self.socket.close()
+        else:
+            print ("keyboard interrupt")
+            self.send(Protocol.Request.DISCONNECTED,self.info["id"])
+            self.socket.close()
     def send (self, type, data):
         message = {
             "type" : type ,

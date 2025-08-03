@@ -44,23 +44,24 @@ class Server:
     def handle(self, client,buffer):
         self.handle_connect(client)
         self.wait_for_room(client)
-
-        while True :
+        connection = True
+        while connection :
             try :
+                
                 data = client.recv(1024).decode("utf-8")
                 if not data :
                     break
                 buffer += data
-                while '\n' in buffer :
+                while '\n' in buffer and connection:
                     line,buffer = buffer.split('\n',1)
                     message = json.loads(line)
-                    self.handle_recieve(message, client)
+                    connection = self.handle_recieve(message, client)               
             except Exception as e:
                 print("????",e)
                 traceback.print_exc()
                 break
         
-        self.broadcast(Protocol.Response.OPPONENT_LEFT, None, client)
+        self.broadcast(Protocol.Response.OPPONENT_LEFT,self.client_ids[client] , client)
         self.disconnect(client)
 
     def handle_connect(self, client):
@@ -191,7 +192,12 @@ class Server:
         data = message.get("data")
         room = self.rooms.get(client)
         if room :
-            if r_type == Protocol.Request.MOVE:
+            if r_type == Protocol.Request.DISCONNECTED :
+                print(self.client_ids[client])
+                print( "left")
+                return False
+                
+            elif r_type == Protocol.Request.MOVE:
                 room.update_player_state(client, data)
                 self.broadcast(Protocol.Response.UPDATE, data, client)
             elif r_type == Protocol.Request.POWERUP :
@@ -209,6 +215,7 @@ class Server:
                         self.send(Protocol.Response.WINNER, None, c)
                     else :
                         self.send(Protocol.Response.LOSER, None, c)
+        return True
 
     def send(self, r_type, data, client):
         try :
@@ -232,6 +239,7 @@ class Server:
         self.teams.pop(client, None)
         self.client_names.pop(client, None)
         self.client_modes.pop(client, None)
+        self.client_ids.pop(client, None)
         try :
             client.close()
         except : 

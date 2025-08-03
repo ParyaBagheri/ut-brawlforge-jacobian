@@ -3,6 +3,7 @@ class Protocol :
         NICKNAME = "request.nickname"
         MATCHMAKING = "request.matchmaking" 
         CHAR_TYPE = 'request.character_type'
+        DISCONNECTED = 'request.disconnected'
         MOVE = "request.move"
         SHOOT = "request.shoot"
         HIT = "request.hit"

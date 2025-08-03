@@ -664,25 +664,34 @@ class Game:
  
     def run(self):
         while True:
-            self.music_manager()
-            if self.state == "playing" or self.state == "paused" or self.state == "gameover" :
-                self.handle_events()
-                self.update()
-                self.draw()
-                pygame.display.flip()
-                self.clock.tick(60)
-            else :
-                if self.state == "main_menu" :
-                    self.main_menu()
-                if self.state == "how_to_play":
-                    self.how_to_play()
-                if self.state == "char_menu" :
-                    self.character_menu()
-                if self.state == "map_menu" :
-                    self.map_menu()
-                if self.state == "won":
-                    self.finish_menu()
-            
+            try :
+                self.music_manager()
+                if self.state == "playing" or self.state == "paused" or self.state == "gameover" :
+                    self.handle_events()
+                    self.update()
+                    self.draw()
+                    pygame.display.flip()
+                    self.clock.tick(60)
+                else :
+                    if self.state == "main_menu" :
+                        self.main_menu()
+                    if self.state == "how_to_play":
+                        self.how_to_play()
+                    if self.state == "char_menu" :
+                        self.character_menu()
+                    if self.state == "map_menu" :
+                        self.map_menu()
+                    if self.state == "won":
+                        self.finish_menu()
+            except KeyboardInterrupt :
+                if self.client != None :
+                    self.client.is_connected = False
+                break
+            except :
+                if self.client != None :
+                    self.client.is_connected = False
+                break
+
 
     def music_manager(self):
         if self.current_music_state == None :
