@@ -108,7 +108,7 @@ class Game:
             return True
     def mp_lose(self):
         if self.player :
-            if self.player.health <= 0 :
+            if self.player.is_dead :
                 return True
         return False
     def how_to_play(self) :
@@ -343,7 +343,7 @@ class Game:
                             
                         elif self.mode == "multiplayer" :
                             character_type = "knight"
-                            self.level = Level("multiplayer", self, 3200, self.mp_win, self.mp_lose)
+                            self.level = Level("multiplayer", self, 3200)
                             self.state = "game_request_menu"
                             
                     elif CHAR_2.is_pressed(CHAR_MENU_MOUSE_POS()):
@@ -354,7 +354,7 @@ class Game:
                             
                         elif self.mode == "multiplayer" :
                             character_type = "girl"
-                            self.level = Level("multiplayer", self, 3200, self.mp_win, self.mp_lose)
+                            self.level = Level("multiplayer", self, 3200)
                             self.state = "game_request_menu"
                                                
                     elif CHAR_3.is_pressed(CHAR_MENU_MOUSE_POS()):
@@ -365,7 +365,7 @@ class Game:
                             
                         elif self.mode == "multiplayer" :
                             character_type = "wizard"
-                            self.level = Level("multiplayer", self, 3200, self.mp_win, self.mp_lose)
+                            self.level = Level("multiplayer", self, 3200)
                             self.state = "game_request_menu"
                             
 
@@ -586,6 +586,9 @@ class Game:
             self.clock.tick(config.FPS)
 
     def lose_screen(self):
+        self.player.reset()
+        for player in self.other_players :
+            player.reset()
         self.screen.fill((0, 0, 0))
         lose_font = pygame.font.Font("src/assets/fonts/OCRAEXT.ttf", 72)
         lose_msg = lose_font.render("YOU LOST !", True, 'yellow')
@@ -593,6 +596,9 @@ class Game:
         text_rect.center = (self.screen_width//2, 200)
         self.screen.blit(lose_msg, text_rect)
     def win_screen(self):
+        self.player.reset()
+        for player in self.other_players :
+            player.reset()
         self.screen.fill((0, 0, 0))
         win_font = pygame.font.Font("src/assets/fonts/OCRAEXT.ttf", 72)
         win_msg = win_font.render("YOU WIN!", True, 'yellow')
@@ -756,15 +762,26 @@ class Game:
         if self.state == "playing" and self.level != None:
             if self.mode != "multiplayer" and self.level.won() :
                 self.state = "won"
-                
-                
-            if self.mode == "multiplayer" :
+            '''if self.mode == "multiplayer" :
+                #if self.player.is_dead :
+                    #self.player.reset()
+                    #self.lose_screen()
+                if self.other_players :
+                    for player in self.other_players :
+                        if not player.is_dead:
+                            break
+                    #if not self.player.is_dead :
+                        #self.player.reset()
+                        #self.win_screen()'''
+
+        
+            '''if self.mode == "multiplayer" :
                 if self.level.won():
                     self.player.reset()
                     self.win_screen()
                 if self.level.lost() :
                     self.player.reset()
-                    self.lose_screen()
+                    self.lose_screen()'''
                 #self.other_player.update(self.level.platforms, self.enemies, self.level.powerups)
             if self.mode == "single_player" and self.enemies :
                 self.player.update(self.level.platforms, self.level.powerup_group, self.enemies)
@@ -874,7 +891,10 @@ class Game:
             self.pause_render()
         # Show game over
         if self.state == "gameover":
-            self.gameover_render()
+            if self.mode == "single_player" :
+                self.gameover_render()
+            else :
+                self.lose_screen()
         # Show loading screen 
         '''if self.is_started == False:
             self.screen.fill((0,0,0))
