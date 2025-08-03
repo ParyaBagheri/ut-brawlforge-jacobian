@@ -7,7 +7,7 @@ from src.engine.assetmanager import AssetManager
 
 
 class Player:
-    def __init__(self, game,character_type, start_x=100, id = None, nickname = None):
+    def __init__(self, game,character_type, start_x=100, id = None, nickname = None, team = None):
         self.game = game
         self.color = (255, 0, 0)  # Player color (red)
         '''if image:
@@ -69,6 +69,7 @@ class Player:
         self.id = id
         self.nickname = nickname
         self.main = True
+        self.team = team
 
     def check_vertical_collision(self, platforms):
         landed_on = None

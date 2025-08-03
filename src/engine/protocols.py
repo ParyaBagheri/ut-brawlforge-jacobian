@@ -14,6 +14,7 @@ class Protocol :
         ID = "response.id"
         OPPONENT = "response.opponent"
         PLAYER_LIST = "response.player_list"
+        TEAM = "response.team"
         START = "response.start"
         UPDATE = "response.update"
         POWERUP_SPAWNED = "response.powerup_spawned"

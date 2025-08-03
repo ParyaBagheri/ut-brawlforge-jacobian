@@ -4,7 +4,7 @@ from .protocols import Protocol
 from .platform import Platform
 from threading import Lock
 
-HOST = '192.168.1.175'
+HOST = '192.168.1.146'
 PORT = 55555
 
 class Server:
@@ -163,6 +163,9 @@ class Server:
         for client in clients :
             self.rooms[client] = room
             self.teams[client] = teams[client]
+        for client in clients :
+            self.send(Protocol.Response.TEAM, teams[client], client)
+            print(f"sent protocol team {self.teams[client]}")
             #opponents = [self.client_names[c] for c in clients if c != client]
             opponents = []
             for c in clients :
@@ -171,12 +174,14 @@ class Server:
                         opponent_info = {
                             "id" : self.client_ids[c],
                             "nickname" : self.client_names[c],
-                            "character_type" : self.client_characters[c]
+                            "character_type" : self.client_characters[c],
+                            "team" : self.teams[c]
                         }
-                        print(opponent_info)
+                        print(f"opponent info {opponent_info}")
                         opponents.append(opponent_info)
                     except Exception as e:
                         print(f"[ERROR getting opponent info]: {e}")
+                        traceback.print_exc()
             self.send(Protocol.Response.OPPONENT, opponents, client)
             self.send(Protocol.Response.START, "", client)
         print("room created and start protocol sent")
@@ -203,6 +208,7 @@ class Server:
             if room.is_finished():
                 loser = room.losing_team
                 winner = [t for t in room.team_health if t != loser][0]
+                #print("[SERVER] Match ended. Sending WINNER/LOSER...")
 
                 for c in room.clients :
                     if self.teams[c] == winner :

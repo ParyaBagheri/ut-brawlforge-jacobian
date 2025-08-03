@@ -22,7 +22,8 @@ class Client :
             # Information required to create a new player
             "id" : None,
             "nickname" : nickname,
-            "character_type" : character_type
+            "character_type" : character_type,
+            "team" : None
         }
         self.request_type = request_type
         #self.players_count = 0
@@ -73,6 +74,9 @@ class Client :
                         self.status["id"] = line.get("data")
                         self.player = Player(self.game, self.info["character_type"],100, self.info["id"],self.info["nickname"])
                         self.game.player = self.player
+                    elif line.get("type") == Protocol.Response.TEAM:
+                        self.info["team"] = line.get("data")
+                        self.player.team = self.info["team"]
                     elif line.get("type") == Protocol.Response.START :
                         self.game.state = "playing"
                         print ("recieved start")
@@ -96,10 +100,11 @@ class Client :
         try:
             # Add new players to the client's player_list 
             for player_info in other_players_info:
-                self.other_players.append(Player(self.game, player_info["character_type"],100, player_info["id"],player_info["nickname"]))
+                self.other_players.append(Player(self.game, player_info["character_type"],100, player_info["id"],player_info["nickname"], player_info["team"]))
             self.game.other_players = self.other_players
-        except:
-            print("error2")
+        except Exception as e:
+            print("error2", e)
+            traceback.print_exc()
     
     def update_other_players(self,data) :        
         
