@@ -23,7 +23,8 @@ class Client :
             "id" : None,
             "nickname" : nickname,
             "character_type" : character_type,
-            "team" : None
+            "team" : None,
+            "request_type" : request_type
         }
         self.request_type = request_type
         #self.players_count = 0
@@ -178,5 +179,9 @@ class Client :
         }
         message = json.dumps(message) + "\n"
         self.socket.sendall(message.encode('utf-8'))
-
+    def new_look(self,nickname,character_type,request_type):
+        self.info["nickname"] = nickname
+        self.info["character_type"] = character_type
+        self.request_type = request_type
+        self.send(Protocol.Request.NEW_LOOK,"")
     

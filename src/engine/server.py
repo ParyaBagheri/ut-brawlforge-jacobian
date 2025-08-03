@@ -223,6 +223,12 @@ class Server:
                         self.send(Protocol.Response.WINNER, None, c)
                     else :
                         self.send(Protocol.Response.LOSER, None, c)
+        elif r_type == Protocol.Request.NEW_LOOK :
+            self.teams.pop(client, None)
+            self.client_names.pop(client, None)
+            self.client_modes.pop(client, None)
+            self.client_characters.pop(client,None)
+            self.handle_connect(client) 
         return True
 
     def send(self, r_type, data, client):
@@ -248,6 +254,7 @@ class Server:
         self.client_names.pop(client, None)
         self.client_modes.pop(client, None)
         self.client_ids.pop(client, None)
+        self.client_characters.pop(client,None)
         try :
             client.close()
         except : 

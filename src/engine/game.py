@@ -438,8 +438,11 @@ class Game:
                     if event.key == pygame.K_RETURN :
                         self.state = "mp_menu" 
                         try :
-                            self.client =  Client(self, nickname, character_type,request_type)
-                            self.client.start()
+                            if self.client == None :
+                                self.client =  Client(self, nickname, character_type,request_type)
+                                self.client.start()
+                            else :
+                                self.client.new_look(nickname,character_type,request_type)
                         except Exception as e:
                             import traceback
                             print("error", e)
