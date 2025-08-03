@@ -970,9 +970,15 @@ class Game:
                 self.screen.blit(heart, (40 + 30*i , 60))
         if self.other_players :
             for player in self.other_players:
+                i = 0
                 if isinstance(player, Player):
-                    other_health_display = font2.render("Enemy: " + str(player.health), True, 'red')
-                    self.screen.blit(other_health_display, (20, 80))
+                    if player.team == self.player.team :
+                        teammate_health_display = font2.render(player.nickname + " : " + str(player.health), True, 'purple')
+                        self.screen.blit(teammate_health_display, (20, 80))
+                    else :
+                        other_health_display = font2.render(player.nickname + " : " + str(player.health), True, 'red')
+                        self.screen.blit(other_health_display, (70, 20 + i))
+                        i += 1
     
     def display_nicknames(self):
         nick_display = font3.render(self.player.nickname, True, 'grey')
