@@ -7,7 +7,7 @@ from src.engine.player import Player
 from src.engine.protocols import Protocol 
 class Client :
     def __init__(self,game, nickname,character_type,request_type):
-        self.host = '192.168.1.204'
+        self.host = '192.168.1.175'
         self.port = 55555
         self.status = {
             # Data sent periodically to update this player's state and position
@@ -37,14 +37,15 @@ class Client :
     def start (self):
         try:
             self.socket.connect((self.host,self.port))
+            self.socket.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY,1)
             self.is_connected = True
         except:
             print("connection error")
             return
         recieve_thread = threading.Thread(target=self.recieve)
-        #update_thread = threading.Thread(target=self.update_status)
+        update_thread = threading.Thread(target=self.update_status)
         recieve_thread.start()
-        #update_thread.start()
+        update_thread.start()
    
 
 
@@ -55,7 +56,6 @@ class Client :
                 
                 self.buffer += chunck
                 while '\n' in self.buffer :
-                    print("recieved")
                     line,self.buffer = self.buffer.split('\n', 1)
                     line = json.loads(line)
                     
@@ -106,11 +106,10 @@ class Client :
         # Update position and state of the player with the same id
         for player in self.other_players :
             if isinstance(player, Player) :
-                print("other player update")
                 player.sync_remote_player(data)
 
     def update_status (self) :
-        if self.is_connected :
+        while self.is_connected :
             try:
                 if self.game.state == "playing" and self.player != None :
                     updated_status = {

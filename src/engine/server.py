@@ -4,7 +4,7 @@ from .protocols import Protocol
 from .platform import Platform
 from threading import Lock
 
-HOST = '192.168.1.204'
+HOST = '192.168.1.175'
 PORT = 55555
 
 class Server:
@@ -33,6 +33,7 @@ class Server:
             while True :
                 buffer = ""
                 client, address = self.server.accept()
+                client.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY,1)
                 print(f"connected with {address}")
                 thread = threading.Thread(target=self.handle, args=(client,buffer,))
                 thread.start()

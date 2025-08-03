@@ -436,8 +436,13 @@ class Game:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_RETURN :
                         self.state = "waiting" 
-                        self.client =  Client(self, nickname, character_type,request_type)
-                        self.client.start()
+                        try :
+                            self.client =  Client(self, nickname, character_type,request_type)
+                            self.client.start()
+                        except Exception as e:
+                            import traceback
+                            print("error", e)
+                            traceback.print_exc()
                         break
                     elif event.key == pygame.K_BACKSPACE :
                         nickname = nickname[:-1]
@@ -764,7 +769,7 @@ class Game:
                 self.player.update(self.level.platforms, self.level.powerup_group, self.enemies)
             elif self.mode == "multiplayer" :
                 self.player.update(self.level.platforms, self.level.powerup_group)
-                self.client.update_status()
+            #   self.client.update_status()
                 for player in self.other_players :
                     if isinstance(player,Player):
                         player.update_remote_player()
