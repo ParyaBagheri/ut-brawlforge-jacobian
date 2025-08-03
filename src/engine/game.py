@@ -436,7 +436,7 @@ class Game:
                     sys.exit()
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_RETURN :
-                        self.state = "waiting" 
+                        self.state = "mp_menu" 
                         try :
                             self.client =  Client(self, nickname, character_type,request_type)
                             self.client.start()
@@ -453,8 +453,8 @@ class Game:
             pygame.display.flip()
             self.clock.tick(config.FPS)
 
-        if self.state == "waiting" :
-            self.waiting_room()
+        if self.state == "mp_menu" :
+            self.multiplayer_menu()
 
     def waiting_room (self):
         background = pygame.image.load(background_path)
@@ -541,6 +541,49 @@ class Game:
             map_menu_event_handler()
             pygame.display.flip()
             self.clock.tick(config.FPS)
+    def multiplayer_menu(self):
+        background = pygame.image.load(background_path)
+        background = pygame.transform.scale(background, (800,600))
+        self.screen.blit(background, (0,0))
+        B1 = Button(self, None, [400, 100], "Match with local players", 'OCRAEXT', 50, 'indigo', 'pink')
+        B2 = Button(self, None, [400, 300], "Check invites", 'OCRAEXT', 50, 'indigo', 'pink')
+        B3 = Button(self, None, [400, 500], "main menu", 'OCRAEXT', 50, 'indigo', 'pink')
+        MP_MENU_MOUSE_POS = pygame.mouse.get_pos
+        def mp_menu_render():
+            B1.draw(MP_MENU_MOUSE_POS())
+            B2.draw(MP_MENU_MOUSE_POS())
+            B3.draw(MP_MENU_MOUSE_POS())
+        def mp_menu_event_handler():
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit
+                    waiting room
+                    invite screen
+                    multiplayer menu
+                    nickname menu
+
+                    sys.exit()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if B1.is_pressed(MP_MENU_MOUSE_POS()):
+                        self.state = "waiting"
+                        self.waiting_room()  
+                    if B2.is_pressed(MP_MENU_MOUSE_POS()):
+                        self.state = "invite_screen"
+                        self.invites_screen()
+                    if B3.is_pressed(MP_MENU_MOUSE_POS()):
+                        self.state = "main_menu"
+                        self.main_menu()
+        while self.state == "mp_menu":
+            mp_menu_render()
+            mp_menu_event_handler()
+            pygame.display.flip()
+            self.clock.tick(config.FPS)
+                        
+
+    def invites_screen(self):
+        background = pygame.image.load(background_path)
+        background = pygame.transform.scale(background, (800,600))
+        self.screen.blit(background, (0,0))
 
     def finish_menu(self):
         self.screen.fill((0,0,0))
@@ -790,7 +833,10 @@ class Game:
             #   self.client.update_status()
                 for player in self.other_players :
                     if isinstance(player,Player):
-                        player.update_remote_player()
+                        if player.is_dead :
+                            self.other_players.remove(player)
+                        else :
+                            player.update_remote_player()
             self.update_camera()
 
             for platform in self.level.platforms :
