@@ -582,6 +582,39 @@ class Game:
         background = pygame.image.load(background_path)
         background = pygame.transform.scale(background, (800,600))
         self.screen.blit(background, (0,0))
+        buttons = {}
+        count = 0
+        
+        def update_invitations () :
+            nonlocal count
+            for invitation in self.client.invitations :
+                if invitation not in buttons :
+                    buttons[invitation] = Button(self, None, [400, 100 + (count* 200)], str(invitation["id"]) + " " + invitation["nickname"], 'OCRAEXT', 30, 'indigo', 'pink')
+                    count +=1
+
+        def invite_screen_render():
+            for invitation in self.client.invitations :
+                if isinstance(buttons[invitation], Button) :
+                    buttons[invitation].draw()
+
+        def invite_screen_event_handler():
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit
+                    sys.exit()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    for invitation in self.client.invitation :
+                        if isinstance(buttons[invitation], Button) :
+                            if buttons[invitation].is_pressed() :
+                                self.client.accept_invite(invitation)
+                                self.state = "waiting"
+                                return
+        while self.state == "invite_screen" :
+            update_invitations()
+            invite_screen_render()
+            invite_screen_event_handler()
+            pygame.display.flip()
+            self.clock.tick(config.FPS)
 
     def finish_menu(self):
         self.screen.fill((0,0,0))
