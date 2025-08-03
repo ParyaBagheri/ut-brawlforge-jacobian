@@ -770,7 +770,7 @@ class Game:
                 self.player.update(self.level.platforms, self.level.powerup_group, self.enemies)
             elif self.mode == "multiplayer" :
                 self.player.update(self.level.platforms, self.level.powerup_group)
-            #   self.client.update_status()
+                self.client.update_status()
                 for player in self.other_players :
                     if isinstance(player,Player):
                         player.update_remote_player()

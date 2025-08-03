@@ -43,9 +43,9 @@ class Client :
             print("connection error")
             return
         recieve_thread = threading.Thread(target=self.recieve)
-        update_thread = threading.Thread(target=self.update_status)
+        #update_thread = threading.Thread(target=self.update_status)
         recieve_thread.start()
-        update_thread.start()
+        #update_thread.start()
    
 
 
@@ -109,7 +109,7 @@ class Client :
                 player.sync_remote_player(data)
 
     def update_status (self) :
-        while self.is_connected :
+        if self.is_connected :
             try:
                 if self.game.state == "playing" and self.player != None :
                     updated_status = {
