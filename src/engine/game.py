@@ -11,6 +11,7 @@ background_path = os.path.join("src", "assets", "images", "background.jpg")
 pygame.font.init()
 font = pygame.font.SysFont('Arial',  32, True, False)
 font2 = pygame.font.Font("src/assets/fonts/MinimalPixelFont.ttf",50)
+font3 = pygame.font.Font("src/assets/fonts/MinimalPixelFont.ttf", 30)
 heartfont = pygame.font.SysFont('Segoe UI Symbol', 40)
 gameoverfont = pygame.font.SysFont('OCR A Extended', 72)
 loadingscreen_font = pygame.font.SysFont('OCR A Extended', 36)
@@ -843,6 +844,7 @@ class Game:
             else :
                 self.screen.blit( self.player.image, (self.player.rect.x - self.camera_x, self.player.rect.y))
         if self.other_players :
+            self.display_nicknames()
             for player in self.other_players :
                 if isinstance(player, Player):
                     if player.direction == "left" :
@@ -901,7 +903,14 @@ class Game:
                 if isinstance(player, Player):
                     other_health_display = font2.render("Enemy: " + str(player.health), True, 'red')
                     self.screen.blit(other_health_display, (20, 80))
-                
+    
+    def display_nicknames(self):
+        nick_display = font3.render(self.player.nickname, True, 'grey')
+        self.screen.blit(nick_display, (self.player.rect.x + 15 - self.camera_x, self.player.rect.y - 20))
+        for player in self.other_players :
+            others_nick_display = font3.render(player.nickname, True, 'grey')
+            self.screen.blit(others_nick_display, (player.rect.x + 15 - self.camera_x, player.rect.y - 20))
+
     def gameover(self):
         self.state = "gameover"
         self.player.color = (0, 0, 0)
