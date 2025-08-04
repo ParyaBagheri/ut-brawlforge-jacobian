@@ -615,7 +615,58 @@ class Game:
             invite_screen_event_handler()
             pygame.display.flip()
             self.clock.tick(config.FPS)
+    def search_id_screen (self):
+        id = ""
+        while self.state == "search_id_screen" :
+            background = pygame.image.load(background_path)
+            background = pygame.transform.scale(background, (800,600))
+            self.screen.blit(background, (0,0))
+            
+            id_menu_font = pygame.font.Font("src/assets/fonts/MinimalPixelFont.ttf",80)
+            id_menu_text = id_menu_font.render("Enter an id ", True, 'indigo')
+            id_menu_text_rect = id_menu_text.get_rect(center= (self.screen_width // 2, self.screen_height//6))
+            self.screen.blit(id_menu_text, id_menu_text_rect)
 
+            text_font = pygame.font.Font("src/assets/fonts/OCRAEXT.ttf",50)
+            id_text = text_font.render(id, True, 'black')
+            text_rect = id_text.get_rect(center=(400,300)) 
+            self.screen.blit(id_text,text_rect) 
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit
+                    sys.exit()
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_RETURN :
+                         
+                        try :
+                            if self.client.send_invite(id)  :
+                                self.state == "waiting"
+                            else :
+                                error_text = text_font.render("error", True, 'black')
+                                error_text_rect = error_text.get_rect(center=(400, 400))
+                                self.screen.blit(error_text,error_text_rect)
+                                id = ""
+                                time.sleep(4)
+                                self.state = "mp_menu"
+                                
+                        except Exception as e:
+                            import traceback
+                            print("error", e)
+                            traceback.print_exc()
+                        break
+                    elif event.key == pygame.K_BACKSPACE :
+                        id = id[:-1]
+                    else: 
+                        id += event.unicode
+            
+            pygame.display.flip()
+            self.clock.tick(config.FPS)
+
+        if self.state == "waiting" :
+            self.waiting_room()
+        elif self.state == "mp_menu" :
+            self.multiplayer_menu
     def finish_menu(self):
         self.screen.fill((0,0,0))
         self.player.reset()

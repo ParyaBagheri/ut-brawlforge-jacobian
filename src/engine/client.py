@@ -24,7 +24,6 @@ class Client :
             "nickname" : nickname,
             "character_type" : character_type,
             "team" : None,
-            "request_type" : request_type
         }
         self.request_type = request_type
         #self.players_count = 0
@@ -35,7 +34,8 @@ class Client :
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.buffer = ""
         self.is_connected = False
-        
+        self.invitations = []
+        self.search_resualt = None
     def start (self):
         try:
             self.socket.connect((self.host,self.port))
@@ -109,6 +109,10 @@ class Client :
                                     self.other_players.remove(player)
                                     self.game.other_players = self.other_players
                                     self.game.state = "won"
+                    elif line.get("type") == Protocol.Response.SEND_INVITE :
+                        self.invitations.append(line.get("data"))
+                    elif line.get("type") == Protocol.Response.SEARCH_RESAULT :
+                        self.search_resualt = line.get("data")
             except KeyboardInterrupt :
                 print ("keyboard interrupt")
                 self.send(Protocol.Request.DISCONNECTED,self.info["id"])
@@ -184,4 +188,13 @@ class Client :
         self.info["character_type"] = character_type
         self.request_type = request_type
         self.send(Protocol.Request.NEW_LOOK,"")
-    
+    def accept_invite (self,invitation):
+        self.send(Protocol.Request.ACCEPT_INVITE, invitation)
+        self.invitations.remove(invitation)
+    def send_invite(self,id):
+        self.send(Protocol.Request.SEND_INVITE, id)
+        while True :
+            if self.search_resualt != None :
+                resualt = self.search_resualt
+                self.search_resualt = None
+                return resualt
