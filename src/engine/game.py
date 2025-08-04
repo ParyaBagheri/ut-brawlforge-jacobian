@@ -100,12 +100,12 @@ class Game:
             self.clock.tick(config.FPS)
 
     def mp_win(self):
-        for player in self.other_players :
+        '''for player in self.other_players :
             if isinstance(player,Player) :
                 if player.team != self.player.team :
                     return False
-        #self.state = "won"
-        return True    
+        #self.state = "won"'''
+        return False    
     def mp_lose(self):
         if self.player :
             if self.player.is_dead :
@@ -767,9 +767,9 @@ class Game:
             self.clock.tick(config.FPS)
 
     def lose_screen(self):
-        '''self.player.reset()
+        self.player.reset()
         for player in self.other_players :
-            player.reset()'''
+            player.reset()
         self.screen.fill((0, 0, 0))
         lose_font = pygame.font.Font("src/assets/fonts/OCRAEXT.ttf", 72)
         lose_msg = lose_font.render("YOU LOST !", True, 'yellow')
@@ -795,10 +795,10 @@ class Game:
             self.clock.tick(60)
 
     def win_screen(self):
-        '''self.player.reset()
+        self.player.reset()
         for player in self.other_players :
             if isinstance(player,Player):
-                player.reset()'''
+                player.reset()
         self.screen.fill((0, 0, 0))
         win_font = pygame.font.Font("src/assets/fonts/OCRAEXT.ttf", 72)
         win_msg = win_font.render("YOU WIN!", True, 'yellow')
@@ -907,14 +907,14 @@ class Game:
                         self.map_menu()
                     if self.state == "won":
                         if self.mode == "single_player" :
-                            self.finish_menu()
-                        else :
-                            self.win_screen()
+                            self.finish_menu()              
             except KeyboardInterrupt :
                 if self.client != None :
                     self.client.is_connected = False
                 break
             except :
+                import traceback
+                traceback.print_exc()
                 if self.client != None :
                     self.client.is_connected = False
                 break
@@ -1128,6 +1128,9 @@ class Game:
                 self.gameover_render()
             else :
                 self.lose_screen()
+        if self.state == "won" :
+            if self.mode == "multiplayer" :
+                self.win_screen()
         # Show loading screen 
         '''if self.is_started == False:
             self.screen.fill((0,0,0))
