@@ -557,11 +557,6 @@ class Game:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit
-                    waiting room
-                    invite screen
-                    multiplayer menu
-                    nickname menu
-
                     sys.exit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if B1.is_pressed(MP_MENU_MOUSE_POS()):
