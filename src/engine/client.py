@@ -125,6 +125,8 @@ class Client :
                         self.invitations.append(line.get("data"))
                     elif line.get("type") == Protocol.Response.SEARCH_RESAULT :
                         self.search_resualt = line.get("data")
+                    elif line.get("type") == Protocol.Response.WINNER :
+                        self.game.state = "won"
             except KeyboardInterrupt :
                 print ("keyboard interrupt")
                 self.send(Protocol.Request.DISCONNECTED,self.info["id"])

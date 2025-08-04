@@ -100,12 +100,12 @@ class Game:
             self.clock.tick(config.FPS)
 
     def mp_win(self):
-        if self.other_players :
-            for player in self.other_players :
-                if not player.is_dead:
+        for player in self.other_players :
+            if isinstance(player,Player) :
+                if player.team != self.player.team :
                     return False
-        if not self.player.is_dead :
-            return True
+        #self.state = "won"
+        return True    
     def mp_lose(self):
         if self.player :
             if self.player.is_dead :
@@ -780,7 +780,8 @@ class Game:
     def win_screen(self):
         self.player.reset()
         for player in self.other_players :
-            player.reset()
+            if isinstance(player,Player):
+                player.reset()
         self.screen.fill((0, 0, 0))
         win_font = pygame.font.Font("src/assets/fonts/OCRAEXT.ttf", 72)
         win_msg = win_font.render("YOU WIN!", True, 'yellow')
@@ -1126,7 +1127,7 @@ class Game:
                         self.screen.blit(teammate_health_display, (20, 80))
                     else :
                         other_health_display = font2.render(player.nickname + " : " + str(player.health), True, 'red')
-                        self.screen.blit(other_health_display, (70, 20 + i))
+                        self.screen.blit(other_health_display, (700, 20 + i))
                         i += 1
     
     def display_nicknames(self):
