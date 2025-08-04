@@ -36,6 +36,7 @@ class Client :
         self.is_connected = False
         self.invitations = []
         self.search_resualt = None
+        self.game_style = None
     def start (self):
         try:
             self.socket.connect((self.host,self.port))
@@ -89,6 +90,11 @@ class Client :
                     elif line.get("type") == Protocol.Response.TEAM:
                         self.info["team"] = line.get("data")
                         self.player.team = self.info["team"]
+                    elif line.get("type") == Protocol.Response.GAME_STYLE :
+                        if self.game_style == "local_game" :
+                            self.send(Protocol.Request.LOCAL_GAME, "")
+                        '''elif self.game_style == "invite_game" :
+                            self.send(Protocol.Request.INVITE_GAME,"")'''
                     elif line.get("type") == Protocol.Response.START :
                         self.game.state = "playing"
                         print ("recieved start")
@@ -193,7 +199,7 @@ class Client :
         self.send(Protocol.Request.ACCEPT_INVITE, invitation)
         self.invitations.remove(invitation)
     def send_invite(self,id):
-        self.send(Protocol.Request.SEND_INVITE, id)
+        self.send(Protocol.Request.SEND_INVITE, int(id))
         while True :
             if self.search_resualt != None :
                 resualt = self.search_resualt

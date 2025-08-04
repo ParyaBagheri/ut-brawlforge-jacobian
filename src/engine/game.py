@@ -579,10 +579,13 @@ class Game:
             pygame.display.flip()
             self.clock.tick(config.FPS)
         if self.state == "waiting"  :
+            self.client.game_style = "local_game"
             self.waiting_room()  
         elif self.state == "search_id" :
+            self.client.game_style = "invite_game"
             self.search_id_screen()
         elif self.state == "invite_screen" :
+            self.client.game_style = "invite_game"
             self.invites_screen()
 
     def invites_screen(self):
