@@ -7,8 +7,8 @@ from src.engine.player import Player
 from src.engine.protocols import Protocol 
 class Client :
     def __init__(self,game, nickname,character_type,request_type):
-        self.host = '192.168.1.175'
-        self.port = 7337
+        self.host = '192.168.1.38'
+        self.port = 55555
         self.status = {
             # Data sent periodically to update this player's state and position
             "id" : None,
@@ -47,8 +47,9 @@ class Client :
             print ("keyboard interrupt")
             self.send(Protocol.Request.DISCONNECTED,self.info["id"])
             self.socket.close()
-        except:
-            print("connection error")
+        except Exception as e:
+            print("connection error", e)
+            traceback.print_exc()
             return
         recieve_thread = threading.Thread(target=self.recieve)
         #update_thread = threading.Thread(target=self.update_status)

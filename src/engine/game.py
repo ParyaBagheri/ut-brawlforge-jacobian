@@ -551,7 +551,7 @@ class Game:
         B1 = Button(self, None, [400, 100], "Match with local players", 'OCRAEXT', 50, 'indigo', 'pink')
         B2 = Button(self, None, [400, 250], "Check invites", 'OCRAEXT', 50, 'indigo', 'pink')
         B3 = Button(self, None, [400, 400], "invite a friend", 'OCRAEXT', 50, 'indigo', 'pink')
-        B4 = Button(self, None, [400, 400], "main menu", 'OCRAEXT', 50, 'indigo', 'pink')
+        B4 = Button(self, None, [400, 550], "main menu", 'OCRAEXT', 50, 'indigo', 'pink')
         MP_MENU_MOUSE_POS = pygame.mouse.get_pos
         def mp_menu_render():
             B1.draw(MP_MENU_MOUSE_POS())

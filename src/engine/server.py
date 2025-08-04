@@ -4,7 +4,7 @@ from .protocols import Protocol
 from .platform import Platform
 from threading import Lock
 
-HOST = '192.168.1.146'
+HOST = '192.168.1.38'
 PORT = 55555
 
 class Server:
