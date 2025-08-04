@@ -549,13 +549,15 @@ class Game:
         background = pygame.transform.scale(background, (800,600))
         self.screen.blit(background, (0,0))
         B1 = Button(self, None, [400, 100], "Match with local players", 'OCRAEXT', 50, 'indigo', 'pink')
-        B2 = Button(self, None, [400, 300], "Check invites", 'OCRAEXT', 50, 'indigo', 'pink')
-        B3 = Button(self, None, [400, 500], "main menu", 'OCRAEXT', 50, 'indigo', 'pink')
+        B2 = Button(self, None, [400, 250], "Check invites", 'OCRAEXT', 50, 'indigo', 'pink')
+        B3 = Button(self, None, [400, 400], "invite a friend", 'OCRAEXT', 50, 'indigo', 'pink')
+        B4 = Button(self, None, [400, 400], "main menu", 'OCRAEXT', 50, 'indigo', 'pink')
         MP_MENU_MOUSE_POS = pygame.mouse.get_pos
         def mp_menu_render():
             B1.draw(MP_MENU_MOUSE_POS())
             B2.draw(MP_MENU_MOUSE_POS())
             B3.draw(MP_MENU_MOUSE_POS())
+            B4.draw(MP_MENU_MOUSE_POS())
         def mp_menu_event_handler():
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -563,20 +565,25 @@ class Game:
                     sys.exit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if B1.is_pressed(MP_MENU_MOUSE_POS()):
-                        self.state = "waiting"
-                        self.waiting_room()  
+                        self.state = "waiting"  
                     if B2.is_pressed(MP_MENU_MOUSE_POS()):
                         self.state = "invite_screen"
-                        self.invites_screen()
                     if B3.is_pressed(MP_MENU_MOUSE_POS()):
+                        self.state = "search_id"
+                    if B4.is_pressed(MP_MENU_MOUSE_POS()):
                         self.state = "main_menu"
-                        self.main_menu()
+                    break
         while self.state == "mp_menu":
             mp_menu_render()
             mp_menu_event_handler()
             pygame.display.flip()
             self.clock.tick(config.FPS)
-                        
+        if self.state == "waiting"  :
+            self.waiting_room()  
+        elif self.state == "search_id" :
+            self.search_id_screen()
+        elif self.state == "invite_screen" :
+            self.invites_screen()
 
     def invites_screen(self):
         background = pygame.image.load(background_path)
@@ -617,13 +624,13 @@ class Game:
             self.clock.tick(config.FPS)
     def search_id_screen (self):
         id = ""
-        while self.state == "search_id_screen" :
+        while self.state == "search_id" :
             background = pygame.image.load(background_path)
             background = pygame.transform.scale(background, (800,600))
             self.screen.blit(background, (0,0))
             
             id_menu_font = pygame.font.Font("src/assets/fonts/MinimalPixelFont.ttf",80)
-            id_menu_text = id_menu_font.render("Enter an id ", True, 'indigo')
+            id_menu_text = id_menu_font.render("Enter an id", True, 'indigo')
             id_menu_text_rect = id_menu_text.get_rect(center= (self.screen_width // 2, self.screen_height//6))
             self.screen.blit(id_menu_text, id_menu_text_rect)
 
@@ -720,6 +727,7 @@ class Game:
         text_rect = lose_msg.get_rect()
         text_rect.center = (self.screen_width//2, 200)
         self.screen.blit(lose_msg, text_rect)
+
     def win_screen(self):
         self.player.reset()
         for player in self.other_players :
@@ -730,6 +738,7 @@ class Game:
         text_rect = win_msg.get_rect()
         text_rect.center = (self.screen_width//2, 200)
         self.screen.blit(win_msg, text_rect)
+
 
     def platform_maker(self):
         platform_img = pygame.image.load("src/assets/images/platform.png").convert_alpha()
