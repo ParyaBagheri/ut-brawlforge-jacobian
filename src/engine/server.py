@@ -110,7 +110,6 @@ class Server:
                 if message.get("type") == Protocol.Request.MATCHMAKING :
                     mode = message.get("data")
                     self.client_modes[client] = mode
-                    self.waiting_clients.append((client, mode))
             except:
                 continue
         while client not in self.client_gamestyles :
@@ -121,6 +120,7 @@ class Server:
                 message = json.loads(line)
                 if message.get("type") == Protocol.Request.LOCAL_GAME :
                     self.client_gamestyles[client] = "local_game"
+                    self.waiting_clients.append((client, self.client_modes[client]))
                     self.match_players()
                 elif message.get("type") == Protocol.Request.INVITE_GAME :
                     self.client_gamestyles[client] = "invite_game"
