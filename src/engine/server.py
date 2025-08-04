@@ -124,8 +124,12 @@ class Server:
                         "request_type" : self.client_modes[client],
                         "nickname" : self.client_names[client]
                     }
-                    self.client_invites[client] = self.ids[message.get("data")]
-                    self.send(Protocol.Response.SEND_INVITE, invitation, self.ids[message.get("data")])
+                    reciever_id = message.get("data")
+                    self.send(Protocol.Response.SEARCH_RESAULT, self.id_found(reciever_id)
+                    if self.id_found(reciever_id) :
+                        self.client_invites[client] = self.ids[message.get("data")]
+                        self.send(Protocol.Response.SEND_INVITE, invitation, self.ids[reciever_id])
+
             except :
                 print("error setting the game style")
         while client not in self.rooms :
@@ -152,6 +156,13 @@ class Server:
                     self.client_ids [ client ] = id
                     self.ids[id] = client
                     return id
+
+    def id_found(self, reciever_id):
+        for client_id in self.ids :
+            if client_id == reciever_id:
+                return True
+        return False
+            
 
     def start_powerup_spawner(self):
         def spawner_loop():

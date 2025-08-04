@@ -22,6 +22,7 @@ class Protocol :
         INVITE_ACCEPTED = "response.invite_accepted"
         OPPONENT = "response.opponent"
         PLAYER_LIST = "response.player_list"
+        SEARCH_RESAULT = "response.search_resault"
         TEAM = "response.team"
         START = "response.start"
         UPDATE = "response.update"
