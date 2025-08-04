@@ -7,7 +7,7 @@ from src.engine.player import Player
 from src.engine.protocols import Protocol 
 class Client :
     def __init__(self,game, nickname,character_type,request_type):
-        self.host = '0.0.0.0'
+        self.host = '192.168.1.38'
         self.port = 55555
         self.status = {
             # Data sent periodically to update this player's state and position
@@ -23,7 +23,7 @@ class Client :
             "id" : None,
             "nickname" : nickname,
             "character_type" : character_type,
-            "team" : None
+            "team" : None,
         }
         self.request_type = request_type
         #self.players_count = 0
@@ -34,19 +34,31 @@ class Client :
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.buffer = ""
         self.is_connected = False
-        
+        self.invitations = []
+        self.search_resualt = None
     def start (self):
         try:
             self.socket.connect((self.host,self.port))
             self.socket.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY,1)
+            self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, 65536)
+            self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 65536)
             self.is_connected = True
-        except:
-            print("connection error")
+        except KeyboardInterrupt :
+            print ("keyboard interrupt")
+            self.send(Protocol.Request.DISCONNECTED,self.info["id"])
+            self.socket.close()
+        except Exception as e:
+            print("connection error", e)
+            traceback.print_exc()
             return
         recieve_thread = threading.Thread(target=self.recieve)
-        update_thread = threading.Thread(target=self.update_status)
+        #update_thread = threading.Thread(target=self.update_status)
         recieve_thread.start()
-        update_thread.start()
+        #update_thread.start()
+        if not self.is_connected :
+            print ("keyboard interrupt")
+            self.send(Protocol.Request.DISCONNECTED,self.info["id"])
+            self.socket.close()
    
 
 
@@ -89,12 +101,35 @@ class Client :
                         self.game.powerup_spawner(line.get("data"))
                     elif line.get("type") == Protocol.Response.POWERUP_PICKED :
                         self.game.powerup_killer(line.get("data"))
+                    elif line.get("type") == Protocol.Response.OPPONENT_LEFT :
+                        for player in self.other_players :
+                            if isinstance(player, Player) :
+                                if player.id == line.get("data") :
+                                    print(player.id )
+                                    print("left")
+                                    self.other_players.remove(player)
+                                    self.game.other_players = self.other_players
+                                    self.game.state = "won"
+                    elif line.get("type") == Protocol.Response.SEND_INVITE :
+                        self.invitations.append(line.get("data"))
+                    elif line.get("type") == Protocol.Response.SEARCH_RESAULT :
+                        self.search_resualt = line.get("data")
+            except KeyboardInterrupt :
+                print ("keyboard interrupt")
+                self.send(Protocol.Request.DISCONNECTED,self.info["id"])
+                self.socket.close()
+                break
             except Exception as e:
                 print("closed",e)
                 traceback.print_exc()
                 self.is_connected = False
+                self.send(Protocol.Request.DISCONNECTED,self.info["id"])
                 self.socket.close()
                 return
+        if not self.is_connected :
+            print ("keyboard interrupt")
+            self.send(Protocol.Request.DISCONNECTED,self.info["id"])
+            self.socket.close()
 
     def add_other_players (self, other_players_info):
         try:
@@ -111,10 +146,11 @@ class Client :
         # Update position and state of the player with the same id
         for player in self.other_players :
             if isinstance(player, Player) :
-                player.sync_remote_player(data)
+                if player.id == data["id"]:
+                    player.sync_remote_player(data)
 
     def update_status (self) :
-        while self.is_connected :
+        if self.is_connected :
             try:
                 if self.game.state == "playing" and self.player != None :
                     updated_status = {
@@ -128,11 +164,19 @@ class Client :
                     
                     self.status = updated_status
                     self.send(Protocol.Request.MOVE, self.status)
+            except KeyboardInterrupt :
+                print ("keyboard interrupt")
+                self.send(Protocol.Request.DISCONNECTED,self.info["id"])
+                self.socket.close()
             except Exception as e:
                 print("error3",e) 
                 traceback.print_exc()
                 self.is_connected =False
                 self.socket.close()
+        else:
+            print ("keyboard interrupt")
+            self.send(Protocol.Request.DISCONNECTED,self.info["id"])
+            self.socket.close()
     def send (self, type, data):
         message = {
             "type" : type ,
@@ -140,5 +184,18 @@ class Client :
         }
         message = json.dumps(message) + "\n"
         self.socket.sendall(message.encode('utf-8'))
-
-    
+    def new_look(self,nickname,character_type,request_type):
+        self.info["nickname"] = nickname
+        self.info["character_type"] = character_type
+        self.request_type = request_type
+        self.send(Protocol.Request.NEW_LOOK,"")
+    def accept_invite (self,invitation):
+        self.send(Protocol.Request.ACCEPT_INVITE, invitation)
+        self.invitations.remove(invitation)
+    def send_invite(self,id):
+        self.send(Protocol.Request.SEND_INVITE, id)
+        while True :
+            if self.search_resualt != None :
+                resualt = self.search_resualt
+                self.search_resualt = None
+                return resualt

@@ -14,6 +14,7 @@ class Protocol :
         POWERUP = "request.powerup"
         KILL_POWERUP = "request.kill_powerup"
         LEAVE = "request.leave"
+        NEW_LOOK = "request.new_look"
     class Response :
         SETUP = "response.setup"
         GAME_STYLE = "response.game_style"

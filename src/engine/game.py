@@ -438,8 +438,11 @@ class Game:
                     if event.key == pygame.K_RETURN :
                         self.state = "mp_menu" 
                         try :
-                            self.client =  Client(self, nickname, character_type,request_type)
-                            self.client.start()
+                            if self.client == None :
+                                self.client =  Client(self, nickname, character_type,request_type)
+                                self.client.start()
+                            else :
+                                self.client.new_look(nickname,character_type,request_type)
                         except Exception as e:
                             import traceback
                             print("error", e)
@@ -546,13 +549,15 @@ class Game:
         background = pygame.transform.scale(background, (800,600))
         self.screen.blit(background, (0,0))
         B1 = Button(self, None, [400, 100], "Match with local players", 'OCRAEXT', 50, 'indigo', 'pink')
-        B2 = Button(self, None, [400, 300], "Check invites", 'OCRAEXT', 50, 'indigo', 'pink')
-        B3 = Button(self, None, [400, 500], "main menu", 'OCRAEXT', 50, 'indigo', 'pink')
+        B2 = Button(self, None, [400, 250], "Check invites", 'OCRAEXT', 50, 'indigo', 'pink')
+        B3 = Button(self, None, [400, 400], "invite a friend", 'OCRAEXT', 50, 'indigo', 'pink')
+        B4 = Button(self, None, [400, 550], "main menu", 'OCRAEXT', 50, 'indigo', 'pink')
         MP_MENU_MOUSE_POS = pygame.mouse.get_pos
         def mp_menu_render():
             B1.draw(MP_MENU_MOUSE_POS())
             B2.draw(MP_MENU_MOUSE_POS())
             B3.draw(MP_MENU_MOUSE_POS())
+            B4.draw(MP_MENU_MOUSE_POS())
         def mp_menu_event_handler():
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -560,26 +565,115 @@ class Game:
                     sys.exit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if B1.is_pressed(MP_MENU_MOUSE_POS()):
-                        self.state = "waiting"
-                        self.waiting_room()  
+                        self.state = "waiting"  
                     if B2.is_pressed(MP_MENU_MOUSE_POS()):
                         self.state = "invite_screen"
-                        self.invites_screen()
                     if B3.is_pressed(MP_MENU_MOUSE_POS()):
+                        self.state = "search_id"
+                    if B4.is_pressed(MP_MENU_MOUSE_POS()):
                         self.state = "main_menu"
-                        self.main_menu()
+                    break
         while self.state == "mp_menu":
             mp_menu_render()
             mp_menu_event_handler()
             pygame.display.flip()
             self.clock.tick(config.FPS)
-                        
+        if self.state == "waiting"  :
+            self.waiting_room()  
+        elif self.state == "search_id" :
+            self.search_id_screen()
+        elif self.state == "invite_screen" :
+            self.invites_screen()
 
     def invites_screen(self):
         background = pygame.image.load(background_path)
         background = pygame.transform.scale(background, (800,600))
         self.screen.blit(background, (0,0))
+        buttons = {}
+        count = 0
+        
+        def update_invitations () :
+            nonlocal count
+            for invitation in self.client.invitations :
+                if invitation not in buttons :
+                    buttons[invitation] = Button(self, None, [400, 100 + (count* 200)], str(invitation["id"]) + " " + invitation["nickname"], 'OCRAEXT', 30, 'indigo', 'pink')
+                    count +=1
 
+        def invite_screen_render():
+            for invitation in self.client.invitations :
+                if isinstance(buttons[invitation], Button) :
+                    buttons[invitation].draw()
+
+        def invite_screen_event_handler():
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit
+                    sys.exit()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    for invitation in self.client.invitation :
+                        if isinstance(buttons[invitation], Button) :
+                            if buttons[invitation].is_pressed() :
+                                self.client.accept_invite(invitation)
+                                self.state = "waiting"
+                                return
+        while self.state == "invite_screen" :
+            update_invitations()
+            invite_screen_render()
+            invite_screen_event_handler()
+            pygame.display.flip()
+            self.clock.tick(config.FPS)
+    def search_id_screen (self):
+        id = ""
+        while self.state == "search_id" :
+            background = pygame.image.load(background_path)
+            background = pygame.transform.scale(background, (800,600))
+            self.screen.blit(background, (0,0))
+            
+            id_menu_font = pygame.font.Font("src/assets/fonts/MinimalPixelFont.ttf",80)
+            id_menu_text = id_menu_font.render("Enter an id", True, 'indigo')
+            id_menu_text_rect = id_menu_text.get_rect(center= (self.screen_width // 2, self.screen_height//6))
+            self.screen.blit(id_menu_text, id_menu_text_rect)
+
+            text_font = pygame.font.Font("src/assets/fonts/OCRAEXT.ttf",50)
+            id_text = text_font.render(id, True, 'black')
+            text_rect = id_text.get_rect(center=(400,300)) 
+            self.screen.blit(id_text,text_rect) 
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit
+                    sys.exit()
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_RETURN :
+                         
+                        try :
+                            if self.client.send_invite(id)  :
+                                self.state == "waiting"
+                            else :
+                                error_text = text_font.render("error", True, 'black')
+                                error_text_rect = error_text.get_rect(center=(400, 400))
+                                self.screen.blit(error_text,error_text_rect)
+                                id = ""
+                                time.sleep(4)
+                                self.state = "mp_menu"
+                                
+                        except Exception as e:
+                            import traceback
+                            print("error", e)
+                            traceback.print_exc()
+                        break
+                    elif event.key == pygame.K_BACKSPACE :
+                        id = id[:-1]
+                    else: 
+                        id += event.unicode
+            
+            pygame.display.flip()
+            self.clock.tick(config.FPS)
+
+        if self.state == "waiting" :
+            self.waiting_room()
+        elif self.state == "mp_menu" :
+            self.multiplayer_menu
     def finish_menu(self):
         self.screen.fill((0,0,0))
         self.player.reset()
@@ -633,6 +727,7 @@ class Game:
         text_rect = lose_msg.get_rect()
         text_rect.center = (self.screen_width//2, 200)
         self.screen.blit(lose_msg, text_rect)
+
     def win_screen(self):
         self.player.reset()
         for player in self.other_players :
@@ -643,6 +738,7 @@ class Game:
         text_rect = win_msg.get_rect()
         text_rect.center = (self.screen_width//2, 200)
         self.screen.blit(win_msg, text_rect)
+
 
     def platform_maker(self):
         platform_img = pygame.image.load("src/assets/images/platform.png").convert_alpha()
@@ -708,25 +804,37 @@ class Game:
  
     def run(self):
         while True:
-            self.music_manager()
-            if self.state == "playing" or self.state == "paused" or self.state == "gameover" :
-                self.handle_events()
-                self.update()
-                self.draw()
-                pygame.display.flip()
-                self.clock.tick(60)
-            else :
-                if self.state == "main_menu" :
-                    self.main_menu()
-                if self.state == "how_to_play":
-                    self.how_to_play()
-                if self.state == "char_menu" :
-                    self.character_menu()
-                if self.state == "map_menu" :
-                    self.map_menu()
-                if self.state == "won":
-                    self.finish_menu()
-            
+            try :
+                self.music_manager()
+                if self.state == "playing" or self.state == "paused" or self.state == "gameover" :
+                    self.handle_events()
+                    self.update()
+                    self.draw()
+                    pygame.display.flip()
+                    self.clock.tick(60)
+                else :
+                    if self.state == "main_menu" :
+                        self.main_menu()
+                    if self.state == "how_to_play":
+                        self.how_to_play()
+                    if self.state == "char_menu" :
+                        self.character_menu()
+                    if self.state == "map_menu" :
+                        self.map_menu()
+                    if self.state == "won":
+                        if self.mode == "single_player" :
+                            self.finish_menu()
+                        else :
+                            self.win_screen()
+            except KeyboardInterrupt :
+                if self.client != None :
+                    self.client.is_connected = False
+                break
+            except :
+                if self.client != None :
+                    self.client.is_connected = False
+                break
+
 
     def music_manager(self):
         if self.current_music_state == None :
@@ -825,7 +933,7 @@ class Game:
                 self.player.update(self.level.platforms, self.level.powerup_group, self.enemies)
             elif self.mode == "multiplayer" :
                 self.player.update(self.level.platforms, self.level.powerup_group)
-            #   self.client.update_status()
+                self.client.update_status()
                 for player in self.other_players :
                     if isinstance(player,Player):
                         if player.is_dead :
@@ -904,7 +1012,7 @@ class Game:
         if self.other_players :
             self.display_nicknames()
             for player in self.other_players :
-                if isinstance(player, Player):
+                if isinstance(player, Player) :
                     if player.direction == "left" :
                         self.screen.blit(pygame.transform.flip(player.image,True,False), (player.rect.x - self.camera_x, player.rect.y))
                     else :
@@ -962,13 +1070,14 @@ class Game:
         if self.other_players :
             i = 0
             for player in self.other_players:
+                i = 0
                 if isinstance(player, Player):
                     if player.team == self.player.team :
                         teammate_health_display = font2.render(player.nickname + " : " + str(player.health), True, 'purple')
                         self.screen.blit(teammate_health_display, (20, 80))
                     else :
                         other_health_display = font2.render(player.nickname + " : " + str(player.health), True, 'red')
-                        self.screen.blit(other_health_display, (700, 20 + i))
+                        self.screen.blit(other_health_display, (70, 20 + i))
                         i += 1
     
     def display_nicknames(self):
