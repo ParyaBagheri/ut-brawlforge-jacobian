@@ -332,7 +332,7 @@ class Game:
             nonlocal character_type
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    pygame.quit
+                    pygame.quit()
                     sys.exit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if CHAR_1.is_pressed(CHAR_MENU_MOUSE_POS()):
@@ -393,7 +393,7 @@ class Game:
             for event in pygame.event.get():
                 nonlocal request_type
                 if event.type == pygame.QUIT:
-                    pygame.quit
+                    pygame.quit()
                     sys.exit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if ONEVONE.is_pressed(GAME_REQUEST_MOUSE_POS()):
@@ -432,7 +432,7 @@ class Game:
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    pygame.quit
+                    pygame.quit()
                     sys.exit()
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_RETURN :
@@ -470,7 +470,7 @@ class Game:
         while self.state == "waiting" :
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    pygame.quit
+                    pygame.quit()
                     sys.exit()
             pygame.display.flip()
             self.clock.tick(config.FPS)
@@ -519,7 +519,7 @@ class Game:
         def map_menu_event_handler():
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    pygame.quit
+                    pygame.quit()
                     sys.exit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if MAP_1.is_pressed(MAP_MENU_MOUSE_POS()):
@@ -649,7 +649,7 @@ class Game:
         def invite_screen_event_handler():
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    pygame.quit
+                    pygame.quit()
                     sys.exit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     for invitation in self.client.invitations :
@@ -688,7 +688,7 @@ class Game:
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    pygame.quit
+                    pygame.quit()
                     sys.exit()
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_RETURN :
@@ -739,7 +739,7 @@ class Game:
         def finish_menu_event_handler():
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    pygame.quit
+                    pygame.quit()
                     sys.exit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if RESTART_BUTTON.is_pressed(MOUSE_POS()):
@@ -767,9 +767,9 @@ class Game:
             self.clock.tick(config.FPS)
 
     def lose_screen(self):
-        self.player.reset()
+        '''self.player.reset()
         for player in self.other_players :
-            player.reset()
+            player.reset()'''
         self.screen.fill((0, 0, 0))
         lose_font = pygame.font.Font("src/assets/fonts/OCRAEXT.ttf", 72)
         lose_msg = lose_font.render("YOU LOST !", True, 'yellow')
@@ -777,17 +777,51 @@ class Game:
         text_rect.center = (self.screen_width//2, 200)
         self.screen.blit(lose_msg, text_rect)
 
+        LS_MOUSE_POS = pygame.mouse.get_pos
+        MENU_BUTTON = Button(self, None, [400, 500], 'main menu', 'OCRAEXT', 40, 'yellow', 'white')
+        def ls_event_handler():
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                if event.type == pygame.MOUSEBUTTONDOWN :
+                    if MENU_BUTTON.is_pressed(LS_MOUSE_POS()):
+                        self.state = "main_menu"
+
+        while self.state == "gameover" :
+            MENU_BUTTON.draw(LS_MOUSE_POS())
+            ls_event_handler()
+            pygame.display.flip()
+            self.clock.tick(60)
+
     def win_screen(self):
-        self.player.reset()
+        '''self.player.reset()
         for player in self.other_players :
             if isinstance(player,Player):
-                player.reset()
+                player.reset()'''
         self.screen.fill((0, 0, 0))
         win_font = pygame.font.Font("src/assets/fonts/OCRAEXT.ttf", 72)
         win_msg = win_font.render("YOU WIN!", True, 'yellow')
         text_rect = win_msg.get_rect()
         text_rect.center = (self.screen_width//2, 200)
         self.screen.blit(win_msg, text_rect)
+
+        WS_MOUSE_POS = pygame.mouse.get_pos
+        MENU_BUTTON = Button(self, None, [400, 500], 'main menu', 'OCRAEXT', 40, 'yellow', 'white')
+        def ws_event_handler():
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                if event.type == pygame.MOUSEBUTTONDOWN :
+                    if MENU_BUTTON.is_pressed(WS_MOUSE_POS()):
+                        self.state = "main_menu"
+
+        while self.state == "gameover" :
+            MENU_BUTTON.draw(WS_MOUSE_POS())
+            ws_event_handler()
+            pygame.display.flip()
+            self.clock.tick(60)
 
 
     def platform_maker(self):
