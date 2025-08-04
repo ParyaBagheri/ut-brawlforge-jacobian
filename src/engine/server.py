@@ -128,7 +128,7 @@ class Server:
                         "nickname" : self.client_names[client]
                     }
                     reciever_id = message.get("data")
-                    self.send(Protocol.Response.SEARCH_RESAULT, self.id_found(reciever_id)
+                    self.send(Protocol.Response.SEARCH_RESAULT, self.id_found(reciever_id))
                     if self.id_found(reciever_id) :
                         self.client_invites[client] = self.ids[message.get("data")]
                         self.send(Protocol.Response.SEND_INVITE, invitation, self.ids[reciever_id])
