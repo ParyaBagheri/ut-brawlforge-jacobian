@@ -4,7 +4,7 @@ from .protocols import Protocol
 from .platform import Platform
 from threading import Lock
 
-HOST = '192.168.1.201'
+HOST = '192.168.1.38'
 PORT = 55555
 
 class Server:
@@ -145,8 +145,9 @@ class Server:
                         self.client_modes[client] = mode
                         clients = [self.ids[id], client]
                         self.create_room(clients)
-            except :
-                print("error setting the game style")
+            except Exception as e:
+                print("error setting the game style",e)
+                traceback.print_exc()
         print("user defined")
  
     def id_generator(self, client):

@@ -91,10 +91,14 @@ class Client :
                         self.info["team"] = line.get("data")
                         self.player.team = self.info["team"]
                     elif line.get("type") == Protocol.Response.GAME_STYLE :
-                        if self.game_style == "local_game" :
-                            self.send(Protocol.Request.LOCAL_GAME, "")
-                        '''elif self.game_style == "invite_game" :
-                            self.send(Protocol.Request.INVITE_GAME,"")'''
+                        while True :
+                            if self.game_style == "local_game" :
+                                self.send(Protocol.Request.LOCAL_GAME, "")
+                                break
+                            elif self.game_style == "invite_game" :
+                                self.send(Protocol.Request.INVITE_GAME,"")
+                                print("invite game")
+                                break
                     elif line.get("type") == Protocol.Response.START :
                         self.game.state = "playing"
                         print ("recieved start")
@@ -117,6 +121,7 @@ class Client :
                                     self.game.other_players = self.other_players
                                     self.game.state = "won"
                     elif line.get("type") == Protocol.Response.SEND_INVITE :
+                        print ("invitation recieved")
                         self.invitations.append(line.get("data"))
                     elif line.get("type") == Protocol.Response.SEARCH_RESAULT :
                         self.search_resualt = line.get("data")
@@ -199,9 +204,15 @@ class Client :
         self.send(Protocol.Request.ACCEPT_INVITE, invitation)
         self.invitations.remove(invitation)
     def send_invite(self,id):
+        print ("sending invite")
         self.send(Protocol.Request.SEND_INVITE, int(id))
         while True :
-            if self.search_resualt != None :
-                resualt = self.search_resualt
-                self.search_resualt = None
-                return resualt
+            try:
+                if self.search_resualt != None :
+                    resualt = self.search_resualt
+                    self.search_resualt = None
+                    print ("id found")
+                    return resualt
+            except Exception as e :
+                print ("errorrr",e)
+                traceback.print_exc()

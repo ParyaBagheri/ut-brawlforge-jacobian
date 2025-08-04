@@ -633,18 +633,18 @@ class Game:
         self.screen.blit(background, (0,0))
         buttons = {}
         count = 0
-        
+        INVITES_SCREEN_MOUSE_POS = pygame.mouse.get_pos
         def update_invitations () :
             nonlocal count
             for invitation in self.client.invitations :
-                if invitation not in buttons :
-                    buttons[invitation] = Button(self, None, [400, 100 + (count* 200)], str(invitation["id"]) + " " + invitation["nickname"], 'OCRAEXT', 30, 'indigo', 'pink')
+                if invitation["sender_id"] not in buttons :
+                    buttons[invitation["sender_id"]] = Button(self, None, [400, 100 + (count* 200)], str(invitation["sender_id"]) + " " + invitation["nickname"], 'OCRAEXT', 30, 'indigo', 'pink')
                     count +=1
 
         def invite_screen_render():
             for invitation in self.client.invitations :
-                if isinstance(buttons[invitation], Button) :
-                    buttons[invitation].draw()
+                if isinstance(buttons[invitation["sender_id"]], Button) :
+                    buttons[invitation["sender_id"]].draw(INVITES_SCREEN_MOUSE_POS())
 
         def invite_screen_event_handler():
             for event in pygame.event.get():
@@ -652,18 +652,23 @@ class Game:
                     pygame.quit
                     sys.exit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    for invitation in self.client.invitation :
-                        if isinstance(buttons[invitation], Button) :
-                            if buttons[invitation].is_pressed() :
+                    for invitation in self.client.invitations :
+                        if isinstance(buttons[invitation["sender_id"]], Button) :
+                            if buttons[invitation["sender_id"]].is_pressed(INVITES_SCREEN_MOUSE_POS()) :
                                 self.client.accept_invite(invitation)
                                 self.state = "waiting"
                                 return
         while self.state == "invite_screen" :
-            update_invitations()
-            invite_screen_render()
-            invite_screen_event_handler()
-            pygame.display.flip()
-            self.clock.tick(config.FPS)
+            try:
+                update_invitations()
+                invite_screen_render()
+                invite_screen_event_handler()
+                pygame.display.flip()
+                self.clock.tick(config.FPS)
+            except Exception as e:
+                print (e)
+                import traceback
+                traceback.print_exc()
     def search_id_screen (self):
         id = ""
         while self.state == "search_id" :
@@ -690,8 +695,10 @@ class Game:
                          
                         try :
                             if self.client.send_invite(id)  :
-                                self.state == "waiting"
+                                print("id found")
+                                self.state = "waiting"
                             else :
+                                print("wrong id")
                                 error_text = text_font.render("error", True, 'black')
                                 error_text_rect = error_text.get_rect(center=(400, 400))
                                 self.screen.blit(error_text,error_text_rect)
