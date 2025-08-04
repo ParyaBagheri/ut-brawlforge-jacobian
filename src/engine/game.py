@@ -548,16 +548,18 @@ class Game:
         background = pygame.image.load(background_path)
         background = pygame.transform.scale(background, (800,600))
         self.screen.blit(background, (0,0))
-        B1 = Button(self, None, [400, 100], "Match with local players", 'OCRAEXT', 50, 'indigo', 'pink')
-        B2 = Button(self, None, [400, 250], "Check invites", 'OCRAEXT', 50, 'indigo', 'pink')
-        B3 = Button(self, None, [400, 400], "invite a friend", 'OCRAEXT', 50, 'indigo', 'pink')
-        B4 = Button(self, None, [400, 550], "main menu", 'OCRAEXT', 50, 'indigo', 'pink')
+        B1 = Button(self, None, [400, 100], "Match with local players", 'OCRAEXT', 40, 'indigo', 'pink')
+        B2 = Button(self, None, [400, 200], "Check invites", 'OCRAEXT', 40, 'indigo', 'pink')
+        B3 = Button(self, None, [400, 300], "invite a friend", 'OCRAEXT', 40, 'indigo', 'pink')
+        B4 = Button(self, None, [400, 500], "main menu", 'OCRAEXT', 40, 'indigo', 'pink')
+        B5 = Button(self, None, [400, 400], "my id", 'OCRAEXT', 40, 'indigo', 'pink')
         MP_MENU_MOUSE_POS = pygame.mouse.get_pos
         def mp_menu_render():
             B1.draw(MP_MENU_MOUSE_POS())
             B2.draw(MP_MENU_MOUSE_POS())
             B3.draw(MP_MENU_MOUSE_POS())
             B4.draw(MP_MENU_MOUSE_POS())
+            B5.draw(MP_MENU_MOUSE_POS())
         def mp_menu_event_handler():
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -572,6 +574,8 @@ class Game:
                         self.state = "search_id"
                     if B4.is_pressed(MP_MENU_MOUSE_POS()):
                         self.state = "main_menu"
+                    if B5.is_pressed(MP_MENU_MOUSE_POS()):
+                        self.state = "id_check"
                     break
         while self.state == "mp_menu":
             mp_menu_render()
@@ -587,6 +591,41 @@ class Game:
         elif self.state == "invite_screen" :
             self.client.game_style = "invite_game"
             self.invites_screen()
+        elif self.state == "id_check":
+            self.id_menu()
+
+    def id_menu(self):
+        background = pygame.image.load(background_path)
+        background = pygame.transform.scale(background, (800,600))
+        self.screen.blit(background, (0,0))
+        id_menu_font = pygame.font.Font("src/assets/fonts/MinimalPixelFont.ttf",80)
+        id_menu_text = id_menu_font.render("Your ID is : ", True, 'indigo')
+        id_menu_text_rect = id_menu_text.get_rect(center= (self.screen_width // 2, self.screen_height//6))
+        self.screen.blit(id_menu_text, id_menu_text_rect)
+        id_font = pygame.font.Font("src/assets/fonts/OCRAEXT.ttf", 80)
+        id_text = id_font.render(str(self.player.id), True, 'indigo')
+        id_text_rect = id_text.get_rect(center=(400, 300))
+        self.screen.blit(id_text, id_text_rect)
+        
+        ID_MENU_MOUSE_POS = pygame.mouse.get_pos
+        BACK_BUTTON = Button(self, None, [100, 500], "back", 'OCRAEXT', 40, 'indigo', 'pink')
+        def id_menu_event_handler():
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                if event.type == pygame.MOUSEBUTTONDOWN :
+                    if BACK_BUTTON.is_pressed(ID_MENU_MOUSE_POS()):
+                        self.state = "mp_menu"
+                
+        while self.state == "id_check":
+            BACK_BUTTON.draw(ID_MENU_MOUSE_POS())
+            id_menu_event_handler()
+            pygame.display.flip()
+            self.clock.tick(60)
+            if self.state == "mp_menu":
+                self.multiplayer_menu()
+
 
     def invites_screen(self):
         background = pygame.image.load(background_path)
