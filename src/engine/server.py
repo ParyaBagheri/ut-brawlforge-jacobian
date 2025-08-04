@@ -4,7 +4,7 @@ from .protocols import Protocol
 from .platform import Platform
 from threading import Lock
 
-HOST = '192.168.1.38'
+HOST = '192.168.1.201'
 PORT = 55555
 
 class Server:
@@ -120,35 +120,33 @@ class Server:
                 line = line.rstrip('\n')
                 message = json.loads(line)
                 if message.get("type") == Protocol.Request.LOCAL_GAME :
+                    self.client_gamestyles[client] = "local_game"
                     self.match_players()
                 elif message.get("type") == Protocol.Request.INVITE_GAME :
-                    invitation = {
-                        "sender_id" : self.client_ids[client],
-                        "request_type" : self.client_modes[client],
-                        "nickname" : self.client_names[client]
-                    }
-                    reciever_id = message.get("data")
-                    self.send(Protocol.Response.SEARCH_RESAULT, self.id_found(reciever_id))
-                    if self.id_found(reciever_id) :
-                        self.client_invites[client] = self.ids[message.get("data")]
-                        self.send(Protocol.Response.SEND_INVITE, invitation, self.ids[reciever_id])
-
+                    self.client_gamestyles[client] = "invite_game"
+                    line = client.recv(1024).decode("utf-8")
+                    line = line.rstrip('\n')
+                    message = json.loads(line)
+                    if message.get("type") == Protocol.Request.SEND_INVITE :
+                        invitation = {
+                            "sender_id" : self.client_ids[client],
+                            "request_type" : self.client_modes[client],
+                            "nickname" : self.client_names[client]
+                        }
+                        reciever_id = message.get("data")
+                        self.send(Protocol.Response.SEARCH_RESAULT, self.id_found(reciever_id), client)
+                        if self.id_found(reciever_id) :
+                            self.client_invites[client] = self.ids[message.get("data")]
+                            self.send(Protocol.Response.SEND_INVITE, invitation, self.ids[reciever_id])
+                    elif message.get("type") == Protocol.Request.ACCEPT_INVITE :
+                        data = message.get("data")
+                        mode = data.get("request_type")
+                        id = data.get("sender_id")
+                        self.client_modes[client] = mode
+                        clients = [self.ids[id], client]
+                        self.create_room(clients)
             except :
                 print("error setting the game style")
-        while client not in self.rooms :
-            try :
-                line = client.recv(1024).decode("utf-8")
-                line = line.rstrip('\n')
-                message = json.loads(line)
-                if message.get("type") == Protocol.Request.ACCEPT_INVITE :
-                    data = message.get("data")
-                    mode = data.get("request_type")
-                    id = data.get("sender_id")
-                    self.client_modes[client] = mode
-                    clients = [self.ids[id], client]
-                    self.create_room(clients)
-            except :
-                print("invitation handling failed")
         print("user defined")
  
     def id_generator(self, client):
