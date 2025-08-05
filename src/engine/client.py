@@ -127,6 +127,7 @@ class Client :
                         self.search_resualt = line.get("data")
                     elif line.get("type") == Protocol.Response.WINNER :
                         self.game.state = "won"
+                        self.game.win_screen()
             except KeyboardInterrupt :
                 print ("keyboard interrupt")
                 self.send(Protocol.Request.DISCONNECTED,self.info["id"])

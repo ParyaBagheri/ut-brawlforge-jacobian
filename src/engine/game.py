@@ -795,33 +795,38 @@ class Game:
             self.clock.tick(60)
 
     def win_screen(self):
-        self.player.reset()
-        for player in self.other_players :
-            if isinstance(player,Player):
-                player.reset()
-        self.screen.fill((0, 0, 0))
-        win_font = pygame.font.Font("src/assets/fonts/OCRAEXT.ttf", 72)
-        win_msg = win_font.render("YOU WIN!", True, 'yellow')
-        text_rect = win_msg.get_rect()
-        text_rect.center = (self.screen_width//2, 200)
-        self.screen.blit(win_msg, text_rect)
+        try :
+            #self.player.reset()
+            '''for player in self.other_players :
+                if isinstance(player,Player) and not player.is_dead:
+                    player.reset()'''
+            self.screen.fill((0, 0, 0))
+            win_font = pygame.font.Font("src/assets/fonts/OCRAEXT.ttf", 72)
+            win_msg = win_font.render("YOU WIN!", True, 'yellow')
+            text_rect = win_msg.get_rect()
+            text_rect.center = (self.screen_width//2, 200)
+            self.screen.blit(win_msg, text_rect)
 
-        WS_MOUSE_POS = pygame.mouse.get_pos
-        MENU_BUTTON = Button(self, None, [400, 500], 'main menu', 'OCRAEXT', 40, 'yellow', 'white')
-        def ws_event_handler():
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
-                if event.type == pygame.MOUSEBUTTONDOWN :
-                    if MENU_BUTTON.is_pressed(WS_MOUSE_POS()):
-                        self.state = "main_menu"
+            WS_MOUSE_POS = pygame.mouse.get_pos
+            MENU_BUTTON = Button(self, None, [400, 500], 'main menu', 'OCRAEXT', 40, 'yellow', 'white')
+            def ws_event_handler():
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        sys.exit()
+                    if event.type == pygame.MOUSEBUTTONDOWN :
+                        if MENU_BUTTON.is_pressed(WS_MOUSE_POS()):
+                            self.state = "main_menu"
 
-        while self.state == "gameover" :
-            MENU_BUTTON.draw(WS_MOUSE_POS())
-            ws_event_handler()
-            pygame.display.flip()
-            self.clock.tick(60)
+            while self.state == "won" :
+                MENU_BUTTON.draw(WS_MOUSE_POS())
+                ws_event_handler()
+                pygame.display.flip()
+                self.clock.tick(60)
+        except Exception as e :
+            print(e)
+            import traceback
+            traceback.print_exc
 
 
     def platform_maker(self):
