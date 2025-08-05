@@ -81,6 +81,7 @@ class Game:
                     sys.exit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if MENU_PLAY.is_pressed(MENU_MOUSE_POS()):
+                        self.mode = "single_player"
                         self.state = "char_menu"
                         self.enemies = pygame.sprite.Group()
                         enemy = Enemy(self)
