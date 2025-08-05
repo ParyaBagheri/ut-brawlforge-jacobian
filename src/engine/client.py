@@ -7,8 +7,8 @@ from src.engine.player import Player
 from src.engine.protocols import Protocol 
 class Client :
     def __init__(self,game, nickname,character_type,request_type):
-        self.host = '192.168.1.38'
-        self.port = 55555
+        self.host = '192.168.1.165'
+        self.port = 7373
         self.status = {
             # Data sent periodically to update this player's state and position
             "id" : None,
@@ -67,7 +67,6 @@ class Client :
         while self.is_connected :  
             try : 
                 chunck = self.socket.recv(1024).decode('utf-8')
-                
                 self.buffer += chunck
                 while '\n' in self.buffer :
                     line,self.buffer = self.buffer.split('\n', 1)
@@ -126,8 +125,9 @@ class Client :
                     elif line.get("type") == Protocol.Response.SEARCH_RESAULT :
                         self.search_resualt = line.get("data")
                     elif line.get("type") == Protocol.Response.WINNER :
-                        self.game.state = "won"
-                        self.game.win_screen()
+                        if self.game.state == "playing":
+                            self.game.state = "won"
+                            self.game.win_screen()
             except KeyboardInterrupt :
                 print ("keyboard interrupt")
                 self.send(Protocol.Request.DISCONNECTED,self.info["id"])
