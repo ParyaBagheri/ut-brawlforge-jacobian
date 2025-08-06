@@ -7,8 +7,8 @@ from src.engine.player import Player
 from src.engine.protocols import Protocol 
 class Client :
     def __init__(self,game, nickname,character_type,request_type):
-        self.host = '192.168.1.165'
-        self.port = 7373
+        self.host = '192.168.1.175'
+        self.port = 7777
         self.status = {
             # Data sent periodically to update this player's state and position
             "id" : None,
@@ -124,10 +124,10 @@ class Client :
                         self.invitations.append(line.get("data"))
                     elif line.get("type") == Protocol.Response.SEARCH_RESAULT :
                         self.search_resualt = line.get("data")
-                    elif line.get("type") == Protocol.Response.WINNER :
+                    '''elif line.get("type") == Protocol.Response.WINNER :
                         if self.game.state == "playing":
                             self.game.state = "won"
-                            self.game.win_screen()
+                            #self.game.win_screen()'''
             except KeyboardInterrupt :
                 print ("keyboard interrupt")
                 self.send(Protocol.Request.DISCONNECTED,self.info["id"])
@@ -202,6 +202,8 @@ class Client :
         self.info["nickname"] = nickname
         self.info["character_type"] = character_type
         self.request_type = request_type
+        self.player = Player(self.game, self.info["character_type"],100, self.info["id"],self.info["nickname"])
+        self.game.player = self.player
         self.send(Protocol.Request.NEW_LOOK,"")
     def accept_invite (self,invitation):
         self.send(Protocol.Request.ACCEPT_INVITE, invitation)

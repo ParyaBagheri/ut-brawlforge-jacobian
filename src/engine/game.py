@@ -101,12 +101,12 @@ class Game:
             self.clock.tick(config.FPS)
 
     def mp_win(self):
-        '''for player in self.other_players :
-            if isinstance(player,Player) :
+        for player in self.other_players :
+            if isinstance(player,Player) and not player.is_dead :
                 if player.team != self.player.team :
                     return False
-        #self.state = "won"'''
-        return False    
+        self.state = "won"
+        return True  
     def mp_lose(self):
         if self.player :
             if self.player.is_dead :
@@ -770,7 +770,8 @@ class Game:
     def lose_screen(self):
         self.player.reset()
         for player in self.other_players :
-            player.reset()
+            if isinstance(player, Player) and not player.is_dead :
+                player.reset()
         self.screen.fill((0, 0, 0))
         lose_font = pygame.font.Font("src/assets/fonts/OCRAEXT.ttf", 72)
         lose_msg = lose_font.render("YOU LOST !", True, 'yellow')
@@ -797,10 +798,10 @@ class Game:
 
     def win_screen(self):
         try :
-            #self.player.reset()
-            '''for player in self.other_players :
+            self.player.reset()
+            for player in self.other_players :
                 if isinstance(player,Player) and not player.is_dead:
-                    player.reset()'''
+                    player.reset()
             self.screen.fill((0, 0, 0))
             win_font = pygame.font.Font("src/assets/fonts/OCRAEXT.ttf", 72)
             win_msg = win_font.render("YOU WIN!", True, 'yellow')
@@ -998,6 +999,8 @@ class Game:
         if self.state == "playing" and self.level != None:
             if self.mode != "multiplayer" and self.level.won() :
                 self.state = "won"
+            if self.mode == "multiplayer" and self.mp_win():
+                self.state == "won"
             '''if self.mode == "multiplayer" :
                 #if self.player.is_dead :
                     #self.player.reset()
@@ -1163,14 +1166,15 @@ class Game:
         if self.other_players :
             i = 0
             for player in self.other_players:
-                i = 0
+                
                 if isinstance(player, Player):
                     if player.team == self.player.team :
                         teammate_health_display = font2.render(player.nickname + " : " + str(player.health), True, 'purple')
                         self.screen.blit(teammate_health_display, (20, 80))
                     else :
                         other_health_display = font2.render(player.nickname + " : " + str(player.health), True, 'red')
-                        self.screen.blit(other_health_display, (700, 20 + i))
+                        other_health_display_rect = other_health_display.get_rect(topright=(780, 20+i))
+                        self.screen.blit(other_health_display, other_health_display_rect)
                         i += 1
     
     def display_nicknames(self):

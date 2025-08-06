@@ -4,8 +4,8 @@ from .protocols import Protocol
 from .platform import Platform
 from threading import Lock
 
-HOST = '192.168.1.38'
-PORT = 55555
+HOST = '192.168.1.175'
+PORT = 7777
 
 class Server:
     def __init__(self, host=HOST, port=PORT):
@@ -49,6 +49,7 @@ class Server:
         self.handle_connect(client)
         self.wait_for_room(client)
         connection = True
+        resault = None
         while connection :
             try :
                 
@@ -59,7 +60,11 @@ class Server:
                 while '\n' in buffer and connection:
                     line,buffer = buffer.split('\n',1)
                     message = json.loads(line)
-                    connection = self.handle_recieve(message, client)               
+                    resault = self.handle_recieve(message, client) 
+                    if resault == False :
+                        connection = False   
+                    elif resault == "restart"  :
+                        return self.handle(client, buffer)         
             except Exception as e:
                 print("????",e)
                 traceback.print_exc()
@@ -236,7 +241,7 @@ class Server:
     def wait_for_room(self, client):
         while client not in self.rooms :
             print("waiting for room")
-            time.sleep(3)
+            time.sleep(1)
 
     def handle_recieve(self, message, client):
         r_type = message.get("type")
@@ -272,7 +277,9 @@ class Server:
             self.client_names.pop(client, None)
             self.client_modes.pop(client, None)
             self.client_characters.pop(client,None)
-            self.handle_connect(client) 
+            self.rooms.pop(client, None)
+            #self.handle_connect(client) 
+            return "restart"
         return True
 
     def send(self, r_type, data, client):
