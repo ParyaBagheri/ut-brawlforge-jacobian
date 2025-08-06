@@ -199,6 +199,9 @@ class Client :
         message = json.dumps(message) + "\n"
         self.socket.sendall(message.encode('utf-8'))
     def new_look(self,nickname,character_type,request_type):
+        print ("new look func")
+        self.other_players = []
+        self.game_style = None
         self.info["nickname"] = nickname
         self.info["character_type"] = character_type
         self.request_type = request_type

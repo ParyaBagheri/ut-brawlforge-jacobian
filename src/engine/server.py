@@ -49,7 +49,6 @@ class Server:
         self.handle_connect(client)
         self.wait_for_room(client)
         connection = True
-        resault = None
         while connection :
             try :
                 
@@ -60,11 +59,7 @@ class Server:
                 while '\n' in buffer and connection:
                     line,buffer = buffer.split('\n',1)
                     message = json.loads(line)
-                    resault = self.handle_recieve(message, client) 
-                    if resault == False :
-                        connection = False   
-                    elif resault == "restart"  :
-                        return self.handle(client, buffer)         
+                    connection = self.handle_recieve(message, client)               
             except Exception as e:
                 print("????",e)
                 traceback.print_exc()
@@ -74,6 +69,7 @@ class Server:
         self.disconnect(client)
 
     def handle_connect(self, client):
+        print ("handle_connect")
         while client not in self.client_names:
             self.send(Protocol.Response.SETUP, "Enter your nickname", client )
             try :
@@ -262,7 +258,7 @@ class Server:
                     room.pending_powerups.remove(data)
                     self.broadcast(Protocol.Response.POWERUP_PICKED, data, client)
 
-            if room.is_finished():
+            '''if room.is_finished():
                 loser = room.losing_team
                 winner = [t for t in room.team_health if t != loser][0]
                 #print("[SERVER] Match ended. Sending WINNER/LOSER...")
@@ -271,15 +267,16 @@ class Server:
                     if self.teams[c] == winner :
                         self.send(Protocol.Response.WINNER, None, c)
                     else :
-                        self.send(Protocol.Response.LOSER, None, c)
-        elif r_type == Protocol.Request.NEW_LOOK :
-            self.teams.pop(client, None)
-            self.client_names.pop(client, None)
-            self.client_modes.pop(client, None)
-            self.client_characters.pop(client,None)
-            self.rooms.pop(client, None)
-            #self.handle_connect(client) 
-            return "restart"
+                        self.send(Protocol.Response.LOSER, None, c)'''
+            if r_type == Protocol.Request.NEW_LOOK :
+                print("New look")
+                self.teams.pop(client, None)
+                self.client_names.pop(client, None)
+                self.client_modes.pop(client, None)
+                self.client_characters.pop(client,None)
+                self.client_gamestyles.pop(client,None)
+                self.client_invites.pop(client,None)
+                self.handle_connect(client) 
         return True
 
     def send(self, r_type, data, client):

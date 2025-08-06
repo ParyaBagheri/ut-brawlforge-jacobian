@@ -772,6 +772,7 @@ class Game:
         for player in self.other_players :
             if isinstance(player, Player) and not player.is_dead :
                 player.reset()
+        self.other_players = []
         self.screen.fill((0, 0, 0))
         lose_font = pygame.font.Font("src/assets/fonts/OCRAEXT.ttf", 72)
         lose_msg = lose_font.render("YOU LOST !", True, 'yellow')
@@ -802,6 +803,7 @@ class Game:
             for player in self.other_players :
                 if isinstance(player,Player) and not player.is_dead:
                     player.reset()
+            self.other_players = []
             self.screen.fill((0, 0, 0))
             win_font = pygame.font.Font("src/assets/fonts/OCRAEXT.ttf", 72)
             win_msg = win_font.render("YOU WIN!", True, 'yellow')
