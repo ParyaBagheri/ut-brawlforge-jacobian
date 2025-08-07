@@ -388,7 +388,12 @@ class Player:
         self.direction = updated_status["direction"]
     def update_remote_player(self):
         if self.state != "die":
-            
+            # Check collisions
+            collided_platform = self.check_vertical_collision(self.game.level.platforms)
+            if collided_platform != None and collided_platform != self.game.ground_rect :
+                if collided_platform.type == 'timed':
+                    collided_platform.timed_platform()
+                
             self.check_powerup_collision(self.game.level.powerups)
             self.check_bullet_collision()
             if self.is_invincible :
@@ -437,6 +442,7 @@ class Player:
                     bullet.player_collision = True
                     if self.main :
                         self.health -= bullet.damage
-
+    
+        
 
                        
