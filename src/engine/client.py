@@ -8,7 +8,7 @@ from src.engine.protocols import Protocol
 class Client :
     def __init__(self,game, nickname,character_type,request_type):
         self.host = '192.168.1.175'
-        self.port = 7777
+        self.port = 55555
         self.status = {
             # Data sent periodically to update this player's state and position
             "id" : None,

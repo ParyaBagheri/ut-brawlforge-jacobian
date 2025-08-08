@@ -5,7 +5,7 @@ from .platform import Platform
 from threading import Lock
 
 HOST = '192.168.1.175'
-PORT = 7777
+PORT = 55555
 
 class Server:
     def __init__(self, host=HOST, port=PORT):
