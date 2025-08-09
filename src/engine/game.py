@@ -1175,7 +1175,7 @@ class Game:
                         self.screen.blit(teammate_health_display, (20, 80))
                     else :
                         other_health_display = font2.render(player.nickname + " : " + str(player.health), True, 'red')
-                        other_health_display_rect = other_health_display.get_rect(topright=(780, 20 + 20 *i))
+                        other_health_display_rect = other_health_display.get_rect(topright=(780, 20 + 40 *i))
                         self.screen.blit(other_health_display, other_health_display_rect)
                         i += 1
     
