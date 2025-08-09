@@ -60,6 +60,7 @@ class Game:
         self.other_players = []
         self.powerup_spawn_interval = 10
         self.last_powerup_spawn = time.time()
+        self.update_time = 0
 
     def main_menu(self):
         #self.screen.fill((0, 0, 0))
@@ -1028,7 +1029,10 @@ class Game:
                 self.player.update(self.level.platforms, self.level.powerup_group, self.enemies)
             elif self.mode == "multiplayer" :
                 self.player.update(self.level.platforms, self.level.powerup_group)
-                self.client.update_status()
+                self.update_time += 0.15
+                if self.update_time >= 1 :
+                    self.client.update_status()
+                    self.update_time = 0
                 for player in self.other_players :
                     if isinstance(player,Player):
                         if player.is_dead :
