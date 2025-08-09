@@ -1029,7 +1029,7 @@ class Game:
                 self.player.update(self.level.platforms, self.level.powerup_group, self.enemies)
             elif self.mode == "multiplayer" :
                 self.player.update(self.level.platforms, self.level.powerup_group)
-                self.update_time += 0.15
+                self.update_time += 0.25
                 if self.update_time >= 1 :
                     self.client.update_status()
                     self.update_time = 0
