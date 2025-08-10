@@ -36,6 +36,8 @@ class Bomber (Enemy,pygame.sprite.Sprite ) :
         prev_state = self.state
         if (self.rect.x >= 0 + self.game.camera_x and self.rect.x - self.game.camera_x <= config.BASE_SCREEN_WIDTH ):
             self.is_inview = True
+        else :
+            self.is_inview = False
     
         if self.is_inview :
 
