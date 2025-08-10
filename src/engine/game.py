@@ -20,6 +20,7 @@ from src.engine.bullet import Bullet
 from src.engine.player import Player
 from src.engine.platform import Platform
 from src.engine.enemy import Enemy
+from src.engine.enemy import Bomber
 from src.engine.button import Button
 from src.engine.level import Level
 from src.engine import data_loader
@@ -85,7 +86,9 @@ class Game:
                         self.state = "char_menu"
                         self.enemies = pygame.sprite.Group()
                         enemy = Enemy(self)
+                        bomber = Bomber(self, 900, 450)
                         self.enemies.add(enemy)
+                        self.enemies .add(bomber)
 
                         
                     if MENU_HOWTO.is_pressed(MENU_MOUSE_POS()):
@@ -1052,10 +1055,12 @@ class Game:
             # Remove dead enemies and spawn new ones
             if self.enemies :
                 for enemy in self.enemies:
-                    if enemy.rect.x <= 0 + self.camera_x or enemy.health <= 0 or self.isGameover == True :
-                        enemy.kill()
-                        new_enemy = Enemy(self)
-                        self.enemies.add(new_enemy)
+                    if not isinstance(enemy, Bomber) :
+                        
+                        if enemy.rect.x <= 0 + self.camera_x or enemy.health <= 0 or self.isGameover == True :
+                            enemy.kill()
+                            new_enemy = Enemy(self)
+                            self.enemies.add(new_enemy)
 
             # spawning random powerups :
             if self.mode == "multiplayer":
@@ -1153,11 +1158,17 @@ class Game:
     def draw_enemies(self):
         if self.enemies:
             for enemy in self.enemies:
-                pygame.draw.rect(self.screen, enemy.color,
-                                pygame.Rect(enemy.rect.x - self.camera_x, 
-                                            enemy.rect.y, 
-                                            enemy.rect.width, 
-                                            enemy.rect.height))
+                if isinstance(enemy, Bomber) :
+                    if enemy.direction == "right" :
+                        self.screen.blit(enemy.image,(enemy.rect.x - self.camera_x, enemy.rect.y))
+                    else :
+                        self.screen.blit(pygame.transform.flip(enemy.image,True,False),(enemy.rect.x - self.camera_x, enemy.rect.y))  
+                else :    
+                    pygame.draw.rect(self.screen, enemy.color,
+                                    pygame.Rect(enemy.rect.x - self.camera_x, 
+                                                enemy.rect.y, 
+                                                enemy.rect.width, 
+                                                enemy.rect.height))
     def show_health(self):
         health_display = font2.render("Your Health: " + str(self.player.health), True, 'black')
         self.screen.blit(health_display, (20,20))

@@ -276,7 +276,22 @@ class AssetManager :
             "damageboost" : boost_image,
             "health" : health_image
         }
-
+    def load_enemy_assets () :
+        bomber_idle_sheet = pygame.image.load("src/assets/images/enemy/bomber/idle.png")
+        bomber_idle_frames = AssetManager.load_frames(bomber_idle_sheet,16 , 16, 0 ,4)
+        bomber_idle_frames = AssetManager.scale_frames(bomber_idle_frames, 50, 50)
+        bomber_run_sheet = pygame.image.load("src/assets/images/enemy/bomber/run.png")
+        bomber_run_frames = AssetManager.load_frames(bomber_run_sheet,16 , 16, 0 ,4)
+        bomber_run_frames = AssetManager.scale_frames(bomber_run_frames, 50, 50)
+        bomber_death_sheet = pygame.image.load("src/assets/images/enemy/bomber/death.png")
+        bomber_death_frames = AssetManager.load_frames(bomber_death_sheet,16 , 16, 0 ,6)
+        bomber_death_frames = AssetManager.scale_frames(bomber_death_frames, 50, 50)
+        AssetManager.enemy_assets["bomber"] = {
+            "idle" : bomber_idle_frames,
+            "run" : bomber_run_frames ,
+            "death" : bomber_death_frames
+        }
+        
     def load_assets():
         AssetManager.load_player_assets()
         AssetManager.load_bullet_assets()
@@ -284,3 +299,4 @@ class AssetManager :
         AssetManager.load_map()
         AssetManager.load_UI_assets ()
         AssetManager.load_powerups_assets()
+        AssetManager.load_enemy_assets()
