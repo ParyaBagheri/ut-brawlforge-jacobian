@@ -122,7 +122,7 @@ class Freezerenemy(Enemy) :
         super().__init__(game)
         self.start_x = start_x
         self.start_y = start_y
-        self.rect = pygame.Rect(self.start_x, self.start_y, 50, 50)
+        self.rect = pygame.Rect(self.start_x, self.start_y, 80, 50)
         self.activated = False
         self.activation_timer = 0
         self.held_bullet = Bullet(self, 'freeze')

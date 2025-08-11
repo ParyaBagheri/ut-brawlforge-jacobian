@@ -1047,15 +1047,15 @@ class Game:
                 if isinstance(bullet, Bullet) :
                     bullet.update()
 
-            # Remove dead enemies and spawn new ones
-            if self.level.enemies :
+            # Remove dead enemies and spawn new ones 
+            '''if self.level.enemies :       
                 for enemy in self.level.enemies:
                     if not isinstance(enemy, Bomber) :
                         
                         if enemy.rect.x <= 0 + self.camera_x or enemy.health <= 0 or self.isGameover == True :
                             enemy.kill()
                             new_enemy = Enemy(self)
-                            self.level.enemies.add(new_enemy)
+                            self.level.enemies.add(new_enemy)'''
 
             # spawning random powerups :
             if self.mode == "multiplayer":
