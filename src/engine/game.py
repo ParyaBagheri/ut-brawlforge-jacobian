@@ -1041,7 +1041,7 @@ class Game:
                 if isinstance(platform, Platform):
                     platform.update()
             if self.mode == "single_player" :
-                for enemy in self.enemies:
+                for enemy in self.level.enemies:
                     enemy.update()
 
             # Update all fired bullets
@@ -1152,7 +1152,7 @@ class Game:
 
     def draw_enemies(self):
         if self.enemies:
-            for enemy in self.enemies:
+            for enemy in self.level.enemies:
                 pygame.draw.rect(self.screen, enemy.color,
                                 pygame.Rect(enemy.rect.x - self.camera_x, 
                                             enemy.rect.y, 

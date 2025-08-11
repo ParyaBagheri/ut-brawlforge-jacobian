@@ -26,7 +26,7 @@ class Level:
         self.powerups = data["powerups"]
         self.powerup_group = pygame.sprite.Group(self.powerups)
         print(f"[DEBUG] Loaded powerups: {len(self.powerups)}")
-        #self.enemies = data["enemies"]
+        self.enemies = data["enemies"]
         #self.player = data["player"]
     def won(self):
         if self.winFunc is None:

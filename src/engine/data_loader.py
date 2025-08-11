@@ -125,7 +125,7 @@ def get_level_data(name, game):
                 
             ],
             "enemies" : [
-                Freezerenemy(game, 2600, 80)
+                Freezerenemy(game, 2600, 50)
             ],
             "powerups" : [
                 Powerup(game, 1150, 200, 'shield'),

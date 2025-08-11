@@ -1,9 +1,12 @@
 import pygame
 import os
+import math
 #from src.engine.enemy import Enemy
 from src.engine.platform import Platform
 from src.engine.assetmanager import AssetManager
 import config
+from src.engine.assetmanager import AssetManager
+
 
 
 class Bullet :
@@ -36,7 +39,7 @@ class Bullet :
     
             
 
-    def fire (self) :
+    def fire (self, direction= None) :
         
         # Mark bullet as shot and add it to the game's bullet list
         self.is_fired = True
@@ -44,16 +47,23 @@ class Bullet :
 
         
         # Set direction and speed based on player's facing direction
-        if self.owner.direction == "right"  :
-            self.changex = self.speed
-            self.changey = self.speed
-            self.direction = "right"
-                 
-        if self.owner.direction == "left" :
-            self.changex = -self.speed
-            self.changey = self.speed
-            self.direction = "left"
-            
+        if direction == None:
+            if self.owner.direction == "right"  :
+                self.changex = self.speed
+                self.changey = self.speed
+                self.direction = "right"
+                    
+            if self.owner.direction == "left" :
+                self.changex = -self.speed
+                self.changey = self.speed
+                self.direction = "left"
+        elif direction :
+            theta = (direction[0]) // math.sqrt(((direction[0]*direction[0]) + (direction[1]*direction[1])))
+            self.direction = 180 - theta
+            self.changex = direction[0] // 40
+            self.changey = direction[1] // 30
+
+
 
 
     def update (self) :
@@ -83,9 +93,10 @@ class Bullet :
             self.image = self.asset[int(self.current_frame)] # Right-facing image
         elif self.direction == "left":
             self.image = pygame.transform.flip(self.asset[int(self.current_frame)], True, False ) #left_facing image
-
+        else :
+            self.image = pygame.transform.rotate(self.asset[int(self.current_frame)], int(self.direction))
     def check_enemy_collision (self) :
-        if self.is_fired == True and self.type != 'freeze_bullet':
+        if self.is_fired == True and self.type != 'freeze':
             if self.game.enemies : 
                 for enemy in self.game.enemies :
                     #if isinstance (enemy, Enemy) :
