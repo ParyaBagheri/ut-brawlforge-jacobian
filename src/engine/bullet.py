@@ -1,6 +1,6 @@
 import pygame
 import os
-from src.engine.enemy import Enemy
+#from src.engine.enemy import Enemy
 from src.engine.platform import Platform
 from src.engine.assetmanager import AssetManager
 import config
