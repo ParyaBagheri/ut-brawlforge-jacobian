@@ -179,9 +179,13 @@ class AssetManager :
         fireball_frames = AssetManager.load_frames(fireball_sheet,13, 9, 0 ,7)
         fireball_frames = AssetManager.scale_frames(fireball_frames, config.BULLET_SIZE ["fireball"][0],config.BULLET_SIZE["fireball"][1] )
         
+        freeze_bullet_sheet = pygame.image.load("src/assets/images/bullet/freeze.png")
+        freeze_bullet_frames = AssetManager.load_frames(freeze_bullet_sheet,15, 5, 0 ,4)
+        freeze_bullet_frames = AssetManager.scale_frames(freeze_bullet_frames, config.BULLET_SIZE ["fireball"][0],config.BULLET_SIZE["fireball"][1] )
         AssetManager.bullet_assets = {
             "arrow" : arrow_image ,
-            "fireball" : fireball_frames
+            "fireball" : fireball_frames,
+            "freeze" : freeze_bullet_frames
         }
     def load_platform_images () :
         
