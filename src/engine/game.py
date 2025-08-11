@@ -19,7 +19,7 @@ loadingscreen_font = pygame.font.SysFont('OCR A Extended', 36)
 from src.engine.bullet import Bullet
 from src.engine.player import Player
 from src.engine.platform import Platform
-from src.engine.enemy import Enemy
+from src.engine.enemy import Enemy, Freezerenemy
 from src.engine.button import Button
 from src.engine.level import Level
 from src.engine import data_loader
@@ -1153,11 +1153,19 @@ class Game:
     def draw_enemies(self):
         if self.enemies:
             for enemy in self.level.enemies:
-                pygame.draw.rect(self.screen, enemy.color,
-                                pygame.Rect(enemy.rect.x - self.camera_x, 
-                                            enemy.rect.y, 
-                                            enemy.rect.width, 
-                                            enemy.rect.height))
+                if isinstance(enemy, Freezerenemy) :
+                    if enemy.direction == "right" :
+                        self.screen.blit(enemy.image,(enemy.rect.x - self.camera_x, enemy.rect.y))
+                    else :
+                        self.screen.blit(pygame.transform.flip(enemy.image,True,False),(enemy.rect.x - self.camera_x, enemy.rect.y))  
+                else :    
+                    pygame.draw.rect(self.screen, enemy.color,
+                                    pygame.Rect(enemy.rect.x - self.camera_x, 
+                                                enemy.rect.y, 
+                                                enemy.rect.width, 
+                                                enemy.rect.height))
+
+                
     def show_health(self):
         health_display = font2.render("Your Health: " + str(self.player.health), True, 'black')
         self.screen.blit(health_display, (20,20))
