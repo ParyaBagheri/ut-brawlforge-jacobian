@@ -1,7 +1,9 @@
 import pygame
 import config
 from src.engine.platform import Platform
+from src.engine.assetmanager import AssetManagerfrom src.engine.bullet import Bullet
 from src.engine.assetmanager import AssetManager
+
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, game):
         pygame.sprite.Sprite.__init__(self)
@@ -113,3 +115,60 @@ class Bomber (Enemy,pygame.sprite.Sprite ) :
                 self.kill()
             else :
                 self.current_frame = 0
+
+
+class Freezerenemy(Enemy) :
+    def __init__(self, game, start_x, start_y):
+        super().__init__(game)
+        self.start_x = start_x
+        self.start_y = start_y
+        self.rect = pygame.Rect(self.start_x, self.start_y, 50, 50)
+        self.activated = False
+        self.activation_timer = 0
+        self.held_bullet = Bullet(self, 'freeze')
+        self.direction = 'left'
+        self.state = "idle"
+        self.current_frame = 0
+        self.assets = AssetManager.enemy_assets["freezer"]
+        self.image = self.assets["idle"][0]
+        self.type = "freezer"
+    
+    def update(self):
+        prev_state = self.state
+        if self.game.player.rect.x - self.rect.x <= 800 and self.game.player.rect.x - self.rect.x >= 0:
+            self.activated = True
+            self.direction = 'right'
+        elif self.game.player.rect.x - self.rect.x <= 0 and self.game.player.rect.x - self.rect.x >= -800 :
+            self.activated = True
+            self.direction = 'right'
+        else :
+            self.activated = False
+            self.activation_timer = 0
+        if self.activated :
+            self.activation_timer += 1
+            if self.activation_timer % 180 == 0:
+                self.state = "attack"
+                self.shoot()
+            if self.health <= 0 :
+                self.health = 0
+                self.state = "death"
+            else :
+                self.state = "idle"
+            self.update_animation(prev_state)
+
+    
+    def shoot(self):
+        self.held_bullet.fire([self.game.player.rect.x + 15 - self.rect.x , self.game.player.rect.y -self.rect.y])
+        self.held_bullet = Bullet(self, 'freeze')
+
+    def update_animation(self, prev_state):
+        if self.state != prev_state:
+            self.current_frame = 0
+        self.image = self.assets[self.state][int(self.current_frame)]
+        self.current_frame += config.PLAYER_FRAMES_SPEED
+        if (self.current_frame >= len(self.assets[self.state])):
+            if self.state == "death" :
+                self.kill()
+            else :
+                self.current_frame = 0
+

@@ -19,7 +19,7 @@ loadingscreen_font = pygame.font.SysFont('OCR A Extended', 36)
 from src.engine.bullet import Bullet
 from src.engine.player import Player
 from src.engine.platform import Platform
-from src.engine.enemy import Enemy
+from src.engine.enemy import Enemy, Freezerenemy
 from src.engine.enemy import Bomber
 from src.engine.button import Button
 from src.engine.level import Level
@@ -1153,7 +1153,7 @@ class Game:
     def draw_enemies(self):
         if self.level.enemies:
             for enemy in self.level.enemies:
-                if isinstance(enemy, Bomber) :
+                if isinstance(enemy, Bomber) or isinstance(enemy, Freezerenemy):
                     if enemy.direction == "right" :
                         self.screen.blit(enemy.image,(enemy.rect.x - self.camera_x, enemy.rect.y))
                     else :

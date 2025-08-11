@@ -28,7 +28,7 @@ class Level:
         self.enemies = data["enemies"]
         self.enemies_group = data["enemies"]
         print(f"[DEBUG] Loaded powerups: {len(self.powerups)}")
-        #self.enemies = data["enemies"]
+        self.enemies = data["enemies"]
         #self.player = data["player"]
     def won(self):
         if self.winFunc is None:

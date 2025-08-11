@@ -16,11 +16,13 @@ PLAYER_FRAMES_SPEED = 0.15
 BULLET_SPEED = {
     "arrow" : 20 ,
     "fireball" : 25 ,
+    "freeze" : 25
 }
 BULLET_DAMAGE = 1
 BULLET_SIZE ={
     "arrow" : (44, 15) ,
-    "fireball" : (30, 21)
+    "fireball" : (30, 21),
+    "freeze" : (30, 21)
 }
 WEAPONS = {
     "knight" : "bow" ,

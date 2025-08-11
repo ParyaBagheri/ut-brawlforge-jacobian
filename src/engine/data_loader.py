@@ -3,6 +3,7 @@ from src.engine.platform import Platform
 from src.engine.collectible import Powerup
 from src.engine.assetmanager import AssetManager
 from src.engine.enemy import Bomber
+from src.engine.enemy import Freezerenemy
 import config
 
 
@@ -126,6 +127,10 @@ def get_level_data(name, game):
                 Platform(game, 7096, 96, 904, 24) #Finish line at 7700
                 
             ],
+            "enemies" : [
+                Freezerenemy(game, 2600, 50),
+                Freezerenemy(game, 4300, 50)
+            ],
             "powerups" : [
                 Powerup(game, 1150, 200, 'shield'),
                 Powerup(game, 2850, 50, 'health'),
@@ -192,6 +197,7 @@ def get_level_data(name, game):
                 Platform(game, 14104, 296, 1900, 48) # Finish platform
 
             ],
+            "enemies" : [],
             "powerups" : [
                 Powerup(game, 900, 300, 'damageboost'),
                 Powerup(game, 1600, 250, 'shield'),

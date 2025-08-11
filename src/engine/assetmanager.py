@@ -179,9 +179,13 @@ class AssetManager :
         fireball_frames = AssetManager.load_frames(fireball_sheet,13, 9, 0 ,7)
         fireball_frames = AssetManager.scale_frames(fireball_frames, config.BULLET_SIZE ["fireball"][0],config.BULLET_SIZE["fireball"][1] )
         
+        freeze_bullet_sheet = pygame.image.load("src/assets/images/bullet/freeze.png")
+        freeze_bullet_frames = AssetManager.load_frames(freeze_bullet_sheet,15, 5, 0 ,4)
+        freeze_bullet_frames = AssetManager.scale_frames(freeze_bullet_frames, config.BULLET_SIZE ["fireball"][0],config.BULLET_SIZE["fireball"][1] )
         AssetManager.bullet_assets = {
             "arrow" : arrow_image ,
-            "fireball" : fireball_frames
+            "fireball" : fireball_frames,
+            "freeze" : freeze_bullet_frames
         }
     def load_platform_images () :
         
@@ -290,6 +294,24 @@ class AssetManager :
             "idle" : bomber_idle_frames,
             "run" : bomber_run_frames ,
             "death" : bomber_death_frames
+        }
+        freezer_idle_sheet = pygame.image.load("src/assets/images/enemy/freezer/idle.png")
+        freezer_idle_frames = AssetManager.load_frames(freezer_idle_sheet,32 , 16, 8 ,4)
+        freezer_idle_frames = AssetManager.scale_frames(freezer_idle_frames, 50, 50)
+        freezer_attack_sheet = pygame.image.load("src/assets/images/enemy/freezer/attack.png")
+        freezer_attack_frames = AssetManager.load_frames(freezer_attack_sheet,32 , 16, 8 ,6)
+        freezer_attack_frames = AssetManager.scale_frames(freezer_attack_frames, 50, 50)
+        freezer_death_sheet = pygame.image.load("src/assets/images/enemy/freezer/death.png")
+        freezer_death_frames = AssetManager.load_frames(freezer_death_sheet,32 , 16, 8 ,7)
+        freezer_death_frames = AssetManager.scale_frames(freezer_death_frames, 50, 50)
+        freezer_damage_sheet = pygame.image.load("src/assets/images/enemy/freezer/damage.png")
+        freezer_damage_frames = AssetManager.load_frames(freezer_damage_sheet,32 , 16, 8 ,4)
+        freezer_damage_frames = AssetManager.scale_frames(freezer_damage_frames, 50, 50)
+        AssetManager.enemy_assets["freezer"] = {
+            "idle" : freezer_idle_frames,
+            "attack" : freezer_attack_frames ,
+            "death" : freezer_death_frames ,
+            "damage" : freezer_damage_frames
         }
         
     def load_assets():
