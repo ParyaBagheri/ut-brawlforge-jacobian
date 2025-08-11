@@ -1,7 +1,7 @@
 import pygame
 import config
 from src.engine.platform import Platform
-from src.engine.assetmanager import AssetManagerfrom src.engine.bullet import Bullet
+from src.engine.bullet import Bullet
 from src.engine.assetmanager import AssetManager
 
 class Enemy(pygame.sprite.Sprite):

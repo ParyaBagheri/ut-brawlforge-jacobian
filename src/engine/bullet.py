@@ -94,7 +94,7 @@ class Bullet :
         else :
             self.image = pygame.transform.rotate(self.asset[int(self.current_frame)], int(self.direction))
     def check_enemy_collision (self) :
-        if self.is_fired == True and self.type != 'freeze':
+        if self.is_fired == True:
             if self.game.enemies : 
                 for enemy in self.game.level.enemies :
                     #if isinstance (enemy, Enemy) :

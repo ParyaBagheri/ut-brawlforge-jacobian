@@ -89,6 +89,9 @@ def get_level_data(name, game):
             ]
         }
     elif name == "lost_city":
+        enemies = pygame.sprite.Group()
+        enemies.add(Freezerenemy(game, 2600, 50))
+        enemies.add(Freezerenemy(game, 4300, 50))
         return{
             "map" : AssetManager.map_image["lost_city"] ,
             "background_layers" : {AssetManager.backgrounds["lost_city"]},
@@ -127,10 +130,7 @@ def get_level_data(name, game):
                 Platform(game, 7096, 96, 904, 24) #Finish line at 7700
                 
             ],
-            "enemies" : [
-                Freezerenemy(game, 2600, 50),
-                Freezerenemy(game, 4300, 50)
-            ],
+            "enemies" : enemies,
             "powerups" : [
                 Powerup(game, 1150, 200, 'shield'),
                 Powerup(game, 2850, 50, 'health'),
