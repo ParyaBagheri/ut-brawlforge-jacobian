@@ -2,6 +2,7 @@ import pygame , random
 from src.engine.platform import Platform
 from src.engine.collectible import Powerup
 from src.engine.assetmanager import AssetManager
+from src.engine.enemy import Freezerenemy
 import config
 
 
@@ -122,6 +123,9 @@ def get_level_data(name, game):
                 Platform(game, 6896, 200, 96, 32),
                 Platform(game, 7096, 96, 904, 24) #Finish line at 7700
                 
+            ],
+            "enemies" : [
+                Freezerenemy(game, 2600, 80)
             ],
             "powerups" : [
                 Powerup(game, 1150, 200, 'shield'),
