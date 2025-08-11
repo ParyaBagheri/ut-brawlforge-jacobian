@@ -25,6 +25,8 @@ class Level:
         self.platforms = data["platforms"]
         self.powerups = data["powerups"]
         self.powerup_group = pygame.sprite.Group(self.powerups)
+        self.enemies = data["enemies"]
+        self.enemies_group = data["enemies"]
         print(f"[DEBUG] Loaded powerups: {len(self.powerups)}")
         #self.enemies = data["enemies"]
         #self.player = data["player"]

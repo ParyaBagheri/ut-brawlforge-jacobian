@@ -13,6 +13,7 @@ class Enemy(pygame.sprite.Sprite):
         self.health = config.MAX_ENEMY_HEALTH
         self.velocity_x = -1*(config.INITIAL_ENEMY_SPEED)
         self.is_collided = False
+        self.state = "idle"
     def update(self):
         self.rect.x += self.velocity_x
 
@@ -32,16 +33,18 @@ class Bomber (Enemy,pygame.sprite.Sprite ) :
         self.game = game
         self.state = "idle"
         self.type = "bomber"
+        self.is_collided = False
     def update (self) :
         prev_state = self.state
-        if (self.rect.x >= 0 + self.game.camera_x and self.rect.x - self.game.camera_x <= config.BASE_SCREEN_WIDTH ):
+        if (self.rect.x >= 0 + self.game.camera_x and self.rect.x - self.game.camera_x <= config.BASE_SCREEN_WIDTH - 50):
             self.is_inview = True
         else :
             self.is_inview = False
     
         if self.is_inview :
 
-            if self.rect.colliderect(self.game.player.rect) or self.health <= 0 :
+            if self.health <= 0 or self.rect.colliderect(self.game.player.rect):
+                self.health = 0
                 self.state = "death"
             elif (self.game.player.rect.bottom >= self.rect.bottom) :
                 self.state = "run"
@@ -50,10 +53,10 @@ class Bomber (Enemy,pygame.sprite.Sprite ) :
 
             if self.state == "run" :
 
-                if self.game.player.rect.x - self.rect.x >= 0 :
+                if self.game.player.rect.x - self.rect.x >= 50:
                     self.direction = "right"
                     self.rect.x += self.velocity_x
-                else :
+                elif self.game.player.rect.x - self.rect.x <= -50:
                     self.direction = "left"
                     self.rect.x -= self.velocity_x
             if self.rect.x <= 0 :

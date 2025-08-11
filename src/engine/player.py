@@ -1,6 +1,7 @@
 import pygame
 import config
 from src.engine.enemy import Enemy
+from src.engine.enemy import Bomber
 from src.engine.bullet import Bullet
 from src.engine.platform import Platform
 from src.engine.assetmanager import AssetManager
@@ -146,7 +147,7 @@ class Player:
 
     def check_enemy_collision(self,enemies):
         for enemy in enemies:
-            if isinstance(enemy, Enemy):
+            if isinstance(enemy, Enemy) and enemy.state != "death":
                 if self.rect.colliderect(enemy.rect):
                     #stomp enemy to kill it;  other collisions reduce player's health
                     if(self.velocity_y > 0 and

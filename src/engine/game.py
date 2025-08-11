@@ -84,11 +84,6 @@ class Game:
                     if MENU_PLAY.is_pressed(MENU_MOUSE_POS()):
                         self.mode = "single_player"
                         self.state = "char_menu"
-                        self.enemies = pygame.sprite.Group()
-                        enemy = Enemy(self)
-                        bomber = Bomber(self, 900, 450)
-                        self.enemies.add(enemy)
-                        self.enemies .add(bomber)
 
                         
                     if MENU_HOWTO.is_pressed(MENU_MOUSE_POS()):
@@ -1027,8 +1022,8 @@ class Game:
                     self.player.reset()
                     self.lose_screen()'''
                 #self.other_player.update(self.level.platforms, self.enemies, self.level.powerups)
-            if self.mode == "single_player" and self.enemies :
-                self.player.update(self.level.platforms, self.level.powerup_group, self.enemies)
+            if self.mode == "single_player" :
+                self.player.update(self.level.platforms, self.level.powerup_group, self.level.enemies)
             elif self.mode == "multiplayer" :
                 self.player.update(self.level.platforms, self.level.powerup_group)
                 self.client.update_status()
@@ -1044,7 +1039,7 @@ class Game:
                 if isinstance(platform, Platform):
                     platform.update()
             if self.mode == "single_player" :
-                for enemy in self.enemies:
+                for enemy in self.level.enemies:
                     enemy.update()
 
             # Update all fired bullets
@@ -1053,14 +1048,14 @@ class Game:
                     bullet.update()
 
             # Remove dead enemies and spawn new ones
-            if self.enemies :
-                for enemy in self.enemies:
+            if self.level.enemies :
+                for enemy in self.level.enemies:
                     if not isinstance(enemy, Bomber) :
                         
                         if enemy.rect.x <= 0 + self.camera_x or enemy.health <= 0 or self.isGameover == True :
                             enemy.kill()
                             new_enemy = Enemy(self)
-                            self.enemies.add(new_enemy)
+                            self.level.enemies.add(new_enemy)
 
             # spawning random powerups :
             if self.mode == "multiplayer":
@@ -1156,8 +1151,8 @@ class Game:
             self.screen.blit(loadingscreen_text, ls_text_rect)'''
 
     def draw_enemies(self):
-        if self.enemies:
-            for enemy in self.enemies:
+        if self.level.enemies:
+            for enemy in self.level.enemies:
                 if isinstance(enemy, Bomber) :
                     if enemy.direction == "right" :
                         self.screen.blit(enemy.image,(enemy.rect.x - self.camera_x, enemy.rect.y))
@@ -1209,6 +1204,7 @@ class Game:
 
     def restart(self):
         self.player.reset()
+        self.level.load()
         for platform in self.level.platforms :
             if isinstance(platform, Platform):
                 platform.activated = False

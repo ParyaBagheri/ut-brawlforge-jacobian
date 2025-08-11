@@ -2,12 +2,15 @@ import pygame , random
 from src.engine.platform import Platform
 from src.engine.collectible import Powerup
 from src.engine.assetmanager import AssetManager
+from src.engine.enemy import Bomber
 import config
 
 
 def get_level_data(name, game):
     if name == "forest":
-        
+        enemies = pygame.sprite.Group()
+        enemies.add(Bomber(game, 900, 450))
+        enemies.add(Bomber(game, 1700, 296 - 50))
         return{
             "map" : AssetManager.map_image["forest"] ,
             "background_layers" : {AssetManager.backgrounds["forest"]},
@@ -17,7 +20,7 @@ def get_level_data(name, game):
                 Platform(game, 750, 304, 250, 20, 'timed', image = AssetManager.platform_images["timed"]), #Fragile platform
                 Platform(game, 1048, 200, 112, 16, 'solid'), # Bonus on this platform
                 Platform(game, 1140, 560 - config.BASE_GROUND_HEIGHT, 50, 40, 'bouncy',AssetManager.platform_images["bouncy"][0]), #Bouncy platform
-                Platform(game, 1248, 296, 304, 24, 'solid'),
+                Platform(game, 1248, 294, 304, 24, 'solid'),
                 Platform(game, 1416, 600 - config.BASE_GROUND_HEIGHT, 350, 20, 'slowing' ), #Muddy platform
                 Platform(game, 1630, 200, 100, 20, 'timed', image = AssetManager.platform_images["timed"]),
                 Platform(game, 1696, 296, 112, 48, 'solid'),
@@ -30,7 +33,7 @@ def get_level_data(name, game):
                 Platform(game, 3050, 560 - config.BASE_GROUND_HEIGHT, 50, 40, 'bouncy', AssetManager.platform_images["bouncy"][0]),
                 game.ground_rect
             ],
-            "enemies" : [],
+            "enemies" : enemies,
             "powerups" : [
                 Powerup(game, 1100, 50, 'shield'),
                 Powerup(game, 2100, 550 - config.BASE_GROUND_HEIGHT, 'doublejump')
