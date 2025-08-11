@@ -1,7 +1,7 @@
 import pygame
 import config
 from src.engine.bullet import Bullet
-
+from src.engine.assetmanager import AssetManager
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, game):
         pygame.sprite.Sprite.__init__(self)
@@ -29,8 +29,12 @@ class Freezerenemy(Enemy) :
         self.activation_timer = 0
         self.held_bullet = Bullet(self, 'freeze_bullet')
         self.direction = 'left'
-    
+        self.current_frame = 0
+        self.asset = AssetManager.enemy_assets["freezer"]
+        self.state = "idle"
+        self.image = self.asset[self.state][0]
     def update(self):
+        prev_state = self.state
         if self.game.player.rect.x - self.rect.x <= 800 and self.game.player.rect.x - self.rect.x >= 0:
             self.activated = True
             self.direction = 'right'
@@ -44,7 +48,14 @@ class Freezerenemy(Enemy) :
             self.activation_timer += 1
             if self.activation_timer % 180 == 0:
                 self.shoot()
-
+        self.update_animation(prev_state) 
+    def update_animation(self,prev_state) :
+        if prev_state != self.state :
+            self.current_frame = 0
+        self.image = self.assets[self.state][int(self.current_frame)]
+        self.current_frame += config.PLAYER_FRAMES_SPEED
+        if(self.current_frame >= len(self.assets[self.state])) :
+            self.current_frame = 0
     
     def shoot(self):
         self.held_bullet.fire()

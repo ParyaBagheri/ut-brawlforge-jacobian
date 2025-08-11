@@ -276,7 +276,26 @@ class AssetManager :
             "damageboost" : boost_image,
             "health" : health_image
         }
-
+    def load_enemy_assets () :
+        freezer_idle_sheet = pygame.image.load("src/assets/images/enemy/freezer/idle.png")
+        freezer_idle_frames = AssetManager.load_frames(freezer_idle_sheet,32 , 16, 8 ,4)
+        freezer_idle_frames = AssetManager.scale_frames(freezer_idle_frames, 50, 50)
+        freezer_attack_sheet = pygame.image.load("src/assets/images/enemy/freezer/attack.png")
+        freezer_attack_frames = AssetManager.load_frames(freezer_attack_sheet,32 , 16, 8 ,6)
+        freezer_attack_frames = AssetManager.scale_frames(freezer_attack_frames, 50, 50)
+        freezer_death_sheet = pygame.image.load("src/assets/images/enemy/freezer/death.png")
+        freezer_death_frames = AssetManager.load_frames(freezer_death_sheet,32 , 16, 8 ,7)
+        freezer_death_frames = AssetManager.scale_frames(freezer_death_frames, 50, 50)
+        freezer_damage_sheet = pygame.image.load("src/assets/images/enemy/freezer/damage.png")
+        freezer_damage_frames = AssetManager.load_frames(freezer_damage_sheet,32 , 16, 8 ,4)
+        freezer_damage_frames = AssetManager.scale_frames(freezer_damage_frames, 50, 50)
+        AssetManager.enemy_assets["freezer"] = {
+            "idle" : freezer_idle_frames,
+            "attack" : freezer_attack_frames ,
+            "death" : freezer_death_frames ,
+            "damage" : freezer_damage_frames
+        }
+        
     def load_assets():
         AssetManager.load_player_assets()
         AssetManager.load_bullet_assets()
@@ -284,3 +303,4 @@ class AssetManager :
         AssetManager.load_map()
         AssetManager.load_UI_assets ()
         AssetManager.load_powerups_assets()
+        AssetManager.load_enemy_assets()
