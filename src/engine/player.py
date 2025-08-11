@@ -26,7 +26,10 @@ class Player:
         self.slowing_timer = 0
         self.direction = "right" # Track facing direction ( default : right- facing )
         self.collision_direction = "none" 
-        self.collision_direction = "none"''
+        self.collision_direction = "none"
+        self.is_frozen = False
+        self.frozen_timer = 0
+
 
         # player's asset managing
         #sounds
@@ -190,22 +193,23 @@ class Player:
         if not self.is_dead:
             self.update_animation(keys)
         if self.state != "die" :
-            # Horizontal movement
-            self.velocity_x = config.MOVE_SPEED - 3 if self.is_slowed else config.MOVE_SPEED
+            if self.is_frozen == False:
+                # Horizontal movement
+                self.velocity_x = config.MOVE_SPEED - 3 if self.is_slowed else config.MOVE_SPEED
 
-            if (keys[pygame.K_a] and self.collision_direction != "left"):
-                self.rect.x -= self.velocity_x
-                self.direction = "left" # Update facing direction
+                if (keys[pygame.K_a] and self.collision_direction != "left"):
+                    self.rect.x -= self.velocity_x
+                    self.direction = "left" # Update facing direction
 
-            if (keys[pygame.K_d] and self.collision_direction != "right"):
-                self.rect.x += self.velocity_x
-                self.direction = "right" # Update facing direction
-            if self.rect.x <= 0 :
-                self.rect.x = 0
+                if (keys[pygame.K_d] and self.collision_direction != "right"):
+                    self.rect.x += self.velocity_x
+                    self.direction = "right" # Update facing direction
+                if self.rect.x <= 0 :
+                    self.rect.x = 0
 
-            # Apply gravity
-            self.velocity_y += config.GRAVITY
-            self.rect.y += self.velocity_y
+                # Apply gravity
+                self.velocity_y += config.GRAVITY
+                self.rect.y += self.velocity_y
 
             # Check collisions
             collided_platform = self.check_vertical_collision(platforms)
@@ -229,8 +233,8 @@ class Player:
             self.check_horizontal_collision(platforms)
             if enemies : self.check_enemy_collision(enemies)
             self.check_powerup_collision(powerups)
-            if self.game.mode == "multiplayer":
-                self.check_bullet_collision()
+            #if self.game.mode == "multiplayer":
+            self.check_bullet_collision()
 
             # Temporary flickering after collision with an enemy
             if self.is_invincible :
@@ -253,27 +257,33 @@ class Player:
                 if self.slowing_timer >= 15 :
                     self.is_slowed = False
                     self.slowing_timer = 0
+            if self.is_frozen :
+                self.frozen_timer += 1
+                if self.is_frozen >= 60:
+                    self.is_frozen = False 
+                    self.frozen_timer = 0
 
             # Jumping (only if on ground)
-            if (keys[pygame.K_UP] or keys[pygame.K_SPACE]):
-                if not self.jumped and (self.on_ground or self.jump_count < self.max_jumps) :
-                    self.jump_count += 1
-                    self.velocity_y = config.JUMP_VELOCITY
-                    self.on_ground = False
-                self.jumped = True
-            else :
-                self.jumped = False
+            if self.is_frozen == False:
+                if (keys[pygame.K_UP] or keys[pygame.K_SPACE]):
+                    if not self.jumped and (self.on_ground or self.jump_count < self.max_jumps) :
+                        self.jump_count += 1
+                        self.velocity_y = config.JUMP_VELOCITY
+                        self.on_ground = False
+                    self.jumped = True
+                else :
+                    self.jumped = False
 
-            #shoot_animation
-            if self.is_shooting == True :
-                self.attack_animation = True
-                self.is_shooting = False
-            #shoot
-            if (self.current_frame >= config.SHOOT_FRAME[self.weapon]  and 
-            self.current_frame < config.SHOOT_FRAME[self.weapon] + config.PLAYER_FRAMES_SPEED and 
-            self.state == "attack") :
-                self.attack_sound = True
-                self.shoot()
+                #shoot_animation
+                if self.is_shooting == True :
+                    self.attack_animation = True
+                    self.is_shooting = False
+                #shoot
+                if (self.current_frame >= config.SHOOT_FRAME[self.weapon]  and 
+                self.current_frame < config.SHOOT_FRAME[self.weapon] + config.PLAYER_FRAMES_SPEED and 
+                self.state == "attack") :
+                    self.attack_sound = True
+                    self.shoot()
 
 
             # Update held bullet (follows player if not fired)
@@ -437,11 +447,13 @@ class Player:
     def check_bullet_collision(self) : 
         for bullet in self.game.Fired_bullets_list :
             if isinstance(bullet,Bullet)  :
-                if self.rect.colliderect(bullet.rect) and bullet.player != self:
+                if self.rect.colliderect(bullet.rect) and bullet.owner != self:
 
                     bullet.player_collision = True
                     if self.main :
                         self.health -= bullet.damage
+                    if bullet.type == "freeze_bullet" :
+                        self.is_frozen = True
     
         
 

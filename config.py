@@ -16,6 +16,7 @@ PLAYER_FRAMES_SPEED = 0.15
 BULLET_SPEED = {
     "arrow" : 20 ,
     "fireball" : 25 ,
+    "freeze_bullet" : 25
 }
 BULLET_DAMAGE = 1
 BULLET_SIZE ={
