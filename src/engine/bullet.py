@@ -50,12 +50,10 @@ class Bullet :
         if direction == None:
             if self.owner.direction == "right"  :
                 self.changex = self.speed
-                self.changey = self.speed
                 self.direction = "right"
                     
             if self.owner.direction == "left" :
                 self.changex = -self.speed
-                self.changey = self.speed
                 self.direction = "left"
         elif direction :
             theta = (direction[0]) // math.sqrt(((direction[0]*direction[0]) + (direction[1]*direction[1])))
@@ -98,7 +96,7 @@ class Bullet :
     def check_enemy_collision (self) :
         if self.is_fired == True and self.type != 'freeze':
             if self.game.enemies : 
-                for enemy in self.game.enemies :
+                for enemy in self.game.level.enemies :
                     #if isinstance (enemy, Enemy) :
                     if self.direction == "right" :
                         if (self.rect.right >= enemy.rect.left and 

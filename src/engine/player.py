@@ -259,7 +259,7 @@ class Player:
                     self.slowing_timer = 0
             if self.is_frozen :
                 self.frozen_timer += 1
-                if self.is_frozen >= 60:
+                if self.frozen_timer >= 120:
                     self.is_frozen = False 
                     self.frozen_timer = 0
 
@@ -374,7 +374,7 @@ class Player:
         self.is_dead = False
         self.current_frame = 0 
         self.color = (255, 0, 0)
-        
+        self.is_frozen = False
         self.sound_effects["running"].stop()
          
                     
@@ -452,7 +452,7 @@ class Player:
                     bullet.player_collision = True
                     if self.main :
                         self.health -= bullet.damage
-                    if bullet.type == "freeze_bullet" :
+                    if bullet.type == "freeze" :
                         self.is_frozen = True
     
         
