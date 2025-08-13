@@ -133,15 +133,15 @@ class Player:
     def check_horizontal_collision(self,platforms):
         for platform in platforms :
             if isinstance(platform, Platform) and platform.visible:
-                if(self.rect.top < platform.rect.bottom and
-                    self.rect.bottom > platform.rect.top) :
+                if(self.rect.top > platform.rect.top and
+                    self.rect.bottom < platform.rect.bottom) :
                     if(self.direction == "right" and
-                       self.rect.right == platform.rect.left):
+                       self.rect.right >= platform.rect.left and self.rect.right <= platform.rect.right):
                         self.rect.right = platform.rect.left
                         self.collision_direction = "right"
                         return platform
                     elif(self.direction == "left" and
-                         self.rect.left == platform.rect.right):
+                        self.rect.left <=  platform.rect.right and self.rect.left >= platform.rect.left):
                         self.rect.left = platform.rect.right
                         self.collision_direction = "left"
                         return platform
