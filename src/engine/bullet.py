@@ -56,8 +56,7 @@ class Bullet :
                 self.changex = -self.speed
                 self.direction = "left"
         elif direction :
-            theta = (direction[0]) // math.sqrt(((direction[0]*direction[0]) + (direction[1]*direction[1])))
-            self.direction = 180 - theta
+            self.direction = math.degrees(math.atan2(-direction[1], direction[0]))
             self.changex = direction[0] // 40
             self.changey = direction[1] // 30
 
@@ -92,7 +91,7 @@ class Bullet :
         elif self.direction == "left":
             self.image = pygame.transform.flip(self.asset[int(self.current_frame)], True, False ) #left_facing image
         else :
-            self.image = pygame.transform.rotate(self.asset[int(self.current_frame)], int(self.direction))
+            self.image = pygame.transform.rotate(self.asset[int(self.current_frame)], self.direction)
     def check_enemy_collision (self) :
         if self.is_fired == True and self.type != "freeze": 
             if self.game.level.enemies : 
