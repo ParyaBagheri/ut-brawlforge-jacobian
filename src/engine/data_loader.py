@@ -12,6 +12,7 @@ def get_level_data(name, game):
         enemies = pygame.sprite.Group()
         enemies.add(Bomber(game, 900, 450))
         enemies.add(Bomber(game, 1700, 296 - 50))
+        enemies.add(Bomber(game, 3000, 450))
         return{
             "map" : AssetManager.map_image["forest"] ,
             "background_layers" : {AssetManager.backgrounds["forest"]},
@@ -41,6 +42,8 @@ def get_level_data(name, game):
             ]
         }
     elif name == "desert":
+        enemies = pygame.sprite.Group()
+        enemies.add(Bomber(game,650 , 350))
         return{
             "map" : AssetManager.map_image["desert"] ,
             "background_layers" : {
@@ -79,7 +82,7 @@ def get_level_data(name, game):
                 Platform(game, 5648, 200, 344, 400) 
                 #Finish Line at 6000
             ],
-            "enemies" : [],
+            "enemies" : enemies,
             "powerups" : [
                 Powerup(game, 1200, 350, 'shield'),
                 Powerup(game, 2300, 400, 'damageboost'),
