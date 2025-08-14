@@ -146,7 +146,7 @@ class Freezerenemy(Enemy) :
             self.activation_timer = 0
         if self.activated :
             self.activation_timer += 1
-            if self.activation_timer % 180 == 0:
+            if self.activation_timer % 200 == 0:
                 self.state = "attack"
                 self.shoot()
             if self.health <= 0 :

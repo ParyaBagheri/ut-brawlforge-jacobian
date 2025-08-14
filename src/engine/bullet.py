@@ -57,8 +57,8 @@ class Bullet :
                 self.direction = "left"
         elif direction :
             self.direction = math.degrees(math.atan2(-direction[1], direction[0]))
-            self.changex = direction[0] // 40
-            self.changey = direction[1] // 30
+            self.changex = direction[0] // 24
+            self.changey = direction[1] // 18
 
 
 

@@ -232,7 +232,7 @@ class Player:
                     self.is_invincible = True
 
             self.check_horizontal_collision(platforms)
-            if enemies : self.check_enemy_collision(enemies)
+            if enemies and self.is_invincible == False : self.check_enemy_collision(enemies)
             self.check_powerup_collision(powerups)
             #if self.game.mode == "multiplayer":
             self.check_bullet_collision()
@@ -260,7 +260,7 @@ class Player:
                     self.slowing_timer = 0
             if self.is_frozen :
                 self.frozen_timer += 1
-                if self.frozen_timer >= 120:
+                if self.frozen_timer >= 100:
                     self.is_frozen = False 
                     self.frozen_timer = 0
 
@@ -451,7 +451,7 @@ class Player:
                 if self.rect.colliderect(bullet.rect) and bullet.owner != self:
 
                     bullet.player_collision = True
-                    if self.main :
+                    if self.main and self.is_invincible == False:
                         self.health -= bullet.damage
                     if bullet.type == "freeze" :
                         self.is_frozen = True

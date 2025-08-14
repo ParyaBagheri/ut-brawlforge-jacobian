@@ -44,6 +44,9 @@ def get_level_data(name, game):
     elif name == "desert":
         enemies = pygame.sprite.Group()
         enemies.add(Bomber(game,650 , 350))
+        enemies.add(Freezerenemy(game, 4500, 106))
+        enemies.add(Bomber(game, 1950, 254))
+        enemies.add(Bomber(game, 5900, 150))
         return{
             "map" : AssetManager.map_image["desert"] ,
             "background_layers" : {
@@ -93,8 +96,11 @@ def get_level_data(name, game):
         }
     elif name == "lost_city":
         enemies = pygame.sprite.Group()
-        enemies.add(Freezerenemy(game, 2600, 50))
-        enemies.add(Freezerenemy(game, 4300, 50))
+        enemies.add(Freezerenemy(game, 2600, 10))
+        enemies.add(Freezerenemy(game, 4400, 50))
+        enemies.add(Bomber(game, 2350, 302))
+        enemies.add(Bomber(game, 3950, 302))
+        enemies.add(Freezerenemy(game, 5650, 50))
         return{
             "map" : AssetManager.map_image["lost_city"] ,
             "background_layers" : {AssetManager.backgrounds["lost_city"]},
@@ -135,7 +141,7 @@ def get_level_data(name, game):
             ],
             "enemies" : enemies,
             "powerups" : [
-                Powerup(game, 1150, 200, 'shield'),
+                Powerup(game, 1300, 200, 'shield'),
                 Powerup(game, 2850, 50, 'health'),
                 Powerup(game, 4150, 250, 'doublejump'),
                 Powerup(game, 5300, 300, 'shield'),
@@ -143,6 +149,17 @@ def get_level_data(name, game):
             ]
         }
     elif name == "underwater":
+        enemies = pygame.sprite.Group()
+        enemies.add(Bomber(game, 1330, 278))
+        enemies.add(Freezerenemy(game, 2000, 50))
+        enemies.add(Bomber(game, 3800, 446))
+        enemies.add(Bomber(game, 4640, 198))
+        enemies.add(Freezerenemy(game, 7000, 50))
+        enemies.add(Bomber(game, 8150, 150))
+        enemies.add(Bomber(game, 10350, 398))
+        enemies.add(Freezerenemy(game, 11400, 50))
+        enemies.add(Freezerenemy(game, 12800, 50))
+
         return{
             "map" : AssetManager.map_image["underwater"] ,
             "background_layers" : {AssetManager.backgrounds["underwater"]},
@@ -200,7 +217,7 @@ def get_level_data(name, game):
                 Platform(game, 14104, 296, 1900, 48) # Finish platform
 
             ],
-            "enemies" : [],
+            "enemies" : enemies,
             "powerups" : [
                 Powerup(game, 900, 300, 'damageboost'),
                 Powerup(game, 1600, 250, 'shield'),
