@@ -17,7 +17,7 @@ BULLET_SPEED = {
     "arrow" : 20 ,
     "fireball" : 25 ,
     "freeze" : 25,
-    "radio_wave" : 15
+    "radio_wave" : 18
 }
 BULLET_DAMAGE = 1
 BULLET_SIZE ={
@@ -35,7 +35,7 @@ WEAPONS = {
 SHOOT_FRAME = {
     "bow" : 2 ,
     "wand" : 4,
-    "antenna" : 0
+    "antenna" : 1
 }
 BULLET_FRAMES_SPEED = 0.45
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
