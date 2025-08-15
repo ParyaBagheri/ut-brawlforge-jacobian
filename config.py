@@ -35,7 +35,7 @@ WEAPONS = {
 SHOOT_FRAME = {
     "bow" : 2 ,
     "wand" : 4,
-    "antenna" : 1
+    "antenna" : 0
 }
 BULLET_FRAMES_SPEED = 0.45
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
