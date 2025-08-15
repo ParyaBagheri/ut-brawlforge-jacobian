@@ -7,6 +7,9 @@ from src.engine.player import Player
 from src.engine.protocols import Protocol 
 class Client :
     def __init__(self,game, nickname,character_type,request_type):
+
+        # Initialize client with game reference and player information
+
         self.host = 'ca066243-4d3c-4eb5-b63d-98aba8e5c22f.hsvc.ir'
         self.port = 31118
         self.status = {
@@ -26,7 +29,6 @@ class Client :
             "team" : None,
         }
         self.request_type = request_type
-        #self.players_count = 0
         self.team = None
         self.player = None
         self.game = game
@@ -35,8 +37,9 @@ class Client :
         self.buffer = ""
         self.is_connected = False
         self.invitations = []
-        self.search_resualt = None
-        self.game_style = None
+        self.search_resualt = None  #List of received game invitations
+        self.game_style = None # Type of game (local, invite, etc.)
+
     def start (self):
         try:
             self.socket.connect((self.host,self.port))
@@ -52,12 +55,12 @@ class Client :
             print("connection error", e)
             traceback.print_exc()
             return
+        
+        # Start thread for receiving server messages
         recieve_thread = threading.Thread(target=self.recieve)
-        #update_thread = threading.Thread(target=self.update_status)
         recieve_thread.start()
-        #update_thread.start()
+        
         if not self.is_connected :
-            print ("keyboard interrupt")
             self.send(Protocol.Request.DISCONNECTED,self.info["id"])
             self.socket.close()
    
@@ -66,12 +69,15 @@ class Client :
     def recieve(self):
         while self.is_connected :  
             try : 
+                # Receive data from server
                 chunck = self.socket.recv(1024).decode('utf-8')
                 self.buffer += chunck
+                # Process complete messages (delimited by newline)
                 while '\n' in self.buffer :
                     line,self.buffer = self.buffer.split('\n', 1)
                     line = json.loads(line)
-                    
+
+                    # Handle different message types from server
                     if line.get("type") == Protocol.Response.SETUP :
                         print("recieved1")
                         if line.get("data") == "Enter your nickname" :
@@ -81,53 +87,63 @@ class Client :
                             self.send(Protocol.Request.CHAR_TYPE,self.info["character_type"])
                         elif line.get("data") == "Choose game mode" :
                             self.send(Protocol.Request.MATCHMAKING, self.request_type)
+
                     elif line.get("type") == Protocol.Response.ID:
                         self.info["id"] = line.get("data")
                         self.status["id"] = line.get("data")
                         self.player = Player(self.game, self.info["character_type"],100, self.info["id"],self.info["nickname"])
                         self.game.player = self.player
+
                     elif line.get("type") == Protocol.Response.TEAM:
                         self.info["team"] = line.get("data")
                         self.player.team = self.info["team"]
+
                     elif line.get("type") == Protocol.Response.GAME_STYLE :
                         while True :
+
                             if self.game_style == "local_game" :
                                 self.send(Protocol.Request.LOCAL_GAME, "")
                                 break
+
                             elif self.game_style == "invite_game" :
                                 self.send(Protocol.Request.INVITE_GAME,"")
                                 print("invite game")
                                 break
+
                     elif line.get("type") == Protocol.Response.START :
                         self.game.state = "playing"
                         print ("recieved start")
+
                     elif line.get("type") == Protocol.Response.UPDATE :
                         self.update_other_players (line.get("data"))
+
                     elif line.get("type") == Protocol.Response.OPPONENT :
                         self.add_other_players( line.get("data"))
                         print ("other player func")
+
                     elif line.get("type") == Protocol.Response.POWERUP_SPAWNED :
                         self.game.powerup_spawner(line.get("data"))
+
                     elif line.get("type") == Protocol.Response.POWERUP_PICKED :
                         self.game.powerup_killer(line.get("data"))
+
                     elif line.get("type") == Protocol.Response.OPPONENT_LEFT :
                         for player in self.other_players :
                             if isinstance(player, Player) :
-                                if player.id == line.get("data") :
+                                if player.id == line.get("data") and not player.is_dead:
                                     print(player.id )
                                     print("left")
                                     self.other_players.remove(player)
                                     self.game.other_players = self.other_players
                                     self.game.state = "won"
+                                    
                     elif line.get("type") == Protocol.Response.SEND_INVITE :
                         print ("invitation recieved")
                         self.invitations.append(line.get("data"))
+
                     elif line.get("type") == Protocol.Response.SEARCH_RESAULT :
                         self.search_resualt = line.get("data")
-                    '''elif line.get("type") == Protocol.Response.WINNER :
-                        if self.game.state == "playing":
-                            self.game.state = "won"
-                            #self.game.win_screen()'''
+
             except KeyboardInterrupt :
                 print ("keyboard interrupt")
                 self.send(Protocol.Request.DISCONNECTED,self.info["id"])
@@ -141,18 +157,19 @@ class Client :
                 self.socket.close()
                 return
         if not self.is_connected :
-            print ("keyboard interrupt")
+            
             self.send(Protocol.Request.DISCONNECTED,self.info["id"])
             self.socket.close()
 
     def add_other_players (self, other_players_info):
         try:
-            # Add new players to the client's player_list 
+            # Create player objects for other players in the game
             for player_info in other_players_info:
+                # Add new players to the client's player_list
                 self.other_players.append(Player(self.game, player_info["character_type"],100, player_info["id"],player_info["nickname"], player_info["team"]))
             self.game.other_players = self.other_players
         except Exception as e:
-            print("error2", e)
+            print("error", e)
             traceback.print_exc()
     
     def update_other_players(self,data) :        
@@ -164,6 +181,7 @@ class Client :
                     player.sync_remote_player(data)
 
     def update_status (self) :
+        # Update and send the local player's status to the server
         if self.is_connected :
             try:
                 if self.game.state == "playing" and self.player != None :
@@ -191,6 +209,7 @@ class Client :
             print ("keyboard interrupt")
             self.send(Protocol.Request.DISCONNECTED,self.info["id"])
             self.socket.close()
+
     def send (self, type, data):
         message = {
             "type" : type ,
@@ -198,7 +217,9 @@ class Client :
         }
         message = json.dumps(message) + "\n"
         self.socket.sendall(message.encode('utf-8'))
+
     def new_look(self,nickname,character_type,request_type):
+        # Change player's appearance and restart matchmaking
         print ("new look func")
         self.other_players = []
         self.game_style = None
@@ -208,11 +229,14 @@ class Client :
         self.player = Player(self.game, self.info["character_type"],100, self.info["id"],self.info["nickname"])
         self.game.player = self.player
         self.send(Protocol.Request.NEW_LOOK,"")
+
     def accept_invite (self,invitation):
+        # Accept a received game invitation
         self.send(Protocol.Request.ACCEPT_INVITE, invitation)
         self.invitations.remove(invitation)
+
     def send_invite(self,id):
-        print ("sending invite")
+        # Send a game invitation to another player
         self.send(Protocol.Request.SEND_INVITE, int(id))
         while True :
             try:

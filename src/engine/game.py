@@ -319,7 +319,7 @@ class Game:
         CHAR_1 = Button(self, AssetManager.player_images["knight"]["idle"], [self.screen_width//4,self.screen_height//2], "knight",'OCRAEXT', 40, (0, 38, 21), (0, 89, 21))
         CHAR_2 = Button(self, AssetManager.player_images["girl"]["idle"], [3 *self.screen_width//4, self.screen_height//2], "girl", 'OCRAEXT', 40, (117, 96,0), (42, 32, 0))
         CHAR_3 = Button(self, AssetManager.player_images["wizard"]["idle"], [self.screen_width//4, 5 * self.screen_height//6], "wizard","OCRAEXT", 40, (255, 181, 118), (81, 1, 109))
-        CHAR_4 = Button(self, AssetManager.player_images["TV"]["idle"], [3 *self.screen_width//4, 5 * self.screen_height//6], "TV","OCRAEXT", 40, (255, 181, 118), (81, 1, 109))
+        CHAR_4 = Button(self, AssetManager.player_images["TV"]["idle"], [3 *self.screen_width//4, 5 * self.screen_height//6], "TV","OCRAEXT", 40, (0, 13, 72), (229, 134, 169))
         CHAR_MENU_MOUSE_POS = pygame.mouse.get_pos
 
         character_type = None
@@ -506,10 +506,6 @@ class Game:
         return False
 
     def map_menu(self):
-        #self.screen.fill((22, 15, 133))
-        #self.screen.fill((246, 231, 143))
-        #self.screen.fill((123, 145, 155))
-        #self.screen.fill((242, 239, 131))
         background = pygame.image.load(background_path)
         background = pygame.transform.scale(background, (800,600))
         self.screen.blit(background, (0,0))
@@ -979,12 +975,10 @@ class Game:
         GAME_MOUSE_POS = pygame.mouse.get_pos
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                if self.state == "multiplayer" and self.client != None:
+                    self.client.is_connected = False
                 pygame.quit()
-                sys.exit()
-            #elif event.type == pygame.VIDEORESIZE:
-                # Resize window and update dimensions
-                #self.screen = pygame.display.set_mode((event.w, event.h), pygame.RESIZABLE)
-                #self.update_dimensions()
+                sys.exit()    
             elif ((event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE) or 
                   (event.type == pygame.MOUSEBUTTONDOWN and self.PAUSE_BUTTON.is_pressed(GAME_MOUSE_POS()))) and \
                     self.state != "gameover" and self.mode == "single_player":
@@ -1008,33 +1002,13 @@ class Game:
                 self.restart()
 
     def update(self):
-        #if self.isGameover == False and self.is_paused == False:
+        
         if self.state == "playing" and self.level != None:
             if self.mode != "multiplayer" and self.level.won() :
                 self.state = "won"
             if self.mode == "multiplayer" and self.mp_win():
                 self.state == "won"
-            '''if self.mode == "multiplayer" :
-                #if self.player.is_dead :
-                    #self.player.reset()
-                    #self.lose_screen()
-                if self.other_players :
-                    for player in self.other_players :
-                        if not player.is_dead:
-                            break
-                    #if not self.player.is_dead :
-                        #self.player.reset()
-                        #self.win_screen()'''
-
-        
-            '''if self.mode == "multiplayer" :
-                if self.level.won():
-                    self.player.reset()
-                    self.win_screen()
-                if self.level.lost() :
-                    self.player.reset()
-                    self.lose_screen()'''
-                #self.other_player.update(self.level.platforms, self.enemies, self.level.powerups)
+          
             if self.mode == "single_player" :
                 self.player.update(self.level.platforms, self.level.powerup_group, self.level.enemies)
             elif self.mode == "multiplayer" :
@@ -1060,22 +1034,8 @@ class Game:
                 if isinstance(bullet, Bullet) :
                     bullet.update()
 
-            # Remove dead enemies and spawn new ones 
-            '''if self.level.enemies :       
-                for enemy in self.level.enemies:
-                    if not isinstance(enemy, Bomber) :
-                        
-                        if enemy.rect.x <= 0 + self.camera_x or enemy.health <= 0 or self.isGameover == True :
-                            enemy.kill()
-                            new_enemy = Enemy(self)
-                            self.level.enemies.add(new_enemy)'''
-
             # spawning random powerups :
             if self.mode == "multiplayer":
-                '''current_time = time.time()
-                if current_time - self.last_powerup_spawn > self.powerup_spawn_interval:
-                    self.spawn_random_powerup()
-                    self.last_powerup_spawn = current_time'''
                 for powerup in self.level.powerup_group :
                     powerup.update()
 
@@ -1085,27 +1045,13 @@ class Game:
 
     def draw(self):
         self.screen.fill((135, 206, 235))  # Sky blue background
-        '''if self.level.background_layers is not None:
-            for image, scroll_factor in self.level.background_layers :
-                offset = int(self.camera_x * scroll_factor)
-                scaled_image = pygame.transform.scale(image, (self.screen_width, self.screen_height))
-                image_width = scaled_image.get_width()
-                start_x = -offset % image_width
-                #self.screen.blit(scaled_image, (-offset, 0))
-            for i in range(-1, self.screen_width // image_width + 2):
-                self.screen.blit(scaled_image, (start_x + i * image_width, 0))
-'''     
+    
         self.screen.blit(self.level.background_layers,(0 - int(self.camera_x/10), 0))
         # Draw platforms and ground
         for platform in self.level.platforms:
             if isinstance(platform, Platform) and platform.visible == True:
                 platform.draw(self.screen, self.camera_x)
-            '''elif not isinstance(platform, Platform) :
-                pygame.draw.rect(self.screen, (34, 139, 34), 
-                               pygame.Rect(platform.x - self.camera_x, 
-                                          platform.y, 
-                                          platform.width, 
-                                          platform.height))'''
+            
         # Draw map
         if self.level.map != None:
             self.screen.blit(self.level.map,( 0 - self.camera_x , 0))
@@ -1155,13 +1101,7 @@ class Game:
         if self.state == "won" :
             if self.mode == "multiplayer" :
                 self.win_screen()
-        # Show loading screen 
-        '''if self.is_started == False:
-            self.screen.fill((0,0,0))
-            loadingscreen_text = loadingscreen_font.render("Press space to start the game!", True, 'white')
-            ls_text_rect = loadingscreen_text.get_rect()
-            ls_text_rect.center = (self.screen_width //2, self.screen_height //2)
-            self.screen.blit(loadingscreen_text, ls_text_rect)'''
+       
 
     def draw_enemies(self):
         if self.level.enemies:

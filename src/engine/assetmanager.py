@@ -3,7 +3,7 @@ import sys
 import config
 
 class AssetManager :
-    
+    # Dictionaries to store various game assets like images and sounds
     player_images = {}
     enemy_assets = {}
     bullet_assets = {}
@@ -14,7 +14,8 @@ class AssetManager :
     UI_images = {}
     UI_sounds = {}
     powerups_images ={}
-
+    
+    # Extract individual frames from a sprite sheet
     def load_frames(sheet,frame_width,frame_hight ,startpoint, numframes):
         frames = []
         for i in range (numframes) :
@@ -23,6 +24,8 @@ class AssetManager :
             frames.append(frame)
 
         return frames
+    
+    # Scale a list of frames to a new width and height
     def scale_frames(frames,width, height) :
         newframes = []
         for i in range (len(frames)):

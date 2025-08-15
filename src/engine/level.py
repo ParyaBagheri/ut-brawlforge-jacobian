@@ -6,9 +6,6 @@ class Level:
         self.name = name
         self.game = game
         self.width = width
-        #self.tilemap = Tiledmap(f"src/assets/tiles and maps/{name}.tmx")
-        #self.platforms = platforms
-        #self.entities = entities
         self.background_layers = []
         self.platforms = []
         self.enemies = []
@@ -29,7 +26,6 @@ class Level:
         self.enemies_group = data["enemies"]
         print(f"[DEBUG] Loaded powerups: {len(self.powerups)}")
         self.enemies = data["enemies"]
-        #self.player = data["player"]
     def won(self):
         if self.winFunc is None:
             return False

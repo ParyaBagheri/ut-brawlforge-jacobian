@@ -261,6 +261,7 @@ def get_level_data(name, game):
                 #Platform(self, 3050, 560 - config.BASE_GROUND_HEIGHT, 50, 40, 'bouncy')
                 game.ground_rect
             ],
+            "enemies" : [],
             "powerups" : []
             
         }

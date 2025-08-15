@@ -14,11 +14,10 @@ class Server:
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server.bind((self.host, self.port))
         self.server.listen()
-
+        # Client data storage dictionaries
         self.client_names = {}
         self.client_modes = {}
         self.client_characters = {}
-        #self.client_ids = []
         self.client_ids = {}
         self.ids = {}
         self.id_lock = Lock()
@@ -29,8 +28,9 @@ class Server:
         self.teams = {}
 
     def start(self):
+        # Start the server's main listening loop
         print("server started.")
-        self.start_powerup_spawner()
+        self.start_powerup_spawner() # Start powerup spawning thread
         try :
             while True :
                 buffer = ""
@@ -39,6 +39,7 @@ class Server:
                 client.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, 65536)
                 client.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 65536)
                 print(f"connected with {address}")
+                # Start new thread to handle client
                 thread = threading.Thread(target=self.handle, args=(client,buffer,))
                 thread.start()
         except KeyboardInterrupt:
@@ -46,12 +47,13 @@ class Server:
             self.server.close()
     
     def handle(self, client,buffer):
+        # Main handler for a client connection
         self.handle_connect(client)
         self.wait_for_room(client)
         connection = True
         while connection :
             try :
-                
+                # Receive and process client messages
                 data = client.recv(1024).decode("utf-8")
                 if not data :
                     break
@@ -64,7 +66,8 @@ class Server:
                 print("????",e)
                 traceback.print_exc()
                 break
-        
+
+        # Handle client disconnection
         self.broadcast(Protocol.Response.OPPONENT_LEFT,self.client_ids[client] , client)
         self.disconnect(client)
 
@@ -152,7 +155,8 @@ class Server:
         print("user defined")
  
     def id_generator(self, client):
-        with self.id_lock : # Guarantees unique IDs
+        # Generate a unique ID for a client (thread-safe)
+        with self.id_lock : 
             while True :
                 id = random.randint(10000, 99999)
                 if id not in self.client_ids.values():
@@ -168,6 +172,7 @@ class Server:
             
 
     def start_powerup_spawner(self):
+        # Background thread to spawn powerups in all active rooms
         def spawner_loop():
             while True : 
                 time.sleep(3)
@@ -182,6 +187,7 @@ class Server:
         thread.start()
 
     def match_players(self):
+        # Match waiting players into game rooms based on mode
         modes = {"1v1" : [], "2v2" : []}
         for client, mode in self.waiting_clients:
             modes[mode].append(client)
@@ -204,6 +210,7 @@ class Server:
                 self.waiting_clients = remaining_clients
     
     def create_room(self, clients):
+        # Create a new game room with the given clients
         print("creato room func")
         team_ids = [1,2] * (len(clients)//2)
         teams = dict(zip(clients, team_ids))
@@ -214,7 +221,6 @@ class Server:
         for client in clients :
             self.send(Protocol.Response.TEAM, teams[client], client)
             print(f"sent protocol team {self.teams[client]}")
-            #opponents = [self.client_names[c] for c in clients if c != client]
             opponents = []
             for c in clients :
                 if c != client :
@@ -235,11 +241,13 @@ class Server:
         print("room created and start protocol sent")
 
     def wait_for_room(self, client):
+        # Wait until client is placed in a game room
         while client not in self.rooms :
             print("waiting for room")
             time.sleep(1)
 
     def handle_recieve(self, message, client):
+        # Handle incoming messages from clients
         r_type = message.get("type")
         data = message.get("data")
         room = self.rooms.get(client)
@@ -250,24 +258,17 @@ class Server:
                 return False
                 
             elif r_type == Protocol.Request.MOVE:
+                # Update and broadcast player movement
                 room.update_player_state(client, data)
                 self.broadcast(Protocol.Response.UPDATE, data, client)
+
             elif r_type == Protocol.Request.POWERUP :
                 if data in room.pending_powerups:
                     room.register_powerup(data)
                     room.pending_powerups.remove(data)
                     self.broadcast(Protocol.Response.POWERUP_PICKED, data, client)
 
-            '''if room.is_finished():
-                loser = room.losing_team
-                winner = [t for t in room.team_health if t != loser][0]
-                #print("[SERVER] Match ended. Sending WINNER/LOSER...")
-
-                for c in room.clients :
-                    if self.teams[c] == winner :
-                        self.send(Protocol.Response.WINNER, None, c)
-                    else :
-                        self.send(Protocol.Response.LOSER, None, c)'''
+            
             if r_type == Protocol.Request.NEW_LOOK :
                 print("New look")
                 self.teams.pop(client, None)
@@ -276,10 +277,12 @@ class Server:
                 self.client_characters.pop(client,None)
                 self.client_gamestyles.pop(client,None)
                 self.client_invites.pop(client,None)
+                # Restart connection process
                 self.handle_connect(client) 
         return True
 
     def send(self, r_type, data, client):
+        # Send a message to a specific client
         try :
             messege = {"type" : r_type, "data" : data}
             client.send((json.dumps(messege) + "\n").encode("utf-8"))
@@ -287,6 +290,7 @@ class Server:
             print(f"[SEND ERROR]: {e}")
 
     def broadcast(self, r_type, data, sender):
+        # Broadcast a message to all other clients in the sender's room
         room = self.rooms.get(sender)
         if room :
             for client in room.clients :
@@ -294,6 +298,7 @@ class Server:
                     self.send(r_type, data, client)
     
     def disconnect(self, client):
+        # Clean up after a disconnected client
         room = self.rooms.get(client)
         if room :
             room.clients.remove(client)

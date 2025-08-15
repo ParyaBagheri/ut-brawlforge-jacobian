@@ -11,11 +11,7 @@ class Player:
     def __init__(self, game,character_type, start_x=100, id = None, nickname = None, team = None):
         self.game = game
         self.color = (255, 0, 0)  # Player color (red)
-        '''if image:
-            self.image = image
-        else:
-            self.image = pygame.Surface((50, 80))
-            self.image.fill(self.color)'''
+
         self.velocity_y = 0
         self.on_ground = False
         self.health = config.MAX_PLAYER_HEALTH
@@ -31,10 +27,9 @@ class Player:
         self.is_frozen = False
         self.frozen_timer = 0
 
-
-        # player's asset managing
         #sounds
         self.sound_effects = AssetManager.player_sounds
+        # Flags to trigger sound effects
         self.mute = False
         self.damage_sound = False
         self.attack_sound = False
@@ -42,30 +37,32 @@ class Player:
         self.collect_sound = False
         # images
         self.character_type = character_type
+        self.assets = AssetManager.player_images[character_type]
+        # Character assets and animation state
         self.state = "idle" 
         self.prev_state = "nothing"
-        self.assets = AssetManager.player_images[character_type]
         self.current_frame = 0
         self.image = self.assets[self.state][self.current_frame]
         self.rect = self.image.get_rect(topleft=(start_x, 0))
-        # type of weapon
-        self.weapon = config.WEAPONS[self.character_type]
-        # attack 
+        # attack  and shoot animations flag
         self.is_shooting = False
         self.attack_animation = False
-        # type of bullet 
+        # die animation 
+        self.is_dead = False
+
+        # Weapon and bullet type based on character
+        self.weapon = config.WEAPONS[self.character_type] 
         if self.weapon == "bow" :
             self.bullet_type = "arrow"
         elif self.weapon == "wand" :
             self.bullet_type = "fireball"
         elif self.weapon == "antenna" :
             self.bullet_type = "radio_wave"
-        # die animation 
-        self.is_dead = False
+        
 
         self.held_bullet = Bullet(self, self.bullet_type) # Create a bullet that follows the player (not fired yet)
         self.held_bullet.owner = self
-
+        # Powerup handling
         self.max_jumps = 1
         self.jump_count = 0
         self.jumped = False
@@ -74,7 +71,7 @@ class Player:
         # MULTIPLAYER
         self.id = id
         self.nickname = nickname
-        self.main = True
+        self.main = True # True if this player is the main local player
         self.team = team
 
     def check_vertical_collision(self, platforms):
@@ -92,7 +89,7 @@ class Player:
                         self.on_ground = True
                         landed_on = platform
                         self.jump_count = 0
-                        #return platform
+                        
                         break
                 elif not isinstance(platform, Platform):
                     if (self.rect.bottom + self.velocity_y > platform.top and
@@ -104,7 +101,7 @@ class Player:
                         self.on_ground = True
                         self.jump_count = 0
                         break
-                        #return platform
+                        
 
         # Check vertical collision (jumping)
         for platform in platforms:
@@ -133,20 +130,26 @@ class Player:
 
 
     def check_horizontal_collision(self,platforms):
+        # Check horizontal collision (when moving right)
         for platform in platforms :
             if isinstance(platform, Platform) and platform.visible:
                 if(self.rect.top > platform.rect.top and
                     self.rect.bottom < platform.rect.bottom) :
+
+                    # Check horizontal collision (when moving right)
                     if(self.direction == "right" and
                        self.rect.right >= platform.rect.left and self.rect.right <= platform.rect.right):
                         self.rect.right = platform.rect.left
                         self.collision_direction = "right"
                         return platform
+                    
+                    # Check horizontal collision (when moving left)
                     elif(self.direction == "left" and
                         self.rect.left <=  platform.rect.right and self.rect.left >= platform.rect.left):
                         self.rect.left = platform.rect.right
                         self.collision_direction = "left"
                         return platform
+                    
                 self.collision_direction = "none"
         return None
 
@@ -193,8 +196,12 @@ class Player:
 
     def update(self, platforms, powerups, enemies=None):
         keys = pygame.key.get_pressed()
+
+        # Update animations if player not dead
         if not self.is_dead:
             self.update_animation(keys)
+
+        # Player controls and physics update if not dying
         if self.state != "die" :
             if self.is_frozen == False:
                 # Horizontal movement
@@ -236,7 +243,6 @@ class Player:
             self.check_horizontal_collision(platforms)
             if enemies and self.is_invincible == False : self.check_enemy_collision(enemies)
             self.check_powerup_collision(powerups)
-            #if self.game.mode == "multiplayer":
             self.check_bullet_collision()
 
             # Temporary flickering after collision with an enemy
@@ -296,7 +302,10 @@ class Player:
             self.game.gameover()
 
     def update_animation (self, keys) :
-        prev_state = self.state
+
+        prev_state = self.state # Remember previous state for sounds
+
+        # Handle death animation and state
         if (self.health <= 0 or self.rect.y >= 600 ) :
             if self.state != "die" :
                 self.current_frame = 0
@@ -304,38 +313,43 @@ class Player:
             elif self.state == "die" and self.current_frame >= len(self.assets [self.state]) - (3 * config.PLAYER_FRAMES_SPEED) :
                 self.is_dead = True
 
+        # Attack animation
         elif self.attack_animation == True :
             if self.state != "attack" :
                 self.current_frame = 0
                 self.state = "attack"
             elif self.state == "attack" and self.current_frame >= len(self.assets [self.state]) - (2 * config.PLAYER_FRAMES_SPEED) :
                 self.attack_animation = False
+        # Idle state: no movement keys pressed and on ground
         elif (self.on_ground and ( not ( keys[pygame.K_a] or keys[pygame.K_d] or keys[pygame.K_UP] or keys[pygame.K_SPACE] ) ) ):
             if(self.state != "idle"):
                 self.current_frame = 0
                 self.state = "idle"
-
+        # Jumping
         elif ( (keys[pygame.K_UP] or keys[pygame.K_SPACE]) and self.on_ground) :
             self.current_frame = 0
             self.state = "jumping"
-
+        # Falling animation when in air and velocity_y > 0
         elif not self.on_ground :
 
             if(self.state != "falling" and self.velocity_y > 0) :
                 self.current_frame = 0
                 self.state = "falling"
-
+        # Running animation
         elif (keys[pygame.K_a] or keys[pygame.K_d]) and self.on_ground :
             if(self.state != "run" ): 
 
                 self.current_frame = 0
                 self.state = "run"
 
+        # Update image
         self.image = self.assets[self.state][int(self.current_frame)]
-
         self.current_frame += config.PLAYER_FRAMES_SPEED
+
+        # Loop animation frames if past last frame
         if(self.current_frame >= len(self.assets[self.state])) :
             self.current_frame = 0
+
         self.sound_manager(prev_state)
 
     def sound_manager(self, prev_state) :
@@ -391,15 +405,22 @@ class Player:
         self.held_bullet = Bullet(self, self.held_bullet.type)
         #self.held_bullet.owner = self
 
+
     def sync_remote_player (self, updated_status) :
+        # Set this player as not being the main player (controlled remotely)
         self.main = False
+        # Keep track of previous state for animation updates
         self.prev_state = self.state
+        # Update player status
         self.rect.x =  updated_status["x"]
         self.rect.y =  updated_status["y"]
         self.state = updated_status["state"]
         self.health = updated_status["health"]
         self.direction = updated_status["direction"]
+
     def update_remote_player(self):
+
+        # Only update if the player is not in a "die" state
         if self.state != "die":
             # Check collisions
             collided_platform = self.check_vertical_collision(self.game.level.platforms)
@@ -431,23 +452,35 @@ class Player:
                 self.attack_sound = True
                 self.shoot()
             self.held_bullet.update()
+        # Continue animation updates if player is still alive    
         if not self.is_dead :
             self.remote_players_animation_update()
+
     def remote_players_animation_update (self) :
+        # Reset animation frame if state changed
         if self.state !=  self.prev_state :
-            self.current_frame = 0 
+            self.current_frame = 0
+        # Handling die animation 
         if self.state == "die" and self.current_frame >= len(self.assets [self.state]) - (3 * config.PLAYER_FRAMES_SPEED) :
             self.is_dead = True
+
         self.current_frame += config.PLAYER_FRAMES_SPEED
+        # Loop back to start if animation is complete
         if(self.current_frame >= len(self.assets[self.state])) :
             self.current_frame = 0
+
         self.image = self.assets[self.state][int(self.current_frame)]
+
         self.remote_players_sound_manager()
     def remote_players_sound_manager(self) :
+        # Play attack sound if flagged
         if self.attack_sound :
             self.sound_effects["attack"].play()
             self.attack_sound = False
+
     def check_bullet_collision(self) : 
+
+        # Check if any fired bullet collides with this player
         for bullet in self.game.Fired_bullets_list :
             if isinstance(bullet,Bullet)  :
                 if self.rect.colliderect(bullet.rect) and bullet.owner != self:
