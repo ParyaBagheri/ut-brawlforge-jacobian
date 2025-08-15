@@ -16,22 +16,26 @@ PLAYER_FRAMES_SPEED = 0.15
 BULLET_SPEED = {
     "arrow" : 20 ,
     "fireball" : 25 ,
-    "freeze" : 25
+    "freeze" : 25,
+    "radio_wave" : 15
 }
 BULLET_DAMAGE = 1
 BULLET_SIZE ={
     "arrow" : (44, 15) ,
     "fireball" : (30, 21),
-    "freeze" : (30, 21)
+    "freeze" : (30, 21),
+    "radio_wave" : (15,36)
 }
 WEAPONS = {
     "knight" : "bow" ,
     "girl" : "bow" ,
-    "wizard" : "wand"
+    "wizard" : "wand",
+    "TV"  : "antenna" 
 }
 SHOOT_FRAME = {
     "bow" : 2 ,
-    "wand" : 4
+    "wand" : 4,
+    "antenna" : 1
 }
 BULLET_FRAMES_SPEED = 0.45
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))

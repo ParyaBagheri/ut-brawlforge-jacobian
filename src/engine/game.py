@@ -319,6 +319,7 @@ class Game:
         CHAR_1 = Button(self, AssetManager.player_images["knight"]["idle"], [self.screen_width//4,self.screen_height//2], "knight",'OCRAEXT', 40, (0, 38, 21), (0, 89, 21))
         CHAR_2 = Button(self, AssetManager.player_images["girl"]["idle"], [3 *self.screen_width//4, self.screen_height//2], "girl", 'OCRAEXT', 40, (117, 96,0), (42, 32, 0))
         CHAR_3 = Button(self, AssetManager.player_images["wizard"]["idle"], [self.screen_width//4, 5 * self.screen_height//6], "wizard","OCRAEXT", 40, (255, 181, 118), (81, 1, 109))
+        CHAR_4 = Button(self, AssetManager.player_images["TV"]["idle"], [3 *self.screen_width//4, 5 * self.screen_height//6], "TV","OCRAEXT", 40, (255, 181, 118), (81, 1, 109))
         CHAR_MENU_MOUSE_POS = pygame.mouse.get_pos
 
         character_type = None
@@ -326,6 +327,7 @@ class Game:
             CHAR_1.draw(CHAR_MENU_MOUSE_POS())
             CHAR_2.draw(CHAR_MENU_MOUSE_POS())
             CHAR_3.draw(CHAR_MENU_MOUSE_POS())
+            CHAR_4.draw(CHAR_MENU_MOUSE_POS())
 
         def char_menu_events():
             nonlocal character_type
@@ -364,6 +366,17 @@ class Game:
                             
                         elif self.mode == "multiplayer" :
                             character_type = "wizard"
+                            self.level = Level("multiplayer", self, 3200)
+                            self.state = "game_request_menu"
+                    
+                    elif CHAR_4.is_pressed(CHAR_MENU_MOUSE_POS()):
+                        
+                        if self.mode == "single_player" :
+                            self.player = Player(self, character_type='TV')
+                            self.state = "map_menu"
+                            
+                        elif self.mode == "multiplayer" :
+                            character_type = "TV"
                             self.level = Level("multiplayer", self, 3200)
                             self.state = "game_request_menu"
                             

@@ -58,6 +58,8 @@ class Player:
             self.bullet_type = "arrow"
         elif self.weapon == "wand" :
             self.bullet_type = "fireball"
+        elif self.weapon == "antenna" :
+            self.bullet_type = "radio_wave"
         # die animation 
         self.is_dead = False
 

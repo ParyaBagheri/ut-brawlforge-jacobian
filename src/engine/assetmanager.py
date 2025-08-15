@@ -109,6 +109,31 @@ class AssetManager :
         wizard_die_frames = AssetManager.load_frames(wizard_die_sheet, 16, 24, 0, 4)
         wizard_die_frames = AssetManager.scale_frames(wizard_die_frames, 50, 80 )
 
+        # TV character images
+        TV_idle_sheet = pygame.image.load("src/assets/images/player/TV/idle.png")
+        TV_idle_frames = AssetManager.load_frames(TV_idle_sheet,16,19,5,4)
+        TV_idle_frames = AssetManager.scale_frames(TV_idle_frames, 50, 80)
+
+        TV_run_sheet = pygame.image.load("src/assets/images/player/TV/run.png")
+        TV_run_frames = AssetManager.load_frames(TV_run_sheet,16,20,4,6)
+        TV_run_frames = AssetManager.scale_frames(TV_run_frames, 50, 80)
+
+        TV_jumping_sheet = pygame.image.load("src/assets/images/player/TV/jumping.png")
+        TV_jumping_frames = AssetManager.load_frames(TV_jumping_sheet,16,20,3,4)
+        TV_jumping_frames = AssetManager.scale_frames(TV_jumping_frames, 50, 80)
+
+        TV_falling_sheet = pygame.image.load("src/assets/images/player/TV/falling.png")
+        TV_falling_frames = AssetManager.load_frames(TV_falling_sheet,16,19,3,1)
+        TV_falling_frames = AssetManager.scale_frames(TV_falling_frames, 50, 80)
+
+        TV_attack_sheet = pygame.image.load("src/assets/images/player/TV/attack.png")
+        TV_attack_frames = AssetManager.load_frames (TV_attack_sheet, 16, 21, 3 ,4)
+        TV_attack_frames = AssetManager.scale_frames(TV_attack_frames, 50, 80)
+
+        TV_die_sheet = pygame.image.load("src/assets/images/player/TV/die.png")
+        TV_die_frames = AssetManager.load_frames(TV_die_sheet, 16, 20, 4, 4)
+        TV_die_frames = AssetManager.scale_frames(TV_die_frames, 50, 80 )
+
         AssetManager.player_images["knight"] = {
             "idle" : knight_idle_frames ,
             "run" : knight_run_frames ,
@@ -133,6 +158,15 @@ class AssetManager :
             "attack" : wizard_attack_frames ,
             "die" : wizard_die_frames
         }
+        AssetManager.player_images["TV"] = {
+            "idle" : TV_idle_frames ,
+            "run" : TV_run_frames ,
+            "jumping" : TV_jumping_frames ,
+            "falling" : TV_falling_frames ,
+            "attack" : TV_attack_frames ,
+            "die" : TV_die_frames
+        }
+
 
     def load_player_sounds ():
         
@@ -182,10 +216,16 @@ class AssetManager :
         freeze_bullet_sheet = pygame.image.load("src/assets/images/bullet/freeze.png")
         freeze_bullet_frames = AssetManager.load_frames(freeze_bullet_sheet,15, 5, 0 ,4)
         freeze_bullet_frames = AssetManager.scale_frames(freeze_bullet_frames, config.BULLET_SIZE ["fireball"][0],config.BULLET_SIZE["fireball"][1] )
+
+        radio_wave_sheet = pygame.image.load("src/assets/images/bullet/radio_wave.png")
+        radio_wave_frames = AssetManager.load_frames(radio_wave_sheet,15, 36, 0 ,4)
+        radio_wave_frames = AssetManager.scale_frames(radio_wave_frames, config.BULLET_SIZE ["radio_wave"][0],config.BULLET_SIZE["radio_wave"][1] )
+
         AssetManager.bullet_assets = {
             "arrow" : arrow_image ,
             "fireball" : fireball_frames,
-            "freeze" : freeze_bullet_frames
+            "freeze" : freeze_bullet_frames,
+            "radio_wave" : radio_wave_frames
         }
     def load_platform_images () :
         
