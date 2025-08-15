@@ -143,7 +143,9 @@ class Client :
 
                     elif line.get("type") == Protocol.Response.SEARCH_RESAULT :
                         self.search_resualt = line.get("data")
-
+                    if not self.is_connected :
+                        break
+                    
             except KeyboardInterrupt :
                 print ("keyboard interrupt")
                 self.send(Protocol.Request.DISCONNECTED,self.info["id"])

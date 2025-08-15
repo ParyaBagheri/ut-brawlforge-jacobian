@@ -253,6 +253,7 @@ class Server:
         room = self.rooms.get(client)
         if room :
             if r_type == Protocol.Request.DISCONNECTED :
+                self.broadcast(Protocol.Response.OPPONENT_LEFT,self.client_ids[client] , client)
                 print(self.client_ids[client])
                 print( "left")
                 return False
