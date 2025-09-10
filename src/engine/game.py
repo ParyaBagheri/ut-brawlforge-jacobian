@@ -1018,7 +1018,7 @@ class Game:
                     if isinstance(player,Player):
                         if player.is_dead :
                             self.other_players.remove(player)
-                            self.client.other_players.remove(player)
+                            
                         else :
                             player.update_remote_player()
             self.update_camera()
