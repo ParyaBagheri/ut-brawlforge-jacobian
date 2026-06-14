@@ -1,4 +1,11 @@
 # UT Brawlforge
+## My portion of works
+ - Modules
+  - Enemy, Platform, Powerup, and Data loader classes & related functions
+  - Map & level design and implementations
+  - Buttons & menus 
+  - Server , Room, and Protocols
+  - Docker files
 
 ## ساختار پروژه
 
